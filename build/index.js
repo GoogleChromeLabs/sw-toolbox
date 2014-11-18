@@ -1,0 +1,1 @@
+self.shed = require('../lib/shed.js');
