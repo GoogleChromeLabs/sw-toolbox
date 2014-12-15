@@ -38,7 +38,7 @@ shed.router.get('/shed-demo/:foo/:bar', shed.networkOnly);
 shed.router.get(':foo/:bar', shed.networkOnly);
 
 // At the moment, if the fetch is for a URL that doesn't match a route, you get
-// some default behaviour. The 'default default' is netowrkOnly, but you can
+// some default behaviour. The 'default default' is networkOnly, but you can
 // change it like so:
 shed.router.default = shed.cacheFirst;
 

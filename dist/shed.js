@@ -4,7 +4,7 @@ self.shed = require('../lib/shed.js');
 'use strict';
 
 var pathRegexp = require('path-to-regexp');
-var url = new URL('./', self.scope);
+var url = new URL('./', self.location);
 var baseUrl = url.protocol + '//' + url.host;
 var basePath = url.pathname;
 
@@ -74,6 +74,9 @@ Router.prototype.add = function(method, path, handler) {
 
 Router.prototype.matchMethod = function(method, url) {
   var routes = this.routes[method.toLowerCase()];
+  if (!routes) {
+    return null;
+  }
   var match, route;
   var paths = Object.keys(routes);
   for (var i = 0; i < paths.length; i++) {
@@ -102,8 +105,15 @@ var version = 1;
 var cachePrefix = 'shed-' + self.scope + '-';
 var cacheName = cachePrefix + version;
 var preCacheItems = [];
+var DEBUG = false;
 
 // Internal Helpers
+
+function debug(message) {
+  if (DEBUG) {
+    console.log('[shed] ' + message);
+  }
+}
 
 function openCache() {
   return caches.open(cacheName);
@@ -131,26 +141,24 @@ function fetchAndCache(request) {
 
 // Setup
 
-console.log('service worker is loading');
+debug('service worker is loading');
 
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 self.addEventListener('install', function(event) {
-  console.log('install event fired');
-  console.log('preCache list: ' + preCacheItems);
+  debug('install event fired');
+  debug('preCache list: ' + preCacheItems);
   event.waitUntil(
     openCache().then(function(cache) {
-      if (Array.isArray(preCacheItems)) {
-        return cache.addAll(preCacheItems);
-      }
+      return cache.addAll(preCacheItems);
     })
   );
 });
 
 self.addEventListener('activate', function(event) {
-  console.log('activate event fired, removing old caches');
+  debug('activate event fired, removing old caches');
   event.waitUntil(
     caches.keys().then(function(names) {
       return Promise.all(
@@ -200,25 +208,25 @@ setTimeout(function() {
 // Strategies
 
 function networkOnly(request) {
-  console.log('Trying network only');
+  debug('Trying network only');
   return networkFetch(request);
 }
 
 function networkFirst(request) {
-  console.log('Trying network first');
+  debug('Trying network first');
   return fetchAndCache(request).catch(function(error) {
-    console.log('Cache fallback');
+    debug('Cache fallback');
     return cacheFetch(request);
   });
 }
 
 function cacheOnly(request) {
-  console.log('Trying cache only');
+  debug('Trying cache only');
   return cacheFetch(request);
 }
 
 function cacheFirst(request) {
-  console.log('Trying cache first');
+  debug('Trying cache first');
   return cacheFetch(request).then(function (response) {
     if (response) {
       return response;
