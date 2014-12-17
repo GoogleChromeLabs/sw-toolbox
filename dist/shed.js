@@ -28,14 +28,14 @@ var Route = function(method, path, handler) {
 };
 
 Route.prototype.makeHandler = function(url) {
-    var match = this.regexp.exec(url);
-    var values = {};
-    this.keys.forEach(function(key, index) {
-      values[key.name] = match[index + 1];
-    });
-    return function(request) {
-      return this.handler(request, values);
-    }.bind(this);
+  var match = this.regexp.exec(url);
+  var values = {};
+  this.keys.forEach(function(key, index) {
+    values[key.name] = match[index + 1];
+  });
+  return function(request) {
+    return this.handler(request, values);
+  }.bind(this);
 };
 
 var Router = function() {
@@ -68,8 +68,10 @@ Router.prototype.any = function(path, handler) {
 };
 
 Router.prototype.add = function(method, path, handler) {
+  method = method.toLowerCase();
+  var route = new Route(method, path, handler);
   this.routes[method] = this.routes[method] || {};
-  this.routes[method][path] = new Route(method.toLowerCase(), path, handler);
+  this.routes[method][route.regexp.toString()] = route;
 };
 
 Router.prototype.matchMethod = function(method, url) {
@@ -107,6 +109,11 @@ var cacheName = cachePrefix + version;
 var preCacheItems = [];
 var DEBUG = false;
 
+// A regular expression to apply to HTTP response codes. Codes that match will
+// be considered successes, while others will not, and will not be cached.
+// TODO: Make this user configurable
+var SUCCESS_RESPONSES = /^0|([123]\d\d)|(40[14567])|410$/;
+
 // Internal Helpers
 
 function debug(message) {
@@ -131,9 +138,13 @@ function cacheFetch(request) {
 
 function fetchAndCache(request) {
   return networkFetch(request.clone()).then(function(response) {
-    openCache().then(function(cache) {
-      cache.put(request, response);
-    });
+
+    // Only cache successful responses
+    if (SUCCESS_RESPONSES.test(response.status)) {
+      openCache().then(function(cache) {
+        cache.put(request, response);
+      });
+    }
 
     return response.clone();
   });
@@ -214,8 +225,25 @@ function networkOnly(request) {
 
 function networkFirst(request) {
   debug('Trying network first');
-  return fetchAndCache(request).catch(function(error) {
-    debug('Cache fallback');
+  return fetchAndCache(request).then(function(response) {
+    if (SUCCESS_RESPONSES.test(response.status)) {
+      return response;
+    }
+
+    return cacheFetch(request).then(function(cacheResponse) {
+      debug('Response was an HTTP error');
+      if (cacheResponse) {
+        debug('Resolving with cached response instead');
+        return cacheResponse;
+      } else {
+        // If we didn't have anything in the cache, it's better to return the
+        // error page than to return nothing
+        debug('No cached result, resolving with HTTP error response from network');
+        return response;
+      }
+    });
+  }).catch(function(error) {
+    debug('Network error, fallback to cache');
     return cacheFetch(request);
   });
 }
@@ -232,7 +260,7 @@ function cacheFirst(request) {
       return response;
     }
 
-    return networkFetch(request);
+    return fetchAndCache(request);
   });
 }
 
@@ -241,9 +269,9 @@ function fastest(request) {
   var reasons = [];
 
   var maybeReject = function(reason) {
-    reasons.push(reason);
+    reasons.push(reason.toString());
     if (rejected) {
-      return Promise.reject(reasons);
+      return Promise.reject(new Error('Both cache and network failed: "' + reasons.join('", "') + '"'));
     }
     rejected = true;
   };
