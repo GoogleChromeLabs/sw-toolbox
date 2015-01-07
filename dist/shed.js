@@ -1,12 +1,77 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 self.shed = require('../lib/shed.js');
-},{"../lib/shed.js":3}],2:[function(require,module,exports){
+},{"../lib/shed.js":6}],2:[function(require,module,exports){
 'use strict';
 
-var pathRegexp = require('path-to-regexp');
+var CacheWrapper = function(name) {
+  this._name = name;
+  this._cache = null;
+};
+
+CacheWrapper.prototype.open = function() {
+  if (!this._cache) {
+    return caches.open(this._name).then(function(cache) {
+      this._cache = cache;
+      return cache;
+    }.bind(this));
+  } else {
+    return Promise.resolve(this._cache);
+  }
+};
+
+CacheWrapper.prototype.fetch = function(request) {
+  return this.open().then(function(cache) {
+    return cache.match(request);
+  });
+};
+
+CacheWrapper.prototype.put = function(request, response) {
+  return this.open().then(function(cache) {
+    cache.put(request, response);
+  });
+};
+
+CacheWrapper.prototype.add = function(requests) {
+  if (!Array.isArray(requests)) {
+    requests = [requests];
+  }
+  return this.open().then(function(cache) {
+    return cache.addAll(requests);
+  });
+};
+
+CacheWrapper.prototype.remove = function(request) {
+  return this.open().then(function(cache) {
+    cache.delete(request);
+  });
+};
+
+module.exports = CacheWrapper;
+},{}],3:[function(require,module,exports){
+'use strict';
+
+var version = 1;
+var cachePrefix = 'shed-' + self.scope + '-';
+
+module.exports = {
+	cacheName: cachePrefix + version,
+	cachePrefix: cachePrefix,
+	debug: false,
+	preCacheItems: [],
+	// A regular expression to apply to HTTP response codes. Codes that match will
+	// be considered successes, while others will not, and will not be cached.
+	successResponses: /^0|([123]\d\d)|(40[14567])|410$/,
+	version: version,
+};
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
 var url = new URL('./', self.location);
 var baseUrl = url.protocol + '//' + url.host;
 var basePath = url.pathname;
+var pathRegexp = require('path-to-regexp');
+
 
 var Route = function(method, path, handler) {
   // The URL() constructor can't parse express-style routes as they are not
@@ -37,6 +102,13 @@ Route.prototype.makeHandler = function(url) {
     return this.handler(request, values);
   }.bind(this);
 };
+
+module.exports = Route;
+
+},{"path-to-regexp":7}],5:[function(require,module,exports){
+'use strict';
+
+var Route = require('./route');
 
 var Router = function() {
   this.routes = {};
@@ -97,53 +169,36 @@ Router.prototype.match = function(request) {
 
 module.exports = new Router();
 
-},{"path-to-regexp":4}],3:[function(require,module,exports){
+},{"./route":4}],6:[function(require,module,exports){
 'use strict';
 
 require('serviceworker-cache-polyfill/lib/caches');
+var options = require('./options');
 var router = require('./router');
+var CacheWrapper = require('./cache-wrapper');
 
-var version = 1;
-var cachePrefix = 'shed-' + self.scope + '-';
-var cacheName = cachePrefix + version;
-var preCacheItems = [];
-var DEBUG = false;
-
-// A regular expression to apply to HTTP response codes. Codes that match will
-// be considered successes, while others will not, and will not be cached.
-// TODO: Make this user configurable
-var SUCCESS_RESPONSES = /^0|([123]\d\d)|(40[14567])|410$/;
+// The cache object is not created until the install event so that the name can
+// be changed.
+var cache = null;
 
 // Internal Helpers
 
 function debug(message) {
-  if (DEBUG) {
+  if (options.debug) {
     console.log('[shed] ' + message);
   }
 }
 
-function openCache() {
-  return caches.open(cacheName);
-}
-
-function networkFetch(request) {
+function fetch(request) {
   return fetch(request);
 }
 
-function cacheFetch(request) {
-  return openCache().then(function(cache) {
-    return cache.match(request);
-  });
-}
-
 function fetchAndCache(request) {
-  return networkFetch(request.clone()).then(function(response) {
+  return fetch(request.clone()).then(function(response) {
 
     // Only cache successful responses
-    if (SUCCESS_RESPONSES.test(response.status)) {
-      openCache().then(function(cache) {
-        cache.put(request, response);
-      });
+    if (options.successResponses.test(response.status)) {
+      cache.put(request, response);
     }
 
     return response.clone();
@@ -160,12 +215,9 @@ function isNumber(n) {
 
 self.addEventListener('install', function(event) {
   debug('install event fired');
-  debug('preCache list: ' + preCacheItems);
-  event.waitUntil(
-    openCache().then(function(cache) {
-      return cache.addAll(preCacheItems);
-    })
-  );
+  debug('preCache list: ' + options.preCacheItems);
+  cache = new CacheWrapper(options.cacheName);
+  event.waitUntil(cache.add(options.preCacheItems));
 });
 
 self.addEventListener('activate', function(event) {
@@ -174,9 +226,9 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(names) {
       return Promise.all(
         names.filter(function(name) {
-          if (name.indexOf(cachePrefix) === 0) {
-            var thisVersion = name.substring(cachePrefix.length);
-            if (isNumber(thisVersion) && thisVersion < version) {
+          if (name.indexOf(options.cachePrefix) === 0) {
+            var thisVersion = name.substring(options.cachePrefix.length);
+            if (isNumber(thisVersion) && thisVersion < options.version) {
               return true;
             }
           }
@@ -220,17 +272,17 @@ setTimeout(function() {
 
 function networkOnly(request) {
   debug('Trying network only');
-  return networkFetch(request);
+  return fetch(request);
 }
 
 function networkFirst(request) {
   debug('Trying network first');
   return fetchAndCache(request).then(function(response) {
-    if (SUCCESS_RESPONSES.test(response.status)) {
+    if (options.successResponses.test(response.status)) {
       return response;
     }
 
-    return cacheFetch(request).then(function(cacheResponse) {
+    return cache.fetch(request).then(function(cacheResponse) {
       debug('Response was an HTTP error');
       if (cacheResponse) {
         debug('Resolving with cached response instead');
@@ -244,18 +296,18 @@ function networkFirst(request) {
     });
   }).catch(function(error) {
     debug('Network error, fallback to cache');
-    return cacheFetch(request);
+    return cache.fetch(request);
   });
 }
 
 function cacheOnly(request) {
   debug('Trying cache only');
-  return cacheFetch(request);
+  return cache.fetch(request);
 }
 
 function cacheFirst(request) {
   debug('Trying cache first');
-  return cacheFetch(request).then(function (response) {
+  return cache.fetch(request).then(function (response) {
     if (response) {
       return response;
     }
@@ -285,22 +337,18 @@ function fastest(request) {
 // Caching
 
 function cache(url) {
-  return openCache().then(function(cache) {
-    return cache.add(url);
-  });
+  return cache.add(url);
 }
 
 function uncache(url) {
-  return openCache().then(function(cache) {
-    return cache.delete(url);
-  });
+  return cache.remove(url);
 }
 
 function precache(items) {
   if (!Array.isArray(items)) {
     items = [items];
   }
-  preCacheItems = items;
+  options.preCacheItems = items;
 }
 
 module.exports = {
@@ -311,11 +359,12 @@ module.exports = {
   fastest: fastest,
   router: router,
   cache: cache,
+  options: options,
   uncache: uncache,
   precache: precache
 };
 
-},{"./router":2,"serviceworker-cache-polyfill/lib/caches":5}],4:[function(require,module,exports){
+},{"./cache-wrapper":2,"./options":3,"./router":5,"serviceworker-cache-polyfill/lib/caches":8}],7:[function(require,module,exports){
 /**
  * Expose `pathtoRegexp`.
  */
@@ -484,7 +533,7 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 if (!Cache.prototype.add) {
   Cache.prototype.add = function add(request) {
     return this.addAll([request]);

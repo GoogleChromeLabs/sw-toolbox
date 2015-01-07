@@ -5,7 +5,9 @@ var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var jshint = require('gulp-jshint');
 
-gulp.task('default', function() {
+var sources = ['build/**/*.js', 'lib/**/*.js'];
+
+gulp.task('build', function() {
   var bundler = browserify({
     entries: ['./build/index.js']
   });
@@ -17,7 +19,13 @@ gulp.task('default', function() {
 });
 
 gulp.task('test', function () {
-    gulp.src(['build/**/*.js', 'lib/**/*.js', 'gulpfile.js'])
+    gulp.src(sources.concat('gulpfile.js'))
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'));
 });
+
+gulp.task('watch', function() {
+  gulp.watch(sources, ['default']);
+});
+
+gulp.task('default', ['test', 'build']);
