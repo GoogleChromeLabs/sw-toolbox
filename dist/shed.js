@@ -189,10 +189,6 @@ function debug(message) {
   }
 }
 
-function fetch(request) {
-  return fetch(request);
-}
-
 function fetchAndCache(request) {
   return fetch(request.clone()).then(function(response) {
 
@@ -205,13 +201,13 @@ function fetchAndCache(request) {
   });
 }
 
-// Setup
-
-debug('service worker is loading');
-
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
+
+// Setup
+
+debug('service worker is loading');
 
 self.addEventListener('install', function(event) {
   debug('install event fired');
