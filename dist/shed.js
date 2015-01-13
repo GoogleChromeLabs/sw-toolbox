@@ -50,8 +50,17 @@ module.exports = CacheWrapper;
 },{}],3:[function(require,module,exports){
 'use strict';
 
+// TODO: This is necessary to handle different implementations in the wild
+// The spec defines self.registration
+var scope;
+if (self.registration) {
+  scope = self.registration.scope;
+} else {
+  scope = self.scope || self.location;
+}
 var version = 1;
-var cachePrefix = 'shed-' + self.scope + '-';
+var cachePrefix = 'shed-' + scope + '-';
+
 
 module.exports = {
 	cacheName: cachePrefix + version,
@@ -67,23 +76,20 @@ module.exports = {
 },{}],4:[function(require,module,exports){
 'use strict';
 
+//TODO: Use self.registration.scope instead of self.location
 var url = new URL('./', self.location);
-var baseUrl = url.protocol + '//' + url.host;
 var basePath = url.pathname;
 var pathRegexp = require('path-to-regexp');
 
 
-var Route = function(method, path, handler) {
+var Route = function(method, path, handler, options) {
   // The URL() constructor can't parse express-style routes as they are not
   // valid urls. This means we have to manually manipulate relative urls into
   // absolute ones. This check is extremely naive but implementing a tweaked
   // version of the full algorithm seems like overkill
   // (https://url.spec.whatwg.org/#concept-basic-url-parser)
-  if (!(path.indexOf('http://') === 0 || path.indexOf('https://') === 0)) {
-    if (path.indexOf('/') !== 0) {
-      path = basePath + path;
-    }
-    path = baseUrl + path;
+  if (path.indexOf('/') !== 0) {
+    path = basePath + path;
   }
 
   this.method = method;
@@ -115,49 +121,40 @@ var Router = function() {
   this.default = null;
 };
 
-Router.prototype.get = function(path, handler) {
-  return this.add('get', path, handler);
-};
+['get', 'post', 'put', 'delete', 'head', 'any'].forEach(function(method) {
+  Router.prototype[method] = function(path, handler, options) {
+    return this.add(method, path, handler, options);
+  };
+});
 
-Router.prototype.post = function(path, handler) {
-  return this.add('post', path, handler);
-};
-
-Router.prototype.put = function(path, handler) {
-  return this.add('put', path, handler);
-};
-
-Router.prototype.delete = function(path, handler) {
-  return this.add('delete', path, handler);
-};
-
-Router.prototype.head = function(path, handler) {
-  return this.add('head', path, handler);
-};
-
-Router.prototype.any = function(path, handler) {
-  return this.add('any', path, handler);
-};
-
-Router.prototype.add = function(method, path, handler) {
+Router.prototype.add = function(method, path, handler, options) {
+  options = options || {};
+  var origin = options.origin || self.location.origin;
   method = method.toLowerCase();
-  var route = new Route(method, path, handler);
-  this.routes[method] = this.routes[method] || {};
-  this.routes[method][route.regexp.toString()] = route;
+  var route = new Route(method, path, handler, options);
+  this.routes[origin] = this.routes[origin] || {};
+  this.routes[origin][method] = this.routes[origin][method] || {};
+  this.routes[origin][method][route.regexp.toString()] = route;
 };
 
 Router.prototype.matchMethod = function(method, url) {
-  var routes = this.routes[method.toLowerCase()];
-  if (!routes) {
+  url = new URL(url);
+  var origin = url.origin;
+  var path = url.pathname;
+  method = method.toLowerCase();
+
+  if (!this.routes[origin] || !this.routes[origin][method]) {
     return null;
   }
+  var routes = this.routes[origin][method];
+
   var match, route;
-  var paths = Object.keys(routes);
-  for (var i = 0; i < paths.length; i++) {
-    route = routes[paths[i]];
-    match = route.regexp.exec(url);
+  var patterns = Object.keys(routes);
+  for (var i = 0; i < patterns.length; i++) {
+    route = routes[patterns[i]];
+    match = route.regexp.exec(path);
     if (match) {
-      return route.makeHandler(url);
+      return route.makeHandler(path);
     }
   }
   return null;
@@ -210,7 +207,7 @@ debug('service worker is loading');
 
 self.addEventListener('install', function(event) {
   debug('install event fired');
-  debug('preCache list: ' + options.preCacheItems);
+  debug('preCache list: ' + (options.preCacheItems.join(', ') || '(none)'));
   event.waitUntil(cache.add(options.preCacheItems));
 });
 
@@ -247,12 +244,12 @@ self.addEventListener('fetch', function(event) {
 // Strategies
 
 function networkOnly(request) {
-  debug('Trying network only');
+  debug('Trying network only [' + request.url + ']');
   return fetch(request);
 }
 
 function networkFirst(request) {
-  debug('Trying network first');
+  debug('Trying network first [' + request.url + ']');
   return fetchAndCache(request).then(function(response) {
     if (options.successResponses.test(response.status)) {
       return response;
@@ -271,18 +268,18 @@ function networkFirst(request) {
       }
     });
   }).catch(function(error) {
-    debug('Network error, fallback to cache');
+    debug('Network error, fallback to cache [' + request.url + ']');
     return cache.fetch(request);
   });
 }
 
 function cacheOnly(request) {
-  debug('Trying cache only');
+  debug('Trying cache only [' + request.url + ']');
   return cache.fetch(request);
 }
 
 function cacheFirst(request) {
-  debug('Trying cache first');
+  debug('Trying cache first [' + request.url + ']');
   return cache.fetch(request).then(function (response) {
     if (response) {
       return response;
