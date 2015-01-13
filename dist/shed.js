@@ -116,6 +116,21 @@ module.exports = Route;
 
 var Route = require('./route');
 
+function regexEscape(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var keyMatch = function(object, string) {
+  var keys = Object.keys(object);
+  for (var i = 0; i < keys.length; i++) {
+    var pattern = new RegExp(keys[i]);
+    if (pattern.test(string)) {
+      return object[keys[i]];
+    }
+  }
+  return null;
+};
+
 var Router = function() {
   this.routes = {};
   this.default = null;
@@ -130,11 +145,16 @@ var Router = function() {
 Router.prototype.add = function(method, path, handler, options) {
   options = options || {};
   var origin = options.origin || self.location.origin;
+  if (origin instanceof RegExp) {
+    origin = origin.source;
+  } else {
+    origin = regexEscape(origin);
+  }
   method = method.toLowerCase();
   var route = new Route(method, path, handler, options);
   this.routes[origin] = this.routes[origin] || {};
   this.routes[origin][method] = this.routes[origin][method] || {};
-  this.routes[origin][method][route.regexp.toString()] = route;
+  this.routes[origin][method][route.regexp.source] = route;
 };
 
 Router.prototype.matchMethod = function(method, url) {
@@ -143,20 +163,22 @@ Router.prototype.matchMethod = function(method, url) {
   var path = url.pathname;
   method = method.toLowerCase();
 
-  if (!this.routes[origin] || !this.routes[origin][method]) {
+  var methods = keyMatch(this.routes, origin);
+  if (!methods) {
     return null;
   }
-  var routes = this.routes[origin][method];
 
-  var match, route;
-  var patterns = Object.keys(routes);
-  for (var i = 0; i < patterns.length; i++) {
-    route = routes[patterns[i]];
-    match = route.regexp.exec(path);
-    if (match) {
-      return route.makeHandler(path);
-    }
+  var routes = methods[method];
+  if (!routes) {
+    return null;
   }
+
+  var route = keyMatch(routes, path);
+
+  if (route) {
+    return route.makeHandler(path);
+  }
+
   return null;
 };
 
