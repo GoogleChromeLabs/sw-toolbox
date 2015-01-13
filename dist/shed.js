@@ -177,9 +177,8 @@ var options = require('./options');
 var router = require('./router');
 var CacheWrapper = require('./cache-wrapper');
 
-// The cache object is not created until the install event so that the name can
-// be changed.
-var cache = null;
+// TODO: If a user changes options.cacheName, nothing happens
+var cache = new CacheWrapper(options.cacheName);
 
 // Internal Helpers
 
@@ -212,7 +211,6 @@ debug('service worker is loading');
 self.addEventListener('install', function(event) {
   debug('install event fired');
   debug('preCache list: ' + options.preCacheItems);
-  cache = new CacheWrapper(options.cacheName);
   event.waitUntil(cache.add(options.preCacheItems));
 });
 
