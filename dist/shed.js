@@ -343,7 +343,7 @@ function precache(items) {
   if (!Array.isArray(items)) {
     items = [items];
   }
-  options.preCacheItems = items;
+  options.preCacheItems = options.preCacheItems.concat(items);
 }
 
 module.exports = {
@@ -359,7 +359,9 @@ module.exports = {
   precache: precache
 };
 
-},{"./cache-wrapper":2,"./options":3,"./router":5,"serviceworker-cache-polyfill/lib/caches":8}],7:[function(require,module,exports){
+},{"./cache-wrapper":2,"./options":3,"./router":5,"serviceworker-cache-polyfill/lib/caches":9}],7:[function(require,module,exports){
+var isArray = require('isarray');
+
 /**
  * Expose `pathtoRegexp`.
  */
@@ -402,7 +404,7 @@ function escapeGroup (group) {
  * @param  {Array}  keys
  * @return {RegExp}
  */
-var attachKeys = function (re, keys) {
+function attachKeys (re, keys) {
   re.keys = keys;
 
   return re;
@@ -420,7 +422,7 @@ var attachKeys = function (re, keys) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
-  if (keys && !Array.isArray(keys)) {
+  if (!isArray(keys)) {
     options = keys;
     keys = null;
   }
@@ -435,32 +437,35 @@ function pathtoRegexp (path, keys, options) {
 
   if (path instanceof RegExp) {
     // Match all capturing groups of a regexp.
-    var groups = path.source.match(/\((?!\?)/g) || [];
+    var groups = path.source.match(/\((?!\?)/g);
 
-    // Map all the matches to their numeric keys and push into the keys.
-    keys.push.apply(keys, groups.map(function (match, index) {
-      return {
-        name:      index,
-        delimiter: null,
-        optional:  false,
-        repeat:    false
-      };
-    }));
+    // Map all the matches to their numeric indexes and push into the keys.
+    if (groups) {
+      for (var i = 0; i < groups.length; i++) {
+        keys.push({
+          name:      i,
+          delimiter: null,
+          optional:  false,
+          repeat:    false
+        });
+      }
+    }
 
     // Return the source back to the user.
     return attachKeys(path, keys);
   }
 
-  if (Array.isArray(path)) {
-    // Map array parts into regexps and return their source. We also pass
-    // the same keys and options instance into every generation to get
-    // consistent matching groups before we join the sources together.
-    path = path.map(function (value) {
-      return pathtoRegexp(value, keys, options).source;
-    });
+  // Map array parts into regexps and return their source. We also pass
+  // the same keys and options instance into every generation to get
+  // consistent matching groups before we join the sources together.
+  if (isArray(path)) {
+    var parts = [];
 
+    for (var i = 0; i < path.length; i++) {
+      parts.push(pathtoRegexp(path[i], keys, options).source);
+    }
     // Generate a new regexp instance by joining all the parts together.
-    return attachKeys(new RegExp('(?:' + path.join('|') + ')', flags), keys);
+    return attachKeys(new RegExp('(?:' + parts.join('|') + ')', flags), keys);
   }
 
   // Alter the path string into a usable regexp.
@@ -528,7 +533,12 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}],8:[function(require,module,exports){
+},{"isarray":8}],8:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],9:[function(require,module,exports){
 if (!Cache.prototype.add) {
   Cache.prototype.add = function add(request) {
     return this.addAll([request]);
