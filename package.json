@@ -4,6 +4,7 @@
   "scripts": {
     "test": "gulp test"
   },
+  "repository": "https://github.com/wibblymat/shed",
   "devDependencies": {
     "browserify": "^6.3.2",
     "gulp": "^3.8.10",

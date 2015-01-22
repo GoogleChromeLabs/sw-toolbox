@@ -24,7 +24,7 @@ gulp.task('test', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['default'], function() {
   gulp.watch(sources, ['default']);
 });
 
