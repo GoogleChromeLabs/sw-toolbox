@@ -1,10 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 self.shed = require('../lib/shed.js');
-},{"../lib/shed.js":7}],2:[function(require,module,exports){
+},{"../lib/shed.js":6}],2:[function(require,module,exports){
 'use strict';
 
 var globalOptions = require('./options');
-var savedState = require('./savedState');
 
 function debug(message, options) {
   options = options || {};
@@ -16,18 +15,9 @@ function debug(message, options) {
 
 function openCache(options) {
   options = options || {};
-  var name = options.cacheName || globalOptions.cacheName;
-  var namePromise;
-  if (name)
-  {
-    namePromise = Promise.resolve(name);
-  } else {
-    namePromise = savedState.get('lastActivatedCache');
-  }
-  return namePromise.then(function(cacheName) {
-    debug('Opening cache "' + cacheName + '"');
-    return caches.open(cacheName);
-  });
+  var cacheName = options.cacheName || globalOptions.cacheName;
+  debug('Opening cache "' + cacheName + '"', options);
+  return caches.open(cacheName);
 }
 
 function fetchAndCache(request, options) {
@@ -46,16 +36,49 @@ function fetchAndCache(request, options) {
   });
 }
 
+function renameCache(source, destination, options) {
+  debug('Renaming cache: [' + source + '] to [' + destination + ']', options);
+  return caches.delete(destination).then(function() {
+    return Promise.all([
+      caches.open(source),
+      caches.open(destination)
+    ]).then(function(results) {
+      var sourceCache = results[0];
+      var destCache = results[1];
+
+      return sourceCache.keys().then(function(requests) {
+        return Promise.all(requests.map(function(request) {
+          return sourceCache.match(request).then(function(response) {
+            return destCache.put(request, response);
+          });
+        }));
+      }).then(function() {
+        return caches.delete(source);
+      });
+    });
+  });
+}
+
 module.exports = {
   debug: debug,
   fetchAndCache: fetchAndCache,
   openCache: openCache,
+  renameCache: renameCache
 };
-},{"./options":3,"./savedState":6}],3:[function(require,module,exports){
+},{"./options":3}],3:[function(require,module,exports){
 'use strict';
 
+// TODO: This is necessary to handle different implementations in the wild
+// The spec defines self.registration, but it was not implemented in Chrome 40.
+var scope;
+if (self.registration) {
+  scope = self.registration.scope;
+} else {
+  scope = self.scope || new URL('./', self.location).href;
+}
+
 module.exports = {
-	cacheName: null,
+	cacheName: '$$$shed-cache$$$' + scope + '$$$',
 	debug: false,
 	preCacheItems: [],
 	// A regular expression to apply to HTTP response codes. Codes that match
@@ -103,7 +126,7 @@ Route.prototype.makeHandler = function(url) {
 
 module.exports = Route;
 
-},{"path-to-regexp":15}],5:[function(require,module,exports){
+},{"path-to-regexp":13}],5:[function(require,module,exports){
 'use strict';
 
 var Route = require('./route');
@@ -183,55 +206,8 @@ module.exports = new Router();
 },{"./route":4}],6:[function(require,module,exports){
 'use strict';
 
-var store = require('./store');
-
-var _state;
-var savePromise = Promise.resolve();
-
-var getState = function() {
-  if (_state) {
-    return Promise.resolve(_state);
-  }
-
-  return store.get('shedState').then(function(state) {
-    return state || {
-      lastInstalledVersion: 0,
-      lastInstalledCache: null,
-      lastActivatedCache: null
-    };
-  }).then(function(state) {
-    _state = state;
-    return _state;
-  });
-};
-
-var save = function(state) {
-  savePromise = savePromise.then(function() {
-    return store.set('shedState', state);
-  });
-
-  return savePromise;
-};
-
-module.exports = {
-  get: function(name) {
-    return getState().then(function(state) {
-      return state[name];
-    });
-  },
-  set: function(name, value) {
-    return getState().then(function(state) {
-      state[name] = value;
-      return save(state);
-    });    
-  }
-};
-},{"./store":8}],7:[function(require,module,exports){
-'use strict';
-
 require('serviceworker-cache-polyfill/lib/caches');
-var globalOptions = require('./options');
-var savedState = require('./savedState');
+var options = require('./options');
 var router = require('./router');
 var helpers = require('./helpers');
 var strategies = require('./strategies');
@@ -240,80 +216,24 @@ helpers.debug('Shed is loading');
 
 // Install
 
-// TODO: This is necessary to handle different implementations in the wild
-// The spec defines self.registration
-var scope;
-if (self.registration) {
-  scope = self.registration.scope;
-} else {
-  scope = self.scope || self.location;
-}
-var cachePrefix = '$$$shed-cache$$$' + scope + '$$$';
-
-function createCache() {
-  helpers.debug('creating new cache');
-  return savedState.get('lastInstalledVersion').then(function(lastVersion) {
-    var version = lastVersion + 1;
-    var name = cachePrefix + version;
-    helpers.debug('creating cache [' + name + ']');
-
-    return Promise.all([
-      savedState.set('lastInstalledVersion', version),
-      savedState.set('lastInstalledCache', name)
-    ]).then(function() {
-      return helpers.openCache({cacheName: name});
-    });
-  });
-}
-
-function initializeCache(cache) {
-  helpers.debug('preCache list: ' + (globalOptions.preCacheItems.join(', ') || '(none)'));
-  return cache.addAll(globalOptions.preCacheItems);
-}
-
 self.addEventListener('install', function(event) {
+  var inactiveCache = options.cacheName + '$$$inactive$$$';
   helpers.debug('install event fired');
-  event.waitUntil(createCache().then(initializeCache));
+  helpers.debug('creating cache [' + inactiveCache + ']');
+  helpers.debug('preCache list: ' + (options.preCacheItems.join(', ') || '(none)'));
+  event.waitUntil(
+    helpers.openCache({cacheName: inactiveCache}).then(function(cache) {
+      return cache.addAll(options.preCacheItems);
+    })
+  );
 });
 
 // Activate
 
-function filterCacheNames(currentCacheName, names) {
-  helpers.debug('Filtering caches: ' + currentCacheName + '[' + names.join(', ') + ']');
-  return names.filter(function(name) {
-    return (name.indexOf(cachePrefix) === 0 && name !== currentCacheName);
-  });
-}
-
-function deleteCache(name) {
-  helpers.debug('Deleting an old cache: [' + name + ']');
-  return caches.delete(name);
-}
-
-function deleteCaches(names) {
-  return Promise.all(names.map(deleteCache));
-}
-
-function deleteOldCaches() {
-  helpers.debug('removing old caches');
-  return Promise.all([
-    savedState.get('lastInstalledCache'),
-    caches.keys()
-  ]).then(function(results) {
-    return filterCacheNames(results[0], results[1]);
-  }).then(deleteCaches);
-}
-
-function setActiveCache() {
-  helpers.debug('Making last installed cache active');
-  return savedState.get('lastInstalledCache').then(function(name) {
-    return savedState.set('lastActivatedCache', name);
-  });
-}
-
 self.addEventListener('activate', function(event) {
   helpers.debug('activate event fired');
-  event.waitUntil(deleteOldCaches().then(setActiveCache));
+  var inactiveCache = options.cacheName + '$$$inactive$$$';
+  event.waitUntil(helpers.renameCache(inactiveCache, options.cacheName));
 });
 
 // Fetch
@@ -346,7 +266,7 @@ function precache(items) {
   if (!Array.isArray(items)) {
     items = [items];
   }
-  globalOptions.preCacheItems = globalOptions.preCacheItems.concat(items);
+  options.preCacheItems = options.preCacheItems.concat(items);
 }
 
 module.exports = {
@@ -356,40 +276,13 @@ module.exports = {
   cacheFirst: strategies.cacheFirst,
   fastest: strategies.fastest,
   router: router,
-  options: globalOptions,
+  options: options,
   cache: cache,
   uncache: uncache,
   precache: precache
 };
 
-},{"./helpers":2,"./options":3,"./router":5,"./savedState":6,"./strategies":12,"serviceworker-cache-polyfill/lib/caches":16}],8:[function(require,module,exports){
-'use strict';
-
-var cacheName = '$$$shed-store$$$';
-var baseUrl = 'https://shed.store.local/';
-
-var Store = function() {
-};
-
-Store.prototype.get = function(key) {
-	return caches.open(cacheName).then(function(cache) {
-		return cache.match(baseUrl + key);
-	}).then(function(response) {
-		if (response) {
-			return response.json();
-		}
-		return undefined;
-	});
-};
-
-Store.prototype.set = function(key, value) {
-	return caches.open(cacheName).then(function(cache) {
-		return cache.put(baseUrl + key, new Response(JSON.stringify(value)));
-	});
-};
-
-module.exports = new Store();
-},{}],9:[function(require,module,exports){
+},{"./helpers":2,"./options":3,"./router":5,"./strategies":10,"serviceworker-cache-polyfill/lib/caches":14}],7:[function(require,module,exports){
 'use strict';
 var helpers = require('../helpers');
 
@@ -407,7 +300,7 @@ function cacheFirst(request, values, options) {
 }
 
 module.exports = cacheFirst;
-},{"../helpers":2}],10:[function(require,module,exports){
+},{"../helpers":2}],8:[function(require,module,exports){
 'use strict';
 var helpers = require('../helpers');
 
@@ -420,7 +313,7 @@ function cacheOnly(request, values, options) {
 
 module.exports = cacheOnly;
 
-},{"../helpers":2}],11:[function(require,module,exports){
+},{"../helpers":2}],9:[function(require,module,exports){
 'use strict';
 var helpers = require('../helpers');
 var cacheOnly = require('./cacheOnly');
@@ -445,7 +338,7 @@ function fastest(request, values, options) {
 }
 
 module.exports = fastest;
-},{"../helpers":2,"./cacheOnly":10}],12:[function(require,module,exports){
+},{"../helpers":2,"./cacheOnly":8}],10:[function(require,module,exports){
 module.exports = {
   networkOnly: require('./networkOnly'),
   networkFirst: require('./networkFirst'),
@@ -453,7 +346,7 @@ module.exports = {
   cacheFirst: require('./cacheFirst'),
   fastest: require('./fastest')	
 };
-},{"./cacheFirst":9,"./cacheOnly":10,"./fastest":11,"./networkFirst":13,"./networkOnly":14}],13:[function(require,module,exports){
+},{"./cacheFirst":7,"./cacheOnly":8,"./fastest":9,"./networkFirst":11,"./networkOnly":12}],11:[function(require,module,exports){
 'use strict';
 var globalOptions = require('../options');
 var helpers = require('../helpers');
@@ -488,7 +381,7 @@ function networkFirst(request, values, options) {
 }
 
 module.exports = networkFirst;
-},{"../helpers":2,"../options":3}],14:[function(require,module,exports){
+},{"../helpers":2,"../options":3}],12:[function(require,module,exports){
 'use strict';
 var helpers = require('../helpers');
 
@@ -498,7 +391,7 @@ function networkOnly(request, values, options) {
 }
 
 module.exports = networkOnly;
-},{"../helpers":2}],15:[function(require,module,exports){
+},{"../helpers":2}],13:[function(require,module,exports){
 /**
  * Expose `pathtoRegexp`.
  */
@@ -667,7 +560,7 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 if (!Cache.prototype.add) {
   Cache.prototype.add = function add(request) {
     return this.addAll([request]);
