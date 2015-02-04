@@ -15,7 +15,7 @@ gulp.task('build', function() {
   return bundler
     .bundle()
     .pipe(source('shed.js'))
-    .pipe(gulp.dest('./dist/'));
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('test', function () {
