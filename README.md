@@ -11,7 +11,7 @@ Shed provides some simple helpers for use in creating your own service workers. 
 From your registering page, register your service worker in the normal way. For example:
 
 ```javascript
-navigator.serviceWorker.register('my-servic-worker.js', {scope: '/'});
+navigator.serviceWorker.register('my-service-worker.js', {scope: '/'});
 ```
 
 For even lower friction, if you don't intend to doing anything more fancy than just registering with a default scope, you can instead include the Shed companion script in your HTML:
@@ -22,12 +22,12 @@ For even lower friction, if you don't intend to doing anything more fancy than j
 
 As currently implemented in Chrome 40, a service worker must exist at the root of the scope that you intend it to control, or higher. So if you want all of the pages under `/myapp/` to be controlled by the worker, the worker script itself must be served from either `/` or `/myapp/`. The default scope is the containing path of the service worker script.
 
-### Using Shed in you worker script
+### Using Shed in your worker script
 
 In your service worker you just need to use `importScripts` to load Shed
 
 ```javascript
-importScripts('../shed/dist/shed.js'); // Update path to match your own setup
+importScripts('bower_components/shed/shed.js'); // Update path to match your own setup
 ```
 
 ## API
