@@ -1,0 +1,15 @@
+{
+  "name": "shed",
+  "main": "shed.js",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "Apache-2",
+  "ignore": [
+    "**/.*",
+    "build",
+    "lib",
+    "tests",
+    "gulpfile.js"
+  ]
+}
