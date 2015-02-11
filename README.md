@@ -6,6 +6,16 @@ A collection of tools for Workers
 
 Shed provides some simple helpers for use in creating your own service workers. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
 
+### Installing Shed
+
+Shed is available through Bower, npm or direct from github:
+
+`bower install --save shed`
+
+`npm install --save shed`
+
+`git clone https://github.com/wibblymat/shed.git`
+
 ### Registering your service worker
 
 From your registering page, register your service worker in the normal way. For example:
