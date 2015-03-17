@@ -1,6 +1,6 @@
 # Shed
 
-A collection of tools for Workers
+> A collection of tools for [service workers](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/)
 
 ## Service Worker helpers
 
@@ -40,55 +40,95 @@ In your service worker you just need to use `importScripts` to load Shed
 importScripts('bower_components/shed/shed.js'); // Update path to match your own setup
 ```
 
-## API
-
+## Basic usage
+Within your service worker file
 ```javascript
-// shed.router has get, put, post, delete, head and any methods, matching HTTP
-// verbs. It uses ExpressJS style route syntax
-shed.router.get('/myapp/index.html', function(request, keys) {
-  return new Response('Handled a request for /myapp/index.html');
+// Set up routes from URL patterns to request handlers
+shed.router.get('/myapp/index.html', someHandler);
+
+// For some common cases Shed provides a built-in handler
+shed.router.get('/', shed.networkFirst);
+
+// URL patterns are the same syntax as ExpressJS routes
+// (http://expressjs.com/guide/routing.html)
+shed.router.get(':foo/index.html', function(request, values) {
+  return new Response('Handled a request for ' + request.url +
+      ', where foo is "' + values.foo + '");
 });
 
-// The built-in handlers are networkFirst, networkOnly, cacheFirst, cacheOnly
-// and fastest. The networkFirst, cacheFirst and fastest handlers will update
-// the cached version if a response is fetched from the network.
-shed.router.get('/myapp/index.html', shed.networkFirst); // Try the network, fallback to cache
-shed.router.get('/myapp/index.html', shed.networkOnly); // Try the network, fail if not available
-shed.router.get('/myapp/index.html', shed.cacheFirst); // Try the cache, fallback to network if not in the cache
-shed.router.get('/myapp/index.html', shed.cacheOnly); // Try the cache, fail if not cached
-shed.router.get('/myapp/index.html', shed.fastest); // Request from the cache and the network, return which ever comes back first
+// For requests to other origins, specify the origin as an option
+shed.router.post('/(.*)', apiHandler, {origin: 'https://api.example.com'});
 
-// You can use relative URLs, which are relative to the scope of the worker
-shed.router.get(':foo/:bar', shed.networkOnly);
+// Provide a default handler
+shed.router.default = myDefaultRequestHandler;
 
-// For requests to other origins, pass the origin in the parameters to the route
-shed.router.post('/(.*)', shed.networkFirst, {origin: 'https://api.example.com'});
-
-// Origins can be specified as a RegExp
-shed.router.post('/(.*)', shed.networkFirst, {origin: /https:\/\/.*\.example\.com/});
-
-// At the moment, if the fetch is for a URL that doesn't match a route, you get
-// some default behaviour. The 'default default' is networkOnly, but you can
-// change it like so:
-shed.router.default = shed.cacheFirst;
-
-// If you want some resources to be cached during the install event, specify
-// them with the precache method
+// You can provide a list of resources which will be cached at service worker install time
 shed.precache(['/index.html', '/site.css', '/images/logo.png']);
-
-// You can manually add or remove things from the cache
-shed.cache('/data/2014/posts.json');
-shed.uncache('/data/2013/posts.json');
-
-// You can pass options to most methods
-// The `debug` option turns on verbose console logging
-shed.router.get('/example/route/', shed.cacheFirst, {debug: true});
-
-// The `cache` option tells shed to use an alternative cache. Provide the string name of the cache, not a Cache object.
-shed.cache('/images/foo.png', {cache: 'my other cache'});
-
-// These can also be set globally
-shed.options.debug = true;
-shed.options.cache = 'main cache';
-
 ```
+
+## Request handlers
+A request handler receives three arguments
+
+```javascript
+var myHandler = function(request, values, options) {
+  // ...
+}
+```
+
+- `request` - [Request](https://fetch.spec.whatwg.org/#request) object that triggered the `fetch` event
+- `values` - Object whose keys are the placeholder names in the URL pattern, with the values being the corresponding part of the request URL. For example, with a URL pattern of `'/images/:size/:name.jpg'` and an actual URL of `'/images/large/unicorns.jpg'`, `values` would be `{size: 'large', name: 'unicorns'}`
+- `options` - the options object that was used when [creating the route](#api)
+
+The return value should be a [Response](https://fetch.spec.whatwg.org/#response), or a [Promise](http://www.html5rocks.com/en/tutorials/es6/promises/) that resolves with a Response. If another value is returned, or if the returned Promise is rejected, the Request will fail which will appear to be a [NetworkError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#exception-NetworkError) to the page that made the request.
+
+### Built-in handlers
+
+There are 5 built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).
+
+#### `shed.networkFirst`
+Try to handle the request by fetching from the network. If it succeeds, store the response in the cache. Otherwise, try to fulfill the request from the cache. This is the strategy to use for basic read-through caching. Also good for API requests where you always want the freshest data when it is available but would rather have stale data than no data.
+
+#### `shed.cacheFirst`
+If the request matches a cache entry, respond with that. Otherwise try to fetch the resource from the network. If the network request succeeds, update the cache. Good for resources that don't change, or for which you have some other update mechanism.
+
+#### `shed.fastest`
+Request the resource from both the cache and the network in parallel. Respond with whichever returns first. Usually this will be the cached version, if there is one. On the one hand this strategy will always make a network request, even if the resource is cached. On the other hand, if/when the network request completes the cache is updated, so that future cache reads will be more up-to-date.
+
+#### `shed.cacheOnly`
+Resolve the request from the cache, or fail. Good for when you need to guarantee that no network request will be made - to save battery on mobile, for example.
+
+#### `shed.networkOnly`
+Handle the request by trying to fetch the URL from the network. If the fetch fails, fail the request. Essentially the same as not creating a route for the URL at all.
+
+## API
+
+### Global Options
+Any method that accepts an `options` object will accept a boolean option of `debug`. When true this causes Shed to output verbose log messages to the worker's console.
+
+Most methods that involve a cache (`shed.cache`, `shed.uncache`, `shed.fastest`, `shed.cacheFirst`, `shed.cacheOnly`, `shed.networkFirst`) accept an option called `cache`, which is the **name** of the [Cache](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/#cache) that should be used. If not specifed Shed will use a default cache.
+
+### `shed.router.get(urlPattern, handler, options)`
+### `shed.router.post(urlPattern, handler, options)`
+### `shed.router.put(urlPattern, handler, options)`
+### `shed.router.delete(urlPattern, handler, options)`
+### `shed.router.head(urlPattern, handler, options)`
+Create a route that causes requests for URLs matching `urlPattern` to be resolved by calling `handler`. Matches requests using the GET, POST, PUT, DELETE or HEAD HTTP methods respectively.
+
+- `urlPattern` - an Express style route. See the docs for the [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module for the full syntax
+- `handler` - a request handler, as [described above](#request-handlers)
+- `options` - an object containing options for the route. This options object will be available to the request handler. The `origin` option is specific to the route methods, and is an exact string or a Regexp against which the origin of the Request must match for the route to be used.
+
+### `shed.router.any(urlPattern, handler, options)`
+Like `shed.router.get`, etc., but matches any HTTP method.
+
+### `shed.router.default`
+If you set this property to a function it will be used as the request handler for any request that does not match a route.
+
+### `shed.precache(arrayOfURLs)`
+Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
+
+### `shed.cache(url, options)`
+Causes the resource at `url` to be added to the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
+
+### `shed.uncache(url, options)`
+Causes the resource at `url` to be removed from the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
