@@ -128,7 +128,7 @@ If you set this property to a function it will be used as the request handler fo
 Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
 
 ### `shed.cache(url, options)`
-Causes the resource at `url` to be added to the cache. Returns a Promise.
+Causes the resource at `url` to be added to the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
 
 ### `shed.uncache(url, options)`
-Causes the resource at `url` to be removed from the cache. Returns a Promise.
+Causes the resource at `url` to be removed from the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
