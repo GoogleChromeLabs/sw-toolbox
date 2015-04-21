@@ -1,13 +1,12 @@
 {
-  "name": "shed",
-  "main": "shed.js",
+  "name": "sw-toolbox",
+  "main": "sw-toolbox.js",
   "moduleType": [
     "globals"
   ],
   "license": "Apache-2",
   "ignore": [
     "**/.*",
-    "build",
     "lib",
     "tests",
     "gulpfile.js"

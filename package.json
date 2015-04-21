@@ -1,10 +1,10 @@
 {
-  "name": "shed",
+  "name": "sw-toolbox",
   "version": "1.0.0",
   "scripts": {
     "test": "gulp test"
   },
-  "repository": "https://github.com/wibblymat/shed",
+  "repository": "https://github.com/GoogleChrome/sw-toolbox",
   "devDependencies": {
     "browserify": "^6.3.2",
     "gulp": "^3.8.10",

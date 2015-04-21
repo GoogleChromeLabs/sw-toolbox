@@ -24,21 +24,21 @@ var sources = ['build/**/*.js', 'lib/**/*.js'];
 
 gulp.task('build', function() {
   var bundler = browserify({
-    entries: ['./lib/shed.js'],
-    standalone: 'shed',
+    entries: ['./lib/sw-toolbox.js'],
+    standalone: 'toolbox',
     debug: true
   });
 
   bundler.plugin('browserify-header');
   bundler.plugin('minifyify', {
-    map: 'shed.map.json',
-    output: 'shed.map.json'
+    map: 'sw-toolbox.map.json',
+    output: 'sw-toolbox.map.json'
   });
 
 
   return bundler
     .bundle()
-    .pipe(source('shed.js'))
+    .pipe(source('sw-toolbox.js'))
     .pipe(gulp.dest('./'));
 });
 
