@@ -23,7 +23,104 @@
 },{}],4:[function(require,module,exports){
 "use strict";var url=new URL("./",self.location),basePath=url.pathname,pathRegexp=require("path-to-regexp"),Route=function(e,t,i,s){0!==t.indexOf("/")&&(t=basePath+t),this.method=e,this.keys=[],this.regexp=pathRegexp(t,this.keys),this.options=s,this.handler=i};Route.prototype.makeHandler=function(e){var t=this.regexp.exec(e),i={};return this.keys.forEach(function(e,s){i[e.name]=t[s+1]}),function(e){return this.handler(e,i,this.options)}.bind(this)},module.exports=Route;
 },{"path-to-regexp":12}],5:[function(require,module,exports){
-"use strict";function regexEscape(t){return t.replace(/[-\/\\^$*+?.()|[\]{}]/g,"\\$&")}var Route=require("./route"),keyMatch=function(t,e){for(var r=Object.keys(t),o=0;o<r.length;o++){var u=new RegExp(r[o]);if(u.test(e))return t[r[o]]}return null},Router=function(){this.routes={},this["default"]=null};["get","post","put","delete","head","any"].forEach(function(t){Router.prototype[t]=function(e,r,o){return this.add(t,e,r,o)}}),Router.prototype.add=function(t,e,r,o){o=o||{};var u=o.origin||self.location.origin;u=u instanceof RegExp?u.source:regexEscape(u),t=t.toLowerCase();var n=new Route(t,e,r,o);this.routes[u]=this.routes[u]||{},this.routes[u][t]=this.routes[u][t]||{},this.routes[u][t][n.regexp.source]=n},Router.prototype.matchMethod=function(t,e){e=new URL(e);var r=e.origin,o=e.pathname;t=t.toLowerCase();var u=keyMatch(this.routes,r);if(!u)return null;var n=u[t];if(!n)return null;var a=keyMatch(n,o);return a?a.makeHandler(o):null},Router.prototype.match=function(t){return this.matchMethod(t.method,t.url)||this.matchMethod("any",t.url)},module.exports=new Router;
+/*
+  Copyright 2014 Google Inc. All Rights Reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+'use strict';
+
+var Route = require('./route');
+
+function regexEscape(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+var keyMatch = function(map, string) {
+  for (var item of map) {
+    var pattern = item[0], value = item[1];
+    if (pattern.test(string)) {
+      return value;
+    }
+  }
+  return null;
+};
+
+var Router = function() {
+  this.routes = new Map();
+  this.default = null;
+};
+
+['get', 'post', 'put', 'delete', 'head', 'any'].forEach(function(method) {
+  Router.prototype[method] = function(path, handler, options) {
+    return this.add(method, path, handler, options);
+  };
+});
+
+Router.prototype.add = function(method, path, handler, options) {
+  options = options || {};
+  var origin = options.origin || self.location.origin;
+  if (!(origin instanceof RegExp)) {
+    origin = new RegExp(regexEscape(origin));
+  }
+  method = method.toLowerCase();
+
+  var route = new Route(method, path, handler, options);
+
+  if (!this.routes.has(origin)) {
+    this.routes.set(origin, new Map());
+  }
+
+  var methodMap = this.routes.get(origin);
+  if (!methodMap.has(method)) {
+    methodMap.set(method, new Map());
+  }
+
+  var routeMap = methodMap.get(method);
+  routeMap.set(route.regexp, route);
+};
+
+Router.prototype.matchMethod = function(method, url) {
+  url = new URL(url);
+  var origin = url.origin;
+  var path = url.pathname;
+  method = method.toLowerCase();
+
+  var methods = keyMatch(this.routes, origin);
+  if (!methods) {
+    return null;
+  }
+
+  var routes = methods.get(method);
+  if (!routes) {
+    return null;
+  }
+
+  var route = keyMatch(routes, path);
+
+  if (route) {
+    return route.makeHandler(path);
+  }
+
+  return null;
+};
+
+Router.prototype.match = function(request) {
+  return this.matchMethod(request.method, request.url) || this.matchMethod('any', request.url);
+};
+
+module.exports = new Router();
+
 },{"./route":4}],6:[function(require,module,exports){
 "use strict";function cacheFirst(e,r,t){return helpers.debug("Strategy: cache first ["+e.url+"]",t),helpers.openCache(t).then(function(r){return r.match(e).then(function(r){return r?r:helpers.fetchAndCache(e,t)})})}var helpers=require("../helpers");module.exports=cacheFirst;
 },{"../helpers":2}],7:[function(require,module,exports){
