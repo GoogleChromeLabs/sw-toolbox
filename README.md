@@ -21,7 +21,7 @@ Service Worker Toolbox is available through Bower, npm or direct from github:
 From your registering page, register your service worker in the normal way. For example:
 
 ```javascript
-navigator.serviceWorker.register('my-service-worker.js', {scope: '/'});
+navigator.serviceWorker.register('my-service-worker.js');
 ```
 
 For even lower friction, if you don't intend to doing anything more fancy than just registering with a default scope, you can instead include the Service Worker Toolbox companion script in your HTML:
