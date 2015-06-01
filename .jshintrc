@@ -20,5 +20,6 @@
   "worker": true,
   "devel": true,
   "node": true,
+  "esnext": true,
   "predef": ["fetch", "Request", "Response", "caches", "self", "URL"]
 }

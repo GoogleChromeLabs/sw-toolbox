@@ -22,7 +22,7 @@ var jshint = require('gulp-jshint');
 
 var sources = ['build/**/*.js', 'lib/**/*.js'];
 
-gulp.task('build', function() {
+gulp.task('build-worker', function() {
   var bundler = browserify({
     entries: ['./lib/sw-toolbox.js'],
     standalone: 'toolbox',
@@ -42,6 +42,26 @@ gulp.task('build', function() {
     .pipe(gulp.dest('./'));
 });
 
+gulp.task('build-client', function() {
+  var bundler = browserify({
+    entries: ['./lib/client.js'],
+    standalone: 'toolbox',
+    debug: true
+  });
+
+  bundler.plugin('browserify-header');
+  bundler.plugin('minifyify', {
+    map: 'client.map.json',
+    output: 'client.map.json'
+  });
+
+
+  return bundler
+    .bundle()
+    .pipe(source('client.js'))
+    .pipe(gulp.dest('./'));
+});
+
 gulp.task('test', function () {
     gulp.src(sources.concat('gulpfile.js'))
         .pipe(jshint('.jshintrc'))
@@ -52,4 +72,5 @@ gulp.task('watch', ['default'], function() {
   gulp.watch(sources, ['default']);
 });
 
+gulp.task('build', ['build-worker', 'build-client']);
 gulp.task('default', ['test', 'build']);
