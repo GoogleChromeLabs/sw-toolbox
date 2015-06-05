@@ -58,22 +58,35 @@ navigator.serviceWorker.ready.then(function() {
     checkValue('multiple/match/anything', '2', assert);
   });
 
+  // Testing the cache/uncache methods
   QUnit.test('Caching', function(assert) {
-    var date = +(new Date());
+    // Construct a URL for a resource that should not already exist
+    var date = Date.now();
     var url = 'cache/' + date;
+
     var done = assert.async();
-    // Empty cache
-    fetch(url).then(function(response) {
+
+    // Confirm that the URL cannot be fetched
+    var step1 = fetch(url);
+    // If the fetch succeeds then we have a problem
+    step1.then(function(response) {
       assert.ok(false, 'Succeeded fetching file that shouldn\'t exist');
-    }, function(reason) {
-      return fetch(url, {method: 'post', body: date + ''}).then(function(response) {
-        return checkValue(url, date, assert);
-      }).then(function() {
-        return fetch(url, {method: 'delete'});
-      });
-    }).then(done, function(reason) {
-      assert.ok(false, 'Failed: ' + reason);
       done();
     });
+
+    // Otherwise, move on to the next check
+    step1.catch(function(reason) {
+      // Add to the cache
+      return fetch(url, {method: 'post', body: date + ''}).then(function(response) {
+        // Check that retrieving from the cache now succeeds
+        return checkValue(url, date, assert);
+      }).then(function() {
+        // Tidy up after ourselves
+        return fetch(url, {method: 'delete'});
+      }).catch(function(reason) {
+        // Catch-all error handler
+        assert.ok(false, 'Failed: ' + reason);
+      }).then(done);;
+    })
   });
 });
