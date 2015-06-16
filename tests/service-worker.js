@@ -41,8 +41,9 @@ This section is actually just ensuring that the test infrastructure is fine
 */
 toolbox.router.get('', rewrite(/\/$/, '/index.html'));
 toolbox.router.get('index.html', toolbox.fastest);
-toolbox.router.get('tests.js', toolbox.networkOnly);
-toolbox.router.get('/(.*)', toolbox.fastest, {origin: /\/\/code.jquery.com/});
+toolbox.router.get('tests.js', toolbox.networkFirst);
+toolbox.router.get('/(.*)/qunit/(.*)', toolbox.fastest);
+toolbox.precache(['index.html', 'test.js', '../node_modules/qunitjs/qunit/qunit.css', '../node_modules/qunitjs/qunit/qunit.js']);
 
 /* Routes needed for tests */
 toolbox.router.default = respondString('Default');
