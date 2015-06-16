@@ -11,6 +11,7 @@
     "gulp-jshint": "^1.9.0",
     "jshint-stylish": "^1.0.0",
     "path-to-regexp": "^1.0.1",
+    "qunitjs": "^1.18.0",
     "serviceworker-cache-polyfill": "coonsta/cache-polyfill",
     "vinyl-source-stream": "^1.0.0"
   },
