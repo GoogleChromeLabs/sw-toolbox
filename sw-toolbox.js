@@ -128,7 +128,7 @@ module.exports = new Router();
 },{"../helpers":2}],7:[function(require,module,exports){
 "use strict";function cacheOnly(e,r,c){return helpers.debug("Strategy: cache only ["+e.url+"]",c),helpers.openCache(c).then(function(r){return r.match(e)})}var helpers=require("../helpers");module.exports=cacheOnly;
 },{"../helpers":2}],8:[function(require,module,exports){
-"use strict";function fastest(e,r,t){helpers.debug("Strategy: fastest ["+e.url+"]",t);var n=!1,c=[],s=function(e){return c.push(e.toString()),n?Promise.reject(new Error('Both cache and network failed: "'+c.join('", "')+'"')):void(n=!0)};return new Promise(function(r,n){helpers.fetchAndCache(e.clone(),t).then(r,s),cacheOnly(e,t).then(r,s)})}var helpers=require("../helpers"),cacheOnly=require("./cacheOnly");module.exports=fastest;
+"use strict";function fastest(e,n,t){return helpers.debug("Strategy: fastest ["+e.url+"]",t),new Promise(function(n,r){var s=!1,c=[],o=function(e){c.push(e.toString()),s?r(new Error('Both cache and network failed: "'+c.join('", "')+'"')):s=!0},a=function(e){e instanceof Response?n(e):o("No result returned")};helpers.fetchAndCache(e.clone(),t).then(a,o),cacheOnly(e,t).then(a,o)})}var helpers=require("../helpers"),cacheOnly=require("./cacheOnly");module.exports=fastest;
 },{"../helpers":2,"./cacheOnly":7}],9:[function(require,module,exports){
 module.exports={networkOnly:require("./networkOnly"),networkFirst:require("./networkFirst"),cacheOnly:require("./cacheOnly"),cacheFirst:require("./cacheFirst"),fastest:require("./fastest")};
 },{"./cacheFirst":6,"./cacheOnly":7,"./fastest":8,"./networkFirst":10,"./networkOnly":11}],10:[function(require,module,exports){
