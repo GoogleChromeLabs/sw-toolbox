@@ -87,6 +87,23 @@ navigator.serviceWorker.ready.then(function() {
         // Catch-all error handler
         assert.ok(false, 'Failed: ' + reason);
       }).then(done);;
-    })
+    });
+  });
+
+  QUnit.test('Precaching', function(assert) {
+    checkValue('fixtures/a', 'a', assert);
+    checkValue('fixtures/b', 'b', assert);
+    checkValue('fixtures/c', 'c', assert);
+    checkValue('fixtures/d', 'd', assert);
+    checkValue('fixtures/e', 'e', assert);
+    checkValue('fixtures/f', 'f', assert);
+    checkValue('fixtures/g', 'g', assert);
+    checkValue('fixtures/h', 'h', assert);
+    checkValue('fixtures/i', 'i', assert);
+    checkValue('fixtures/j', 'j', assert);
+    checkValue('fixtures/k', 'k', assert);
+    checkValue('fixtures/l', 'l', assert);
+    checkValue('fixtures/m', 'm', assert);
+    checkValue('fixtures/n', 'n', assert);
   });
 });

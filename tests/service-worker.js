@@ -70,3 +70,15 @@ toolbox.router.post('cache/:name', function(request) {
 toolbox.router.delete('cache/:name', function(request) {
   return toolbox.uncache(request.url).then(respondOK, respondError);
 });
+
+toolbox.router.get('fixtures/:foo', toolbox.cacheOnly)
+// Single item
+toolbox.precache('fixtures/a');
+// Array of items
+toolbox.precache(['fixtures/b', 'fixtures/c']);
+// Array of Promises
+toolbox.precache([Promise.resolve('fixtures/d'), Promise.resolve('fixtures/e')]);
+// Array of Arrays
+toolbox.precache(['fixtures/f', ['fixtures/g', 'fixtures/h'], ['fixtures/i', 'fixtures/j']]);
+// Array of Promises for Arrays
+toolbox.precache([Promise.resolve(['fixtures/k', 'fixtures/l']), Promise.resolve(['fixtures/m', 'fixtures/n'])]);
