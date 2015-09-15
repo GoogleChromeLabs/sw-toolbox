@@ -53,7 +53,7 @@ toolbox.router.get('/', toolbox.networkFirst);
 // (http://expressjs.com/guide/routing.html)
 toolbox.router.get(':foo/index.html', function(request, values) {
   return new Response('Handled a request for ' + request.url +
-      ', where foo is "' + values.foo + '");
+      ', where foo is "' + values.foo + '"');
 });
 
 // For requests to other origins, specify the origin as an option
