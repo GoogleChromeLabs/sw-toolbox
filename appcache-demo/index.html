@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <title>Possibly Cached</title>
+  </head>
+  <body>
+    <p>I might be served from the cache.</p>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js?manifest=manifest.appcache');
+      }
+    </script>
+  </body>
+</html>

@@ -1,22 +1,21 @@
 {
   "name": "sw-toolbox",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "scripts": {
     "test": "gulp test"
   },
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
   "devDependencies": {
     "browserify": "^6.3.2",
+    "browserify-header": "^0.9.2",
     "gulp": "^3.8.10",
     "gulp-jshint": "^1.9.0",
     "jshint-stylish": "^1.0.0",
+    "minifyify": "^6.4.0",
+    "parse-appcache-manifest": "^0.2.0",
     "path-to-regexp": "^1.0.1",
     "qunitjs": "^1.18.0",
     "serviceworker-cache-polyfill": "coonsta/cache-polyfill",
     "vinyl-source-stream": "^1.0.0"
-  },
-  "dependencies": {
-    "browserify-header": "^0.9.2",
-    "minifyify": "^6.4.0"
   }
 }

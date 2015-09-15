@@ -30,10 +30,10 @@ gulp.task('build', function() {
   });
 
   bundler.plugin('browserify-header');
-  bundler.plugin('minifyify', {
+  /*bundler.plugin('minifyify', {
     map: 'sw-toolbox.map.json',
     output: 'sw-toolbox.map.json'
-  });
+  });*/
 
 
   return bundler
