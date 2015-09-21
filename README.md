@@ -105,7 +105,13 @@ Handle the request by trying to fetch the URL from the network. If the fetch fai
 ### Global Options
 Any method that accepts an `options` object will accept a boolean option of `debug`. When true this causes Service Worker Toolbox to output verbose log messages to the worker's console.
 
-Most methods that involve a cache (`toolbox.cache`, `toolbox.uncache`, `toolbox.fastest`, `toolbox.cacheFirst`, `toolbox.cacheOnly`, `toolbox.networkFirst`) accept an option called `cache`, which is the **name** of the [Cache](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/#cache) that should be used. If not specifed Service Worker Toolbox will use a default cache.
+Most methods that involve a cache (`toolbox.cache`, `toolbox.uncache`, `toolbox.fastest`, `toolbox.cacheFirst`, `toolbox.cacheOnly`, `toolbox.networkFirst`) accept an option called `cacheName`, which is the **name** of the [Cache](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/#cache) that should be used. If not specified, Service Worker Toolbox will use a default cache.
+
+The `networkFirst` strategy supports a timeout, specified in seconds via the `networkTimeoutSeconds`
+global or local option. If `networkTimeoutSeconds` is explicitly set, then any network requests that
+take longer than that amount of time will automatically fall back to the cached response, or to an
+error response if there is no cached response for that request. By default, when
+`networkTimeoutSeconds` is not set, the browser's native networking timeout logic applies.
 
 ### `toolbox.router.get(urlPattern, handler, options)`
 ### `toolbox.router.post(urlPattern, handler, options)`
@@ -141,7 +147,7 @@ Patches are encouraged, and may be submitted by forking this project and submitt
 
 ## License
 
-Copyright 2014 Google, Inc.
+Copyright 2015 Google, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
