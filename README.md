@@ -109,9 +109,9 @@ Most methods that involve a cache (`toolbox.cache`, `toolbox.uncache`, `toolbox.
 
 The `networkFirst` strategy supports a timeout, specified in seconds via the `networkTimeoutSeconds`
 global or local option. If `networkTimeoutSeconds` is explicitly set, then any network requests that
-take longer than that amount of time will automatically fall back to the cached response, or to an
-error response if there is no cached response for that request. By default, when
-`networkTimeoutSeconds` is not set, the browser's native networking timeout logic applies.
+take longer than that amount of time will automatically fall back to the cached response if one
+exists. By default, when `networkTimeoutSeconds` is not set, the browser's native networking timeout
+logic applies.
 
 ### `toolbox.router.get(urlPattern, handler, options)`
 ### `toolbox.router.post(urlPattern, handler, options)`
