@@ -1,0 +1,17 @@
+{
+  "extends": "xo",
+  "env": {
+    "serviceworker": true,
+    "worker": true
+  },
+  "rules": {
+    "default-case": 0,
+    "indent": [2, 2, {"SwitchCase": 1}],
+    "global-require": 0,
+    "max-nested-callbacks": 0,
+    "no-console": 0,
+    "no-inline-comments": 0,
+    "no-warning-comments": 0,
+    "space-before-function-paren": [2, "never"]
+  }
+}
