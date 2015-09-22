@@ -4,6 +4,7 @@ importScripts('../sw-toolbox.js');
   'use strict';
 
   global.toolbox.options.debug = true;
+  global.toolbox.options.maxCacheEntries = 2;
   global.toolbox.options.networkTimeoutSeconds = 10;
   global.toolbox.router.default = global.toolbox.networkFirst;
 })(self);
