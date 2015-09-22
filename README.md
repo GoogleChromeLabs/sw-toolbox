@@ -113,6 +113,13 @@ take longer than that amount of time will automatically fall back to the cached 
 exists. By default, when `networkTimeoutSeconds` is not set, the browser's native networking timeout
 logic applies.
 
+The `maxCacheEntries` option can be used to impose a least-recently used cache expiration policy
+on entries cached via the various built-in handlers. You normally would only want to use this
+on a cache that's dedicated to storing entries for a dynamic set of resources with no natural limit.
+Setting `maxCacheEntries` to, e.g., `10` would mean that after the 11th entry is cached, the
+least-recently used entry would be automatically deleted. The cache should never end up growing
+beyond `maxCacheEntries` entries.
+
 ### `toolbox.router.get(urlPattern, handler, options)`
 ### `toolbox.router.post(urlPattern, handler, options)`
 ### `toolbox.router.put(urlPattern, handler, options)`
