@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <title>Max Cache Entries Demo</title>
+    <link rel="stylesheet" href="../common.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body>
+    <h1>Max Cache Entries Demo</h1>
+
+    <h3>Background</h3>
+    <p>
+      This configuration in
+      <a href="service-worker.js" target="_blank"><code>service-worker.js</code></a> demonstrates
+      the use of the <code>maxCacheEntries</code> option on dedicated cache that's used for any
+      requests that go against the YouTube thumbnail server. That dedicated cache will store up to
+      <code>10</code> results, and once that's reached, the least-recently used result will be
+      deleted. It uses the <code>cacheFirst</code> strategy, so any responses that are still in the
+      cache will be used directly, without going against the network.
+    </p>
+
+    <p>
+      The cache used for YouTube thumbnail URLs is independent from the "default" cache, which is
+      used for all other requests, like YouTube API responses and this page's CSS, JavaScript, and
+      HTML. The page doesn't impose any upper limit on the size of that default cache, and we can
+      use a <code>networkFirst</code> strategy for it.
+    </p>
+
+    <p>
+      Creating a dedicated cache with <code>maxCacheEntries</code> set to handle dynamic, unbounded
+      requests is a useful pattern to follow. If we just used the default cache without
+      <code>maxCacheEntries</code> for the thumbnail responses, then that cache would grow in size
+      as more and more searches were performed, needlessly consuming disk space for old thumbnails
+      that are likely no longer needed.
+    </p>
+
+    <h3>Live Demo</h3>
+    <p>
+      Try increasing the number of thumbnails returned, or changing the search term, and then
+      observe the cache expirations logged in the developer console.
+    </p>
+    <form id="search">
+      <label for="searchTerm">Search YouTube for</label>
+      <input id="searchTerm" type="search" value="javascript">
+      <label for="maxResults">, returning at most</label>
+      <input id="maxResults" type="number" min="1" max="50" value="10">
+      <span>thumbnails.</span>
+      <input type="submit" value="Search">
+    </form>
+
+    <div id="results"></div>
+
+    <script src="app.js"></script>
+    <script src="../../companion.js" data-service-worker="service-worker.js"></script>
+  </body>
+</html>
