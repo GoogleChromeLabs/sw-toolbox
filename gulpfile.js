@@ -16,9 +16,9 @@
 'use strict';
 
 var browserify = require('browserify');
+var eslint = require('gulp-eslint');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
-var jshint = require('gulp-jshint');
 
 var sources = ['build/**/*.js', 'lib/**/*.js'];
 
@@ -35,21 +35,21 @@ gulp.task('build', function() {
     output: 'sw-toolbox.map.json'
   });
 
-
   return bundler
     .bundle()
     .pipe(source('sw-toolbox.js'))
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('test', function () {
-    gulp.src(sources.concat('gulpfile.js'))
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter('jshint-stylish'));
+gulp.task('lint', function() {
+  return gulp.src(sources.concat('gulpfile.js'))
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
 gulp.task('watch', ['default'], function() {
   gulp.watch(sources, ['default']);
 });
 
-gulp.task('default', ['test', 'build']);
+gulp.task('default', ['lint', 'build']);
