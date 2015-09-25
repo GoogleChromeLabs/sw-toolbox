@@ -5,7 +5,12 @@
   "scripts": {
     "test": "gulp lint"
   },
+  "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
+  "dependencies": {
+    "serviceworker-cache-polyfill": "coonsta/cache-polyfill",
+    "path-to-regexp": "^1.0.1"
+  },
   "devDependencies": {
     "browserify": "^6.3.2",
     "browserify-header": "^0.9.2",
@@ -15,9 +20,7 @@
     "gulp-eslint": "^1.0.0",
     "jshint-stylish": "^1.0.0",
     "minifyify": "^6.4.0",
-    "path-to-regexp": "^1.0.1",
     "qunitjs": "^1.18.0",
-    "serviceworker-cache-polyfill": "coonsta/cache-polyfill",
     "vinyl-source-stream": "^1.0.0"
   }
 }
