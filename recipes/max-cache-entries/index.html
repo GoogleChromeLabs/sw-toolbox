@@ -10,13 +10,13 @@
 
     <h3>Background</h3>
     <p>
-      This configuration in
-      <a href="service-worker.js" target="_blank"><code>service-worker.js</code></a> demonstrates
-      the use of the <code>maxCacheEntries</code> option on dedicated cache that's used for any
-      requests that go against the YouTube thumbnail server. That dedicated cache will store up to
-      <code>10</code> results, and once that's reached, the least-recently used result will be
-      deleted. It uses the <code>cacheFirst</code> strategy, so any responses that are still in the
-      cache will be used directly, without going against the network.
+      The <a href="service-worker.js" target="_blank">service worker</a> in this example
+      demonstrates using the maxCacheEntries option to restrict the number of items that will be
+      stored in the cache. It uses a dedicated cache to hold YouTube video thumbnails. That
+      dedicated cache will store up to <code>10</code> results, and once that's reached, the
+      least-recently used result will be deleted. It uses the <code>cacheFirst</code> strategy, so
+      any responses that are still in the cache will be used directly, without going against the
+      network.
     </p>
 
     <p>
