@@ -59,7 +59,7 @@ toolbox.router.get(':foo/index.html', function(request, values) {
 // For requests to other origins, specify the origin as an option
 toolbox.router.post('/(.*)', apiHandler, {origin: 'https://api.example.com'});
 
-// Provide a default handler
+// Provide a default handler for GET requests
 toolbox.router.default = myDefaultRequestHandler;
 
 // You can provide a list of resources which will be cached at service worker install time
@@ -128,7 +128,7 @@ Create a route that causes requests for URLs matching `urlPattern` to be resolve
 Like `toolbox.router.get`, etc., but matches any HTTP method.
 
 ### `toolbox.router.default`
-If you set this property to a function it will be used as the request handler for any request that does not match a route.
+If you set this property to a function it will be used as the request handler for any GET request that does not match a route.
 
 ### `toolbox.precache(arrayOfURLs)`
 Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
