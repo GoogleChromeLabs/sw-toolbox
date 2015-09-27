@@ -15,6 +15,8 @@
     cacheName: 'youtube-thumbnails',
     // Store up to 10 entries in that cache.
     maxCacheEntries: 10,
+    // Expire any entries that are older than 30 seconds.
+    maxCacheAgeSeconds: 30,
     // origin allows us to restrict the handler to requests whose origin matches a regexp.
     // In this case, we want to match anything that ends in 'ytimg.com'.
     origin: /\.ytimg\.com$/
