@@ -71,6 +71,25 @@ toolbox.router.delete('cache/:name', function(request) {
   return toolbox.uncache(request.url).then(respondOK, respondError);
 });
 
+// Handler with a dedicated cache and maxCacheEntries set.
+toolbox.router.get('fixtures/max-cache-entries/:foo', toolbox.networkFirst, {
+  cacheName: 'max-cache-entries',
+  maxCacheEntries: 2
+});
+
+// Handler with a dedicated cache and maxCacheAgeSeconds set.
+toolbox.router.get('fixtures/max-cache-age/:foo', toolbox.networkFirst, {
+  cacheName: 'max-cache-age',
+  maxCacheAgeSeconds: 1
+});
+
+// Handler with a dedicated cache and maxCacheAgeSeconds and maxCacheEntries set.
+toolbox.router.get('fixtures/max-cache-age-entries/:foo', toolbox.networkFirst, {
+  cacheName: 'max-cache-age-entries',
+  maxCacheAgeSeconds: 1,
+  maxCacheEntries: 2
+});
+
 toolbox.router.get('fixtures/:foo', toolbox.cacheOnly)
 // Single item
 toolbox.precache('fixtures/a');
