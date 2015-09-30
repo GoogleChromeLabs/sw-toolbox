@@ -1,7 +1,0 @@
-tests/
-node_modules/
-npm-debug.log
-gulpfile.js
-bower.json
-.eslintrc
-
