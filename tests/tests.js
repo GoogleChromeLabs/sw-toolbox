@@ -89,15 +89,12 @@ navigator.serviceWorker.ready.then(function() {
     var done = assert.async();
 
     // Confirm that the URL cannot be fetched
-    var step1 = fetch(url);
-    // If the fetch succeeds then we have a problem
-    step1.then(function(response) {
+    var step1 = fetch(url).then(function(response) {
+      // If the fetch succeeds then we have a problem
       assert.ok(false, 'Succeeded fetching file that shouldn\'t exist');
       done();
-    });
-
-    // Otherwise, move on to the next check
-    step1.catch(function(reason) {
+    }).catch(function(reason) {
+      // Otherwise, move on to the next check
       // Add to the cache
       return fetch(url, {method: 'post', body: date + ''}).then(function(response) {
         // Check that retrieving from the cache now succeeds

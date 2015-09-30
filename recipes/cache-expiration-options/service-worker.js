@@ -12,11 +12,13 @@
   // - toolbox.cacheFirst let us to use the predefined cache strategy for those requests.
   global.toolbox.router.get('/(.*)', global.toolbox.cacheFirst, {
     // Use a dedicated cache for the responses, separate from the default cache.
-    cacheName: 'youtube-thumbnails',
-    // Store up to 10 entries in that cache.
-    maxCacheEntries: 10,
-    // Expire any entries that are older than 30 seconds.
-    maxCacheAgeSeconds: 30,
+    cache: {
+      name: 'youtube-thumbnails',
+      // Store up to 10 entries in that cache.
+      maxEntries: 10,
+      // Expire any entries that are older than 30 seconds.
+      maxAgeSeconds: 30
+    },
     // origin allows us to restrict the handler to requests whose origin matches a regexp.
     // In this case, we want to match anything that ends in 'ytimg.com'.
     origin: /\.ytimg\.com$/
