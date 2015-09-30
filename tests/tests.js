@@ -89,7 +89,7 @@ navigator.serviceWorker.ready.then(function() {
     var done = assert.async();
 
     // Confirm that the URL cannot be fetched
-    var step1 = fetch(url).then(function(response) {
+    fetch(url).then(function(response) {
       // If the fetch succeeds then we have a problem
       assert.ok(false, 'Succeeded fetching file that shouldn\'t exist');
       done();

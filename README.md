@@ -125,7 +125,7 @@ Various properties of `cache` control the behavior of the default cache when set
 
 #### cache.name [String]
 The name of [`Cache`](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache)
-used to store [`Response`](https://fetch.spec.whatwg.org/#response-class)s. Using a uniquely name
+used to store [`Response`](https://fetch.spec.whatwg.org/#response-class)s. Using a unique name
 allows you to customize the cache's maximum size and age of entries.
 _Default_: Generated at runtime based on the service worker's `registration.scope` value.
 
