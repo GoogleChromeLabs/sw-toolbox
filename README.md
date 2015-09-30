@@ -103,15 +103,50 @@ Handle the request by trying to fetch the URL from the network. If the fetch fai
 ## API
 
 ### Global Options
-Any method that accepts an `options` object will accept a boolean option of `debug`. When true this causes Service Worker Toolbox to output verbose log messages to the worker's console.
 
-Most methods that involve a cache (`toolbox.cache`, `toolbox.uncache`, `toolbox.fastest`, `toolbox.cacheFirst`, `toolbox.cacheOnly`, `toolbox.networkFirst`) accept an option called `cacheName`, which is the **name** of the [Cache](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/#cache) that should be used. If not specified, Service Worker Toolbox will use a default cache.
+All options can be specified globally via properties of `toolbox.options`.
+Any individual options can be configured on a per-handler basis, via the `Object` passed as the
+third parameter to the `toolbox.router.get(urlPattern, handler, options)`, etc. methods.
 
-The `networkFirst` strategy supports a timeout, specified in seconds via the `networkTimeoutSeconds`
-global or local option. If `networkTimeoutSeconds` is explicitly set, then any network requests that
-take longer than that amount of time will automatically fall back to the cached response if one
-exists. By default, when `networkTimeoutSeconds` is not set, the browser's native networking timeout
-logic applies.
+#### debug [Boolean]
+Determines whether extra information is logged to the browser's `console`.
+_Default_: `false`
+
+#### networkTimeoutSeconds [Number]
+A timeout that applies to the `toolbox.networkFirst` built-in handler.
+If `networkTimeoutSeconds` is set, then any network requests that take longer than that amount of time
+will automatically fall back to the cached response if one exists. By default, when
+`networkTimeoutSeconds` is not set, the browser's native networking timeout logic applies.
+_Default_: `null`
+
+#### cache [Object]
+Various properties of `cache` control the behavior of the default cache when set via
+`toolbox.options.cache`, or the cache used by a specific request handler.
+
+#### cache.name [String]
+The name of [`Cache`](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache)
+used to store [`Response`](https://fetch.spec.whatwg.org/#response-class)s. Using a unique name
+allows you to customize the cache's maximum size and age of entries.
+_Default_: Generated at runtime based on the service worker's `registration.scope` value.
+
+#### cache.maxEntries [Number]
+The `cache.maxEntries` option can be used to impose a least-recently used cache expiration policy
+on entries cached via the various built-in handlers. You can use this with a cache that's dedicated
+to storing entries for a dynamic set of resources with no natural limit. Setting `cache.maxEntries` to, e.g.,
+`10` would mean that after the 11th entry is cached, the least-recently used entry would be
+automatically deleted. The cache should never end up growing beyond `cache.maxEntries` entries.
+This option will only take effect if `cache.name` is also set.
+It can be used alone or in conjunction with `cache.maxAgeSeconds`.
+_Default_: `null`
+
+#### cache.maxAgeSeconds [Number]
+The `maxAgeSeconds` option can be used to impose a maximum age for cache entries, in seconds.
+You can use this with a cache that's dedicated to storing entries for a dynamic set of resources
+with no natural limit. Setting `cache.maxAgeSeconds` to, e.g., `60 * 60 * 24` would mean that any
+entries older than a day would automatically be deleted.
+This option will only take effect if `cache.name` is also set.
+It can be used alone or in conjunction with `cache.maxEntries`.
+_Default_: `null`
 
 ### `toolbox.router.get(urlPattern, handler, options)`
 ### `toolbox.router.post(urlPattern, handler, options)`

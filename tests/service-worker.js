@@ -62,7 +62,7 @@ toolbox.router.get('multiple/match/:foo', respondString('2'));
 
 toolbox.router.get('cache/:name', toolbox.cacheOnly);
 toolbox.router.post('cache/:name', function(request) {
-  return Promise.all([request.text(), caches.open(toolbox.options.cacheName)]).then(function(params) {
+  return Promise.all([request.text(), caches.open(toolbox.options.cache.name)]).then(function(params) {
     var text = params[0], cache = params[1];
     return cache.put(request.url, new Response(text));
   }).then(respondOK, respondError);
@@ -71,7 +71,32 @@ toolbox.router.delete('cache/:name', function(request) {
   return toolbox.uncache(request.url).then(respondOK, respondError);
 });
 
-toolbox.router.get('fixtures/:foo', toolbox.cacheOnly)
+// Handler with a dedicated cache and maxCacheEntries set.
+toolbox.router.get('fixtures/max-cache-entries/:foo', toolbox.networkFirst, {
+  cache: {
+    name: 'max-cache-entries',
+    maxEntries: 2
+  }
+});
+
+// Handler with a dedicated cache and maxCacheAgeSeconds set.
+toolbox.router.get('fixtures/max-cache-age/:foo', toolbox.networkFirst, {
+  cache: {
+    name: 'max-cache-age',
+    maxAgeSeconds: 1
+  }
+});
+
+// Handler with a dedicated cache and maxCacheAgeSeconds and maxCacheEntries set.
+toolbox.router.get('fixtures/max-cache-age-entries/:foo', toolbox.networkFirst, {
+  cache: {
+    name: 'max-cache-age-entries',
+    maxAgeSeconds: 1,
+    maxEntries: 2
+  }
+});
+
+toolbox.router.get('fixtures/:foo', toolbox.cacheOnly);
 // Single item
 toolbox.precache('fixtures/a');
 // Array of items

@@ -20,7 +20,8 @@ var eslint = require('gulp-eslint');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 
-var sources = ['build/**/*.js', 'lib/**/*.js'];
+var buildSources = ['lib/**/*.js'];
+var lintSources = buildSources.concat(['gulpfile.js', 'recipes/**/*.js']);
 
 gulp.task('build', function() {
   var bundler = browserify({
@@ -42,14 +43,14 @@ gulp.task('build', function() {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(sources.concat('gulpfile.js'))
+  return gulp.src(lintSources)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
 });
 
-gulp.task('watch', ['default'], function() {
-  gulp.watch(sources, ['default']);
+gulp.task('watch', ['build'], function() {
+  gulp.watch(buildSources, ['build']);
 });
 
 gulp.task('default', ['lint', 'build']);
