@@ -18,9 +18,11 @@
     "eslint-config-xo": "^0.6.0",
     "gulp": "^3.8.10",
     "gulp-eslint": "^1.0.0",
+    "gulp-gh-pages": "^0.5.2",
     "jshint-stylish": "^1.0.0",
     "minifyify": "^6.4.0",
     "qunitjs": "^1.18.0",
+    "temp": "^0.8.3",
     "vinyl-source-stream": "^1.0.0"
   }
 }
