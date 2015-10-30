@@ -2,8 +2,6 @@
 
 > A collection of tools for [service workers](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/)
 
-## Service Worker helpers
-
 Service Worker Toolbox provides some simple helpers for use in creating your own service workers. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
 
 ## Install
