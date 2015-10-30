@@ -64,7 +64,7 @@ toolbox.router.default = myDefaultRequestHandler;
 toolbox.precache(['/index.html', '/site.css', '/images/logo.png']);
 ```
 
-### Request handlers
+### Using request handlers
 A request handler receives three arguments
 
 ```javascript
@@ -78,25 +78,6 @@ var myHandler = function(request, values, options) {
 - `options` - the options object that was used when [creating the route](#api)
 
 The return value should be a [Response](https://fetch.spec.whatwg.org/#response), or a [Promise](http://www.html5rocks.com/en/tutorials/es6/promises/) that resolves with a Response. If another value is returned, or if the returned Promise is rejected, the Request will fail which will appear to be a [NetworkError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#exception-NetworkError) to the page that made the request.
-
-### Built-in handlers
-
-There are 5 built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).
-
-#### `toolbox.networkFirst`
-Try to handle the request by fetching from the network. If it succeeds, store the response in the cache. Otherwise, try to fulfill the request from the cache. This is the strategy to use for basic read-through caching. Also good for API requests where you always want the freshest data when it is available but would rather have stale data than no data.
-
-#### `toolbox.cacheFirst`
-If the request matches a cache entry, respond with that. Otherwise try to fetch the resource from the network. If the network request succeeds, update the cache. Good for resources that don't change, or for which you have some other update mechanism.
-
-#### `toolbox.fastest`
-Request the resource from both the cache and the network in parallel. Respond with whichever returns first. Usually this will be the cached version, if there is one. On the one hand this strategy will always make a network request, even if the resource is cached. On the other hand, if/when the network request completes the cache is updated, so that future cache reads will be more up-to-date.
-
-#### `toolbox.cacheOnly`
-Resolve the request from the cache, or fail. Good for when you need to guarantee that no network request will be made - to save battery on mobile, for example.
-
-#### `toolbox.networkOnly`
-Handle the request by trying to fetch the URL from the network. If the fetch fails, fail the request. Essentially the same as not creating a route for the URL at all.
 
 ## API
 
@@ -145,6 +126,25 @@ entries older than a day would automatically be deleted.
 This option will only take effect if `cache.name` is also set.
 It can be used alone or in conjunction with `cache.maxEntries`.
 _Default_: `null`
+
+### Built-in handlers
+
+There are 5 built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).
+
+#### `toolbox.networkFirst`
+Try to handle the request by fetching from the network. If it succeeds, store the response in the cache. Otherwise, try to fulfill the request from the cache. This is the strategy to use for basic read-through caching. Also good for API requests where you always want the freshest data when it is available but would rather have stale data than no data.
+
+#### `toolbox.cacheFirst`
+If the request matches a cache entry, respond with that. Otherwise try to fetch the resource from the network. If the network request succeeds, update the cache. Good for resources that don't change, or for which you have some other update mechanism.
+
+#### `toolbox.fastest`
+Request the resource from both the cache and the network in parallel. Respond with whichever returns first. Usually this will be the cached version, if there is one. On the one hand this strategy will always make a network request, even if the resource is cached. On the other hand, if/when the network request completes the cache is updated, so that future cache reads will be more up-to-date.
+
+#### `toolbox.cacheOnly`
+Resolve the request from the cache, or fail. Good for when you need to guarantee that no network request will be made - to save battery on mobile, for example.
+
+#### `toolbox.networkOnly`
+Handle the request by trying to fetch the URL from the network. If the fetch fails, fail the request. Essentially the same as not creating a route for the URL at all.
 
 ###Methods
 
