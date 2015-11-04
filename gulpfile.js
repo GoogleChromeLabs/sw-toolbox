@@ -16,11 +16,14 @@
 'use strict';
 
 var browserify = require('browserify');
+var eslint = require('gulp-eslint');
+var ghPages = require('gulp-gh-pages');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
-var jshint = require('gulp-jshint');
+var temp = require('temp').track();
 
-var sources = ['build/**/*.js', 'lib/**/*.js'];
+var buildSources = ['lib/**/*.js'];
+var lintSources = buildSources.concat(['gulpfile.js', 'recipes/**/*.js']);
 
 gulp.task('build', function() {
   var bundler = browserify({
@@ -35,21 +38,33 @@ gulp.task('build', function() {
     output: 'sw-toolbox.map.json'
   });*/
 
-
   return bundler
     .bundle()
     .pipe(source('sw-toolbox.js'))
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('test', function () {
-    gulp.src(sources.concat('gulpfile.js'))
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter('jshint-stylish'));
+gulp.task('lint', function() {
+  return gulp.src(lintSources)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
-gulp.task('watch', ['default'], function() {
-  gulp.watch(sources, ['default']);
+gulp.task('watch', ['build'], function() {
+  gulp.watch(buildSources, ['build']);
 });
 
-gulp.task('default', ['test', 'build']);
+gulp.task('gh-pages', ['build'], function() {
+  var tempDir = temp.mkdirSync();
+
+  return gulp.src([
+    'companion.js',
+    'sw-toolbox.js',
+    'sw-toolbox.map.json',
+    'recipes/**/*'
+  ], {base: __dirname})
+    .pipe(ghPages({cacheDir: tempDir}));
+});
+
+gulp.task('default', ['lint', 'build']);

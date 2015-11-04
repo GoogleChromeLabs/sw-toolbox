@@ -1,6 +1,6 @@
 'use strict';
 
-navigator.serviceWorker.register('service-worker.js', { scope: './' });
+navigator.serviceWorker.register('service-worker.js');
 
 var checkValue = function(url, value, assert, method) {
   var done = assert.async();
@@ -12,6 +12,28 @@ var checkValue = function(url, value, assert, method) {
     done();
   }).catch(function(reason) {
     assert.ok(false, reason);
+  });
+};
+
+var checkCache = function(cache, url, isExpected, assert) {
+  var done = assert.async();
+  setTimeout(function() {
+    cache.match(url).then(function(response) {
+      assert.equal(!!response, isExpected, url + ' is in the cache');
+      done();
+    });
+  }, 500);
+};
+
+var executeInSeries = function(promises) {
+  return promises.reduce(function(previous, current) {
+    return previous = previous.then(current);
+  }, Promise.resolve());
+};
+
+var pausePromise = function(timeout) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, timeout);
   });
 };
 
@@ -67,15 +89,12 @@ navigator.serviceWorker.ready.then(function() {
     var done = assert.async();
 
     // Confirm that the URL cannot be fetched
-    var step1 = fetch(url);
-    // If the fetch succeeds then we have a problem
-    step1.then(function(response) {
+    fetch(url).then(function(response) {
+      // If the fetch succeeds then we have a problem
       assert.ok(false, 'Succeeded fetching file that shouldn\'t exist');
       done();
-    });
-
-    // Otherwise, move on to the next check
-    step1.catch(function(reason) {
+    }).catch(function(reason) {
+      // Otherwise, move on to the next check
       // Add to the cache
       return fetch(url, {method: 'post', body: date + ''}).then(function(response) {
         // Check that retrieving from the cache now succeeds
@@ -86,7 +105,7 @@ navigator.serviceWorker.ready.then(function() {
       }).catch(function(reason) {
         // Catch-all error handler
         assert.ok(false, 'Failed: ' + reason);
-      }).then(done);;
+      }).then(done);
     });
   });
 
@@ -105,5 +124,76 @@ navigator.serviceWorker.ready.then(function() {
     checkValue('fixtures/l', 'l', assert);
     checkValue('fixtures/m', 'm', assert);
     checkValue('fixtures/n', 'n', assert);
+  });
+
+  QUnit.test('Max Cache Entires', function(assert) {
+    assert.expect(3);
+
+    var urls = ['a', 'b', 'c'].map(function(letter) {
+      return 'fixtures/max-cache-entries/' + letter;
+    });
+
+    var fetchPromises = urls.map(function(url) {
+      return function() {
+        return fetch(url).then(pausePromise.bind(null, 500));
+      };
+    });
+
+    return caches.open('max-cache-entries').then(function(cache) {
+      return executeInSeries(fetchPromises).then(function() {
+        checkCache(cache, urls[0], false, assert);
+        checkCache(cache, urls[1], true, assert);
+        checkCache(cache, urls[2], true, assert);
+      });
+    });
+  });
+
+  QUnit.test('Max Cache Age', function(assert) {
+    assert.expect(3);
+
+    var urls = ['a', 'b', 'c'].map(function(letter) {
+      return 'fixtures/max-cache-age/' + letter;
+    });
+
+    var fetchPromises = urls.map(function(url) {
+      return fetch.bind(this, url);
+    });
+    fetchPromises.splice(1, 0, pausePromise.bind(null, 1500));
+
+    return caches.open('max-cache-age').then(function(cache) {
+      return executeInSeries(fetchPromises).then(function() {
+        checkCache(cache, urls[0], false, assert);
+        checkCache(cache, urls[1], true, assert);
+        checkCache(cache, urls[2], true, assert);
+      });
+    });
+  });
+
+  QUnit.test('Max Cache Age + Entries', function(assert) {
+    assert.expect(6);
+
+    var urls = ['a', 'b', 'c'].map(function(letter) {
+      return 'fixtures/max-cache-age-entries/' + letter;
+    });
+
+    var fetchPromises = urls.map(function(url) {
+      return fetch.bind(this, url);
+    });
+    fetchPromises.splice(1, 0, pausePromise.bind(null, 1500));
+
+    return caches.open('max-cache-age-entries').then(function(cache) {
+      return executeInSeries(fetchPromises).then(function() {
+        checkCache(cache, urls[0], false, assert);
+        checkCache(cache, urls[1], true, assert);
+        checkCache(cache, urls[2], true, assert);
+      }).then(pausePromise.bind(null, 1500)).then(function() {
+        var url = 'fixtures/max-cache-age-entries/d';
+        return fetch(url).then(function() {
+          checkCache(cache, urls[1], false, assert);
+          checkCache(cache, urls[2], false, assert);
+          checkCache(cache, url, true, assert);
+        });
+      });
+    });
   });
 });
