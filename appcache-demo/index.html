@@ -1,12 +1,13 @@
-<html>
+<html manifest="manifest.appcache">
   <head>
     <title>Possibly Cached</title>
   </head>
   <body>
     <p>I might be served from the cache.</p>
     <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js?manifest=manifest.appcache');
+      var manifest = document.firstChild.getAttribute('manifest');
+      if (manifest && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js?manifest=' + manifest);
       }
     </script>
   </body>

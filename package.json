@@ -22,7 +22,6 @@
     "jshint-stylish": "^1.0.0",
     "minifyify": "^6.4.0",
     "parse-appcache-manifest": "^0.2.0",
-    "path-to-regexp": "^1.0.1",
     "qunitjs": "^1.18.0",
     "temp": "^0.8.3",
     "vinyl-source-stream": "^1.0.0"
