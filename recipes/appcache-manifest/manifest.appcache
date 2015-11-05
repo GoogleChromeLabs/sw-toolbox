@@ -1,9 +1,11 @@
 CACHE MANIFEST
-# 2015-09-15:v1
+# v1
 
 CACHE:
 ./
 index.html
+../common.css
+../https-redirect.js
 
 NETWORK:
 no-cache
