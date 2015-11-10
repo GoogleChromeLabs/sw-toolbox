@@ -38,7 +38,18 @@ In your service worker you just need to use `importScripts` to load Service Work
 importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to match your own setup
 ```
 
+### Define Routes
+
+
+
 ## Usage
+
+
+
+The URL and the HTTP request method define which handler is called for a particular request. This is called a _route_. For example, to send `GET` requests for the URL `'/myapp/index.html'` might be defined this way:
+
+`toolbox.router.get('/myapp/index.html', mainHandler);`
+
 The following examples would all appear within your service worker file.
 ```javascript
 // Set up routes from URL patterns to request handlers
