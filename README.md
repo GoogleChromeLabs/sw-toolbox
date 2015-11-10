@@ -161,27 +161,27 @@ Handle the request by trying to fetch the URL from the network. If the fetch fai
 Create a route that causes requests for URLs matching `urlPattern` to be resolved by calling `handler`. Matches requests using the GET, POST, PUT, DELETE or HEAD HTTP methods respectively.
 
 - `urlPattern` - an Express style route. See the docs for the [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module for the full syntax
-- `handler` - a request handler, as [described above](#request-handlers)
-- `options` - an object containing options for the route. This options object will be available to the request handler. The `origin` option is specific to the route methods, and is an exact string or a Regexp against which the origin of the Request must match for the route to be used.
+- `handler` - a request handler, as [described above](#using-request-handlers)
+- `options` - an object containing options for the router. This options object will be passed to the request handler. The `origin` option is specific to the router methods, and can be either an exact string or a Regexp against which the origin of the Request must match for the router to be used.
 
 #### `toolbox.router.any(urlPattern, handler, options)`
 Like `toolbox.router.get`, etc., but matches any HTTP method.
 
 #### `toolbox.router.default`
-If you set this property to a function it will be used as the request handler for any GET request that does not match a route.
+Takes a function to use as the request handler for any GET request that does not match a route.
 
 #### `toolbox.precache(arrayOfURLs)`
 Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
 
 #### `toolbox.cache(url, options)`
-Causes the resource at `url` to be added to the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be added to the cache. Returns a Promise. The `options` parameter supports the `debug` and `cache` [global options](#global-options).
 
 #### `toolbox.uncache(url, options)`
-Causes the resource at `url` to be removed from the cache. Returns a Promise. Supports the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be removed from the cache. Returns a Promise. The `options` parameter supports  the `debug` and `cache` [global options](#global-options).
 
 ## Support
 
-If you’ve found an error in this library, please file an issue: https://github.com/GoogleChrome/sw-toolbox/issues
+If you’ve found an error in this library, please file an issue at: https://github.com/GoogleChrome/sw-toolbox/issues.
 
 Patches are encouraged, and may be submitted by forking this project and submitting a pull request through GitHub.
 
