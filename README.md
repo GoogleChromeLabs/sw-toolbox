@@ -174,10 +174,10 @@ Takes a function to use as the request handler for any GET request that does not
 Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
 
 #### `toolbox.cache(url, options)`
-Causes the resource at `url` to be added to the cache. Returns a Promise. The `options` parameter supports the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be added to the cache and returns a Promise that resolves with void. The `options` parameter supports the `debug` and `cache` [global options](#global-options).
 
 #### `toolbox.uncache(url, options)`
-Causes the resource at `url` to be removed from the cache. Returns a Promise. The `options` parameter supports  the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The `options` parameter supports  the `debug` and `cache` [global options](#global-options).
 
 ## Support
 
