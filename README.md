@@ -22,13 +22,13 @@ From your registering page, register your service worker in the normal way. For 
 navigator.serviceWorker.register('my-service-worker.js');
 ```
 
-For even lower friction, if you don't intend to doing anything more fancy than just registering with a default scope, you can instead include the Service Worker Toolbox companion script in your HTML:
+For even lower friction, especiall if you don't do anything more fancy than registering with a default scope, you can instead include the Service Worker Toolbox companion script in your HTML:
 
 ```html
 <script src="/path/to/sw-toolbox/companion.js" data-service-worker="my-service-worker.js"></script>
 ```
 
-As currently implemented in Chrome 40+, a service worker must exist at the root of the scope that you intend it to control, or higher. So if you want all of the pages under `/myapp/` to be controlled by the worker, the worker script itself must be served from either `/` or `/myapp/`. The default scope is the containing path of the service worker script.
+As implemented in Chrome 40 or later, a service worker must exist at the root of the scope that you intend it to control, or higher. So if you want all of the pages under `/myapp/` to be controlled by the worker, the worker script itself must be served from either `/` or `/myapp/`. The default scope is the containing path of the service worker script.
 
 ### Add Service Worker Toolbox to your service worker script
 
@@ -39,7 +39,7 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to ma
 ```
 
 ## Usage
-Within your service worker file
+The following examples would all appear within your service worker file.
 ```javascript
 // Set up routes from URL patterns to request handlers
 toolbox.router.get('/myapp/index.html', someHandler);
@@ -65,7 +65,7 @@ toolbox.precache(['/index.html', '/site.css', '/images/logo.png']);
 ```
 
 ### Using request handlers
-A request handler receives three arguments
+A request handler takes three arguments.
 
 ```javascript
 var myHandler = function(request, values, options) {
@@ -73,9 +73,9 @@ var myHandler = function(request, values, options) {
 }
 ```
 
-- `request` - [Request](https://fetch.spec.whatwg.org/#request) object that triggered the `fetch` event
+- `request` - The [Request](https://fetch.spec.whatwg.org/#request) object that triggered the `fetch` event
 - `values` - Object whose keys are the placeholder names in the URL pattern, with the values being the corresponding part of the request URL. For example, with a URL pattern of `'/images/:size/:name.jpg'` and an actual URL of `'/images/large/unicorns.jpg'`, `values` would be `{size: 'large', name: 'unicorns'}`
-- `options` - the options object that was used when [creating the route](#api)
+- `options` - the [options](#options) passed to one of the [router methods](#methods).
 
 The return value should be a [Response](https://fetch.spec.whatwg.org/#response), or a [Promise](http://www.html5rocks.com/en/tutorials/es6/promises/) that resolves with a Response. If another value is returned, or if the returned Promise is rejected, the Request will fail which will appear to be a [NetworkError](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#exception-NetworkError) to the page that made the request.
 
@@ -85,17 +85,19 @@ The return value should be a [Response](https://fetch.spec.whatwg.org/#response)
 
 All options can be specified globally via properties of `toolbox.options`.
 Any individual options can be configured on a per-handler basis, via the `Object` passed as the
-third parameter to the `toolbox.router.get(urlPattern, handler, options)`, etc. methods.
+third parameter to `toolbox.router` methods.
 
 #### debug [Boolean]
-Determines whether extra information is logged to the browser's `console`.
+Determines whether extra information is logged to the browser's console.
+
 _Default_: `false`
 
 #### networkTimeoutSeconds [Number]
 A timeout that applies to the `toolbox.networkFirst` built-in handler.
 If `networkTimeoutSeconds` is set, then any network requests that take longer than that amount of time
-will automatically fall back to the cached response if one exists. By default, when
+will automatically fall back to the cached response if one exists. When
 `networkTimeoutSeconds` is not set, the browser's native networking timeout logic applies.
+
 _Default_: `null`
 
 #### cache [Object]
@@ -103,28 +105,31 @@ Various properties of `cache` control the behavior of the default cache when set
 `toolbox.options.cache`, or the cache used by a specific request handler.
 
 #### cache.name [String]
-The name of [`Cache`](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache)
-used to store [`Response`](https://fetch.spec.whatwg.org/#response-class)s. Using a unique name
+The name of the [`Cache`](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache)
+used to store [`Response`](https://fetch.spec.whatwg.org/#response-class) objects. Using a unique name
 allows you to customize the cache's maximum size and age of entries.
+
 _Default_: Generated at runtime based on the service worker's `registration.scope` value.
 
 #### cache.maxEntries [Number]
-The `cache.maxEntries` option can be used to impose a least-recently used cache expiration policy
+Imposes a least-recently used cache expiration policy
 on entries cached via the various built-in handlers. You can use this with a cache that's dedicated
 to storing entries for a dynamic set of resources with no natural limit. Setting `cache.maxEntries` to, e.g.,
 `10` would mean that after the 11th entry is cached, the least-recently used entry would be
 automatically deleted. The cache should never end up growing beyond `cache.maxEntries` entries.
 This option will only take effect if `cache.name` is also set.
 It can be used alone or in conjunction with `cache.maxAgeSeconds`.
+
 _Default_: `null`
 
 #### cache.maxAgeSeconds [Number]
-The `maxAgeSeconds` option can be used to impose a maximum age for cache entries, in seconds.
+Imposes a maximum age for cache entries, in seconds.
 You can use this with a cache that's dedicated to storing entries for a dynamic set of resources
 with no natural limit. Setting `cache.maxAgeSeconds` to, e.g., `60 * 60 * 24` would mean that any
 entries older than a day would automatically be deleted.
 This option will only take effect if `cache.name` is also set.
 It can be used alone or in conjunction with `cache.maxEntries`.
+
 _Default_: `null`
 
 ### Built-in handlers
