@@ -22,7 +22,7 @@ From your registering page, register your service worker in the normal way. For 
 navigator.serviceWorker.register('my-service-worker.js');
 ```
 
-For even lower friction, especiall if you don't do anything more fancy than registering with a default scope, you can instead include the Service Worker Toolbox companion script in your HTML:
+For even lower friction, especially if you don't do anything more fancy than registering with a default scope, you can instead include the Service Worker Toolbox companion script in your HTML:
 
 ```html
 <script src="/path/to/sw-toolbox/companion.js" data-service-worker="my-service-worker.js"></script>
