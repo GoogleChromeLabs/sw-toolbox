@@ -162,7 +162,7 @@ Create a route that causes requests for URLs matching `urlPattern` to be resolve
 
 - `urlPattern` - an Express style route. See the docs for the [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module for the full syntax
 - `handler` - a request handler, as [described above](#using-request-handlers)
-- `options` - an object containing options for the router. This options object will be passed to the request handler. The `origin` option is specific to the router methods, and can be either an exact string or a Regexp against which the origin of the Request must match for the router to be used.
+- `options` - an object containing options for the route. This options object will be passed to the request handler. The `origin` option is specific to the router methods, and can be either an exact string or a Regexp against which the origin of the Request must match for the route to be used.
 
 #### `toolbox.router.any(urlPattern, handler, options)`
 Like `toolbox.router.get`, etc., but matches any HTTP method.
