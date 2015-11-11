@@ -42,7 +42,9 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to ma
 
 ### Defining Routes
 
-A _route_ is a combination of a URL and an HTTP request method and a request handler. For example, to send `GET` requests for the URL `'/myapp/index.html'` to a handler called `mainHandler()` you would write the following in your service worker file: 
+A _route_ is a URL pattern and request method associated with a handler. It defines the behaviour for a section of the site. _Routing_ is the process of matching an incoming request with the most appropriate route. To define a route you call the appropriate method on `toolbox.router`.
+
+For example, to send `GET` requests for the URL `'/myapp/index.html'` to a handler called `mainHandler()` you would write the following in your service worker file: 
 
 `toolbox.router.get('/myapp/index.html', mainHandler);`
 
