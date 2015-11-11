@@ -39,11 +39,16 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to ma
 ```
 
 ## Usage
-The following examples would all appear within your service worker file.
-```javascript
-// Set up routes from URL patterns to request handlers
-toolbox.router.get('/myapp/index.html', someHandler);
 
+### Defining Routes
+
+A _route_ is a combination of a URL and an HTTP request method and a request handler. For example, to send `GET` requests for the URL `'/myapp/index.html'` to a handler called `mainHandler()` you would write the following in your service worker file: 
+
+`toolbox.router.get('/myapp/index.html', mainHandler);`
+
+Some other examples follow.
+
+```javascript
 // For some common cases Service Worker Toolbox provides a built-in handler
 toolbox.router.get('/', toolbox.networkFirst);
 
@@ -59,12 +64,17 @@ toolbox.router.post('/(.*)', apiHandler, {origin: 'https://api.example.com'});
 
 // Provide a default handler for GET requests
 toolbox.router.default = myDefaultRequestHandler;
+```
 
-// You can provide a list of resources which will be cached at service worker install time
+### Precaching
+
+You can provide a list of resources which will be cached at service worker install time
+
+```javascript
 toolbox.precache(['/index.html', '/site.css', '/images/logo.png']);
 ```
 
-### Using request handlers
+### Defining Request Handlers
 A request handler takes three arguments.
 
 ```javascript
