@@ -32,11 +32,13 @@ As implemented in Chrome 40 or later, a service worker must exist at the root of
 
 ### Add Service Worker Toolbox to your service worker script
 
-In your service worker you just need to use `importScripts` to load Service Worker Toolbox
+In your service worker you just need to use `importScripts` to load Service Worker Toolbox. For example:
 
 ```javascript
-importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to match your own setup
+importScripts('bower_components/sw-toolbox/sw-toolbox.js'); 
 ```
+
+The path to `sw-toolbox.js` depends on your installation. The example above is for bower. If you had installed with npm, the path would be `node_modules/sw-toolbox/sw-toolbox.js`. 
 
 ## Usage
 
