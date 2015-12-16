@@ -1,0 +1,15 @@
+CACHE MANIFEST
+# v1
+
+CACHE:
+./
+index.html
+../common.css
+../https-redirect.js
+../../companion.js
+
+NETWORK:
+no-cache
+
+FALLBACK:
+can-fallback.html fallback.html
