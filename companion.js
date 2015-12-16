@@ -23,15 +23,16 @@
     var manifest = document.firstChild.getAttribute('manifest');
     if (manifest) {
       var absoluteManifestUrl = new URL(manifest, document.baseURI);
-      swUrl.search += (swUrl.search ? '&' : '') + 'manifest=' + absoluteManifestUrl;
-
+      swUrl.search += (swUrl.search ? '&' : '') + 'manifest=' +
+        absoluteManifestUrl;
     }
 
     var swUrlString = swUrl.toString();
 
     if (manifest && 'caches' in window) {
       window.caches.open(swUrlString).then(function(cache) {
-        console.log('Adding %s to cache %s to match implicit AppCache manifest behavior.', window.location.href, swUrlString);
+        console.log('Adding %s to cache %s to match AppCache behavior.',
+          window.location.href, swUrlString);
         cache.add(window.location.href);
       })
     }
