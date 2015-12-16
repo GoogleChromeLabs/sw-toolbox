@@ -15,6 +15,6 @@
     // corresponding service worker based on the configuration.
     global.toolbox.appCacheManifest(manifest);
   } else {
-    console.warn('Please provide the AppCache Manifest file in the manifest= URL query parameter.');
+    throw Error('Skipping this registration, since there is no manifest= URL query parameter.');
   }
 })(self);

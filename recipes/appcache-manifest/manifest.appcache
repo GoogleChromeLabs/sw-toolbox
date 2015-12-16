@@ -6,6 +6,7 @@ CACHE:
 index.html
 ../common.css
 ../https-redirect.js
+../../companion.js
 
 NETWORK:
 no-cache

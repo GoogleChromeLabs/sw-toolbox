@@ -15,9 +15,27 @@
 */
 (function() {
   'use strict';
-  var workerScript = document.currentScript.dataset.serviceWorker;
+  var swScript = document.currentScript.dataset.serviceWorker;
 
-  if (workerScript && 'serviceWorker' in navigator) {
-    navigator.serviceWorker.register(workerScript);
+  if (swScript && 'serviceWorker' in navigator) {
+    var swUrl = new URL(swScript, document.baseURI);
+
+    var manifest = document.firstChild.getAttribute('manifest');
+    if (manifest) {
+      var absoluteManifestUrl = new URL(manifest, document.baseURI);
+      swUrl.search += (swUrl.search ? '&' : '') + 'manifest=' + absoluteManifestUrl;
+
+    }
+
+    var swUrlString = swUrl.toString();
+
+    if (manifest && 'caches' in window) {
+      window.caches.open(swUrlString).then(function(cache) {
+        console.log('Adding %s to cache %s to match implicit AppCache manifest behavior.', window.location.href, swUrlString);
+        cache.add(window.location.href);
+      })
+    }
+
+    navigator.serviceWorker.register(swUrlString);
   }
 })();
