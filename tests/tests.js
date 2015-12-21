@@ -2,6 +2,14 @@
 
 navigator.serviceWorker.register('service-worker.js');
 
+var controlledPromise = new Promise(function(resolve) {
+  if (navigator.serviceWorker.controller) {
+    resolve();
+  } else {
+    navigator.serviceWorker.addEventListener('controllerchange', resolve);
+  }
+});
+
 var checkValue = function(url, value, assert, method) {
   var done = assert.async();
   method = method || 'get';
@@ -37,8 +45,7 @@ var pausePromise = function(timeout) {
   });
 };
 
-navigator.serviceWorker.ready.then(function() {
-
+controlledPromise.then(function() {
   QUnit.test('Default route', function(assert) {
     checkValue('not/real/path', 'Default', assert);
   });
@@ -66,10 +73,6 @@ navigator.serviceWorker.ready.then(function() {
 
     checkValue('matches/only/head', 'OK', assert, 'head');
     checkValue('matches/only/head', 'Default', assert, 'get');
-    checkValue('matches/only/head', 'Default', assert, 'put');
-    checkValue('matches/only/head', 'Default', assert, 'post');
-    checkValue('matches/only/head', 'Default', assert, 'delete');
-    checkValue('matches/only/head', 'Default', assert, 'x-custom');
   });
 
   QUnit.test('First declared route wins', function(assert) {
