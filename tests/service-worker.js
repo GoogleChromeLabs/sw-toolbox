@@ -59,6 +59,11 @@ toolbox.router.head('matches/only/head', respondOK);
 toolbox.router.get('multiple/match/:foo.html', respondString('1'));
 toolbox.router.get('multiple/match/:foo', respondString('2'));
 
+// Needed for 'Origin option'
+toolbox.router.get('/shouldOK', respondOK, {origin: /originexample\.com$/});
+
+// Needed for 'Regex routing'
+toolbox.router.get(/regexexample\.com\/shouldOK/, respondOK);
 
 toolbox.router.get('cache/:name', toolbox.cacheOnly);
 toolbox.router.post('cache/:name', function(request) {
