@@ -8,7 +8,9 @@
   global.toolbox.options.debug = true;
 
   // Set up a handler for HTTP GET requests:
-  // - /\.ytimg\.com\// will match any requests going against ytimg.com.
+  // - /\.ytimg\.com\// will match any requests whose URL contains 'ytimg.com'.
+  //   A narrower RegExp could be used, but just checking for ytimg.com anywhere
+  //   in the URL should be fine for this sample.
   // - toolbox.cacheFirst let us to use the predefined cache strategy for those
   //   requests.
   global.toolbox.router.get(/\.ytimg\.com\//, global.toolbox.cacheFirst, {

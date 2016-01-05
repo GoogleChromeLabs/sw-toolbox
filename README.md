@@ -61,26 +61,26 @@ However, if you need wildcards (e.g. match _any_ URL that begins with
 match `https://othersite.com/api/`), `sw-toolbox` has two options for
 configuring your routes.
 
-### ExpressJS-style Routes
+### Express-style Routes
 
-For developers familiar with [ExpressJS routing](http://expressjs.com/en/guide/routing.html),
+For developers familiar with [Express routing](http://expressjs.com/en/guide/routing.html),
 `sw-toolbox` offers support for similar named wildcards, via the
 [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) library.
 
 If you use a `String` to define your route, it's assumed you're using
-ExpressJS-style routes.
+Express-style routes.
 
 By default, a route will only match URLs on the same origin as the service
-worker. If you'd like your ExpressJS-style routes to match URLs on different
+worker. If you'd like your Express-style routes to match URLs on different
 origins, you need to pass in a value for the `origin` option. The value could be
 either a `String` (which is checked for an exact match) or a `RegExp` object.
 In both cases, it's matched against the full origin of the URL
 (e.g. `'https://example.com'`).
 
-Some examples of using ExpressJS-style routing include:
+Some examples of using Express-style routing include:
 
 ```javascript
-// URL patterns are the same syntax as ExpressJS routes
+// URL patterns are the same syntax as Express routes
 // (http://expressjs.com/guide/routing.html)
 toolbox.router.get(':foo/index.html', function(request, values) {
   return new Response('Handled a request for ' + request.url +
@@ -97,16 +97,16 @@ Developers who are more comfortable using [regular expressions](https://regex101
 can use an alternative syntax to define routes, passing in a [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
 object as the first parameter. This `RegExp` will be matched against the full
 request URL when determining whether the route applies, including the origin and 
-path. This can lead to simpler cross-origin routing vs. ExpressJS-style routes,
+path. This can lead to simpler cross-origin routing vs. Express-style routes,
 since both the origin and the path are matched simultaneously, without having
 to specify a separate `origin` option.
 
-Note that while ExpressJS-style routes allow you to name path fragment
+Note that while Express-style routes allow you to name path fragment
 parameters that will be passed to your handler (see `values.foo` in the previous
 example), that functionality is not supported while using regular expression
 routes.
 
-Some examples of using ExpressJS-style routing include:
+Some examples of using Regular Expression routing include:
 
 ```javascript
 // Match URLs that end in index.html
