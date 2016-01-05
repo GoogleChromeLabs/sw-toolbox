@@ -8,10 +8,12 @@
   global.toolbox.options.debug = true;
 
   // Set up a handler for HTTP GET requests:
-  // - '/(.*)' means any URL pathname will be matched.
+  // - /\.ytimg\.com\// will match any requests whose URL contains 'ytimg.com'.
+  //   A narrower RegExp could be used, but just checking for ytimg.com anywhere
+  //   in the URL should be fine for this sample.
   // - toolbox.cacheFirst let us to use the predefined cache strategy for those
   //   requests.
-  global.toolbox.router.get('/(.*)', global.toolbox.cacheFirst, {
+  global.toolbox.router.get(/\.ytimg\.com\//, global.toolbox.cacheFirst, {
     // Use a dedicated cache for the responses, separate from the default cache.
     cache: {
       name: 'youtube-thumbnails',
@@ -19,11 +21,7 @@
       maxEntries: 10,
       // Expire any entries that are older than 30 seconds.
       maxAgeSeconds: 30
-    },
-    // origin allows us to restrict the handler to requests whose origin matches
-    // a regexp. In this case, we want to match anything that ends in
-    // 'ytimg.com'.
-    origin: /\.ytimg\.com$/
+    }
   });
 
   // By default, all requests that don't match our custom handler will use the

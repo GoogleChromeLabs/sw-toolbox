@@ -70,6 +70,14 @@ controlledPromise.then(function() {
     checkValue('matching/all/patterns', 'all', assert);
   });
 
+  QUnit.test('Origin option', function(assert) {
+    checkValue('https://originexample.com/shouldOK', 'OK', assert);
+  });
+
+  QUnit.test('Regex routing', function(assert) {
+    checkValue('https://regexexample.com/shouldOK', 'OK', assert);
+  });
+
   QUnit.test('Method-based matching', function(assert) {
     checkValue('matches/any/method', 'OK', assert, 'get');
     checkValue('matches/any/method', 'OK', assert, 'put');
