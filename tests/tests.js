@@ -2,6 +2,21 @@
 
 navigator.serviceWorker.register('service-worker.js');
 
+// We want to delay the start of our tests until the page is controlled by
+// the service worker, since only at that point will the service worker
+// intercept network requests.
+// We can't use navigator.serviceWorker.ready, since that promise resolves once
+// the service worker is activated (but before it takes control of the page),
+// so we need to create our own equivalent promise.
+// See https://github.com/slightlyoff/ServiceWorker/issues/799
+var controlledPromise = new Promise(function(resolve) {
+  if (navigator.serviceWorker.controller) {
+    resolve();
+  } else {
+    navigator.serviceWorker.addEventListener('controllerchange', resolve);
+  }
+});
+
 var checkValue = function(url, value, assert, method) {
   var done = assert.async();
   method = method || 'get';
@@ -37,8 +52,7 @@ var pausePromise = function(timeout) {
   });
 };
 
-navigator.serviceWorker.ready.then(function() {
-
+controlledPromise.then(function() {
   QUnit.test('Default route', function(assert) {
     checkValue('not/real/path', 'Default', assert);
   });
@@ -66,10 +80,6 @@ navigator.serviceWorker.ready.then(function() {
 
     checkValue('matches/only/head', 'OK', assert, 'head');
     checkValue('matches/only/head', 'Default', assert, 'get');
-    checkValue('matches/only/head', 'Default', assert, 'put');
-    checkValue('matches/only/head', 'Default', assert, 'post');
-    checkValue('matches/only/head', 'Default', assert, 'delete');
-    checkValue('matches/only/head', 'Default', assert, 'x-custom');
   });
 
   QUnit.test('First declared route wins', function(assert) {
