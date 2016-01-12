@@ -1,5 +1,5 @@
 <!--
-  Copyright 2015 Google Inc. All rights reserved.
+  Copyright 2016 Google Inc. All rights reserved.
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -88,30 +88,22 @@
         return;
       }
 
+      // should adds objects to primitives which requires this call to be made
+      // before any tests are run.
       window.chai.should();
 
       // We unregister all service workers, clear all caches and remove
       // All registered iframes
-      beforeEach(function(done) {
-        testHelper.cleanState()
-        .then(() => done(), done);
+      beforeEach(function() {
+        return testHelper.cleanState();
       });
 
       // Clean up after the final test has finished
-      after(function(done) {
-        testHelper.cleanState()
-        .then(() => done(), done);
+      after(function() {
+        return testHelper.cleanState();
       });
 
       var runResults = mocha.run();
-
-      // If there are no tests we should define window.swtoolbox
-      // so the automated test suite will know the test has ended
-      if (runResults.total === 0) {
-        publishTestResults();
-        return;
-      }
-
       // pass, fail and end events allow up to capture results and
       // determine when to publish test results
       runResults.on('pass', function(test) {

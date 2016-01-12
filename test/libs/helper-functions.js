@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Google Inc. All rights reserved.
+ * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 /* eslint-env browser */
 
+var testCounter = 0;
+
 // Each service worker that is registered should be given a unique
 // scope. To achieve this we register it with a scope the same as
 // an iframe's src that is unique for each test.
@@ -29,9 +31,12 @@ var getIframe = function() {
       return resolve(existingIframe);
     }
 
+    // This will be used as a unique service worker scope
+    testCounter++;
+
     var newIframe = document.createElement('iframe');
     newIframe.classList.add('js-test-iframe');
-    newIframe.src = '/test/iframe/' + Math.random();
+    newIframe.src = '/test/iframe/' + testCounter;
     newIframe.addEventListener('load', () => {
       resolve(newIframe);
     });
@@ -43,32 +48,18 @@ window.testHelper = {
   unregisterAllRegistrations: function() {
     return navigator.serviceWorker.getRegistrations()
       .then(registrations => {
-        if (registrations.length === 0) {
-          return Promise.resolve();
-        }
-
-        var unregisterPromises = [];
-        for (var i = 0; i < registrations.length; i++) {
-          unregisterPromises.push(
-            registrations[i].unregister()
-          );
-        }
-        return Promise.all(unregisterPromises);
+        return Promise.all(registrations.map(registration => {
+          registration.unregister();
+        }));
       });
   },
 
   clearAllCaches: function() {
     return window.caches.keys()
       .then(cacheNames => {
-        if (cacheNames.length === 0) {
-          return Promise.resolve();
-        }
-
-        var cacheTaskPromises = [];
-        for (var i = 0; i < cacheNames.length; i++) {
-          cacheTaskPromises.push(window.caches.delete(cacheNames[i]));
-        }
-        return Promise.all(cacheTaskPromises);
+        return Promise.all(cacheNames.map(cacheName => {
+          window.caches.delete(cacheName);
+        }));
       });
   },
 
@@ -149,9 +140,9 @@ window.testHelper = {
   // This is limited to text at the moment.
   getAllCachedAssets: function(cacheName) {
     var cache = null;
-    return window.caches.keys()
-      .then(cacheKeys => {
-        if (cacheKeys.indexOf(cacheName) < 0) {
+    return window.caches.has(cacheName)
+      .then(hasCache => {
+        if (!hasCache) {
           throw new Error('Cache doesn\'t exist.');
         }
 
