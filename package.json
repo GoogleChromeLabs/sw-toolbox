@@ -14,13 +14,16 @@
   "devDependencies": {
     "browserify": "^12.0.1",
     "browserify-header": "^0.9.2",
+    "chai": "^3.4.1",
     "eslint": "^1.10.3",
     "eslint-config-google": "^0.3.0",
+    "express": "^4.13.3",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
     "gulp-gh-pages": "^0.5.4",
     "jshint-stylish": "^2.1.0",
     "minifyify": "^7.1.0",
+    "mocha": "^2.3.4",
     "qunitjs": "^1.20.0",
     "temp": "^0.8.3",
     "vinyl-source-stream": "^1.1.0"
