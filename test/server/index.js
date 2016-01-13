@@ -27,7 +27,7 @@ var app = express();
 
 // Set up static assets
 app.use('/test/browser-tests/',
-  express.static(path.join(__dirname, '../browser-tests/'), {
+  express.static(path.join(__dirname, '..', 'browser-tests/'), {
     setHeaders: function(res) {
       res.setHeader('Service-Worker-Allowed', '/');
     }
@@ -35,7 +35,7 @@ app.use('/test/browser-tests/',
 );
 
 // Allow all assets in the project to be served (This includes sw-toolbox.js)
-app.use('/', express.static(path.join(__dirname, '../../')));
+app.use('/', express.static(path.join(__dirname, '..', '..')));
 
 // If the user tries to go to the root of the test server, redirect them
 // to /test/
@@ -47,7 +47,7 @@ app.get('/', function(req, res) {
 // a page to claim and control. This is done by returning a basic
 // html file for /test/iframe/<timestamp>
 app.get('/test/iframe/:timestamp', function(req, res) {
-  res.sendFile(path.join(__dirname, '../data/test-iframe.html'));
+  res.sendFile(path.join(__dirname, '..', 'data', 'test-iframe.html'));
 });
 
 // Start service on port 8888
