@@ -1,0 +1,121 @@
+<!--
+  Copyright 2016 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SW Toolbox Tests</title>
+  <link href="/node_modules/mocha/mocha.css" rel="stylesheet" />
+
+  <!--
+    iframes are used to manage service worker scoping.
+    This will hide them and stop the page from jumping around
+  -->
+  <style>
+    iframe {
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="mocha"></div>
+
+  <script src="/node_modules/chai/chai.js"></script>
+  <script src="/node_modules/mocha/mocha.js"></script>
+
+  <!-- Helper functions will be under window.testHelper -->
+  <script src="/test/libs/helper-functions.js"></script>
+
+  <!--
+    Timeout is extended to ensure tests for max-cache-age
+    have enough time to complete
+  -->
+  <script>mocha.setup({
+    ui: 'bdd',
+    timeout: 5000
+  })</script>
+
+  <!-- In browser test scripts should be added to the page here-->
+  <script src="/test/browser-tests/precache/precache.js"></script>
+
+  <script>
+    (function() {
+      // To automate the tests with selenium, we need a way
+      // to inform selenium when the tests are completed and
+      // pass results back.
+      // This is done by waiting for window.swtoolbox to be defined.
+      // This is done in publishTestResults();
+      var passedTests = [];
+      var failedTests = [];
+
+      // This is a helper method that simplifies the test
+      // results to an object that can be JSON.string-ified.
+      function getFriendlyTestResult(testResult) {
+        return {
+          title: testResult.title,
+          state: testResult.state
+        };
+      };
+
+      // Once this is called, automated tests should be
+      // able to read sw.toolbox and get test results.
+      function publishTestResults() {
+        window.swtoolbox = {
+          testResults: {
+            passed: passedTests,
+            failed: failedTests
+          }
+        };
+      }
+
+      // This make browsers without a service worker pass tests by
+      // bypassing the tests altogether.
+      // This is desirable to allow travis to run tests in all browsers
+      // regardless of support or not and perform tests when the browser
+      // starts to support service workers.
+      if (!('serviceWorker' in navigator)) {
+        publishTestResults();
+        return;
+      }
+
+      // should adds objects to primitives which requires this call to be made
+      // before any tests are run.
+      window.chai.should();
+
+      // We unregister all service workers, clear all caches and remove
+      // All registered iframes
+      beforeEach(function() {
+        return testHelper.cleanState();
+      });
+
+      // Clean up after the final test has finished
+      after(function() {
+        return testHelper.cleanState();
+      });
+
+      var runResults = mocha.run();
+      // pass, fail and end events allow up to capture results and
+      // determine when to publish test results
+      runResults.on('pass', function(test) {
+        passedTests.push(getFriendlyTestResult(test));
+      })
+      .on('fail', function(test) {
+        failedTests.push(getFriendlyTestResult(test));
+      })
+      .on('end', function() {
+        publishTestResults();
+      });
+    })();
+  </script>
+</body>
+</html>
