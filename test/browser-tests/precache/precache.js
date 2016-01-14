@@ -30,7 +30,6 @@ describe('Test precache method', () => {
 
     return new Promise((resolve, reject) => {
       let cachedAssetsKeys = Object.keys(cachedAssets);
-      console.log(cachedAssetsKeys);
       cachedAssetsKeys.should.have.length(assetSet.size);
 
       for (let assetPath of assetSet) {
