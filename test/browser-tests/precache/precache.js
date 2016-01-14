@@ -30,6 +30,7 @@ describe('Test precache method', () => {
 
     return new Promise((resolve, reject) => {
       let cachedAssetsKeys = Object.keys(cachedAssets);
+      console.log(cachedAssetsKeys);
       cachedAssetsKeys.should.have.length(assetSet.size);
 
       for (let assetPath of assetSet) {
@@ -166,6 +167,24 @@ describe('Test precache method', () => {
       })
       .then(cachedAssets => {
         return compareCachedAssets(additionalInstallAssets, cachedAssets);
+      });
+  });
+
+  it('should precache all desired assets from a mix of strings, promises and arrays', () => {
+    let assetList = [
+      '/test/data/files/text.txt',
+      '/test/data/files/text-1.txt',
+      '/test/data/files/text-2.txt',
+      '/test/data/files/text-3.txt',
+      '/test/data/files/text-4.txt',
+      '/test/data/files/text-5.txt'
+    ];
+    return testHelper.activateSW(serviceWorkersFolder + '/mix.js')
+      .then(() => {
+        return testHelper.getAllCachedAssets('precache-mix');
+      })
+      .then(cachedAssets => {
+        return compareCachedAssets(assetList, cachedAssets);
       });
   });
 });
