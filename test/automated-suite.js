@@ -100,18 +100,13 @@ describe('Test SW-Toolbox', () => {
     .then(testResults => {
       if (testResults.failed.length > 0) {
         var failedTests = testResults.failed;
-        var errorMsg = 'Issues in ' + browserName + '.\n\n' + browserName + ' had ' + testResults.failed.length + ' test failures.\n';
-        errorMsg += '------------------------------------------------\n';
-        for (var i = 0; i < failedTests.length; i++) {
-          var testResult = failedTests[i];
-          errorMsg += '[Failed Test ' + (i + 1) + ']\n';
-          errorMsg += '    ' + testResult.title + '\n';
-          if ((i + 1) !== failedTests.length) {
-            errorMsg += '\n';
-          }
-        }
-        errorMsg += '------------------------------------------------\n';
-        throw new Error(errorMsg);
+        var errorMessage = 'Issues in ' + browserName + '.\n\n' + browserName + ' had ' + testResults.failed.length + ' test failures.\n';
+        errorMessage += '------------------------------------------------\n';
+        errorMessage += failedTests.map((failedTest, i) => {
+          return `[Failed Test ${i + 1}]\n    ${failedTest.title}\n`;
+        }).join('\n');
+        errorMessage += '------------------------------------------------\n';
+        throw new Error(errorMessage);
       }
     });
   };
