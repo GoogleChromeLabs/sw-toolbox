@@ -18,15 +18,14 @@
 
 // This is a test and we want descriptions to be useful, if this
 // breaks the max-length, it's ok.
+/* eslint-disable max-len, no-console, padded-blocks, no-multiple-empty-lines */
+/* eslint-env node,mocha */
 
 var fs = require('fs');
 var webdriver = require('selenium-webdriver');
 var chrome = require('selenium-webdriver/chrome');
 var firefox = require('selenium-webdriver/firefox');
 require('chai').should();
-
-/* eslint-disable max-len, no-console, padded-blocks, no-multiple-empty-lines */
-/* eslint-env node,mocha */
 
 // These tests make use of selenium-webdriver. You can find the relevant
 // documentation here: http://selenium.googlecode.com/git/docs/api/javascript/index.html
