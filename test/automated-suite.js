@@ -92,9 +92,7 @@ describe('Test SW-Toolbox', () => {
         // Resolve the outer promise to get out of the webdriver promise chain
         resolve(testResults);
       })
-      .thenCatch(function(err) {
-        reject(err);
-      });
+      .thenCatch(reject);
     })
     .then(testResults => {
       if (testResults.failed.length > 0) {
@@ -129,9 +127,7 @@ describe('Test SW-Toolbox', () => {
         .then(() => {
           done();
         })
-        .catch(err => {
-          done(err);
-        });
+        .catch(done);
     })
     .catch(() => {
       done(new Error('Executable for Chrome Stable not found'));
@@ -157,9 +153,7 @@ describe('Test SW-Toolbox', () => {
         .then(() => {
           done();
         })
-        .catch(err => {
-          done(err);
-        });
+        .catch(done);
     })
     .catch(() => {
       done(new Error('Executable for Chrome Beta not found'));
@@ -176,9 +170,7 @@ describe('Test SW-Toolbox', () => {
     .then(() => {
       done();
     })
-    .catch(err => {
-      done(err);
-    });
+    .catch(done);
   });
 
   it('should pass all tests in Firefox Beta', done => {
@@ -200,9 +192,7 @@ describe('Test SW-Toolbox', () => {
       .then(() => {
         done();
       })
-      .catch(err => {
-        done(err);
-      });
+      .catch(done);
     })
     .catch(() => {
       done(new Error('Executable for Firefox Beta not found'));
