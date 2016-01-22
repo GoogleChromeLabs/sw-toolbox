@@ -88,7 +88,9 @@ describe('Test precache method', () => {
       });
   });
 
-  it('should precache all desired assets from arrays of arrays in precache-valid', () => {
+  // This behaviour is undefined - discussed here:
+  // https://github.com/GoogleChrome/sw-toolbox/issues/74
+  it.skip('should precache all desired assets from arrays of arrays in precache-valid', () => {
     let assetList = [
       '/test/data/files/text.txt',
       '/test/data/files/text-1.txt',
@@ -109,7 +111,9 @@ describe('Test precache method', () => {
       });
   });
 
-  it('should precache all desired assets from arrays of arrays of promises in precache-valid', () => {
+  // This behaviour is undefined - discussed here:
+  // https://github.com/GoogleChrome/sw-toolbox/issues/79
+  it.skip('should precache all desired assets from arrays of arrays of promises in precache-valid', () => {
     let assetList = [
       '/test/data/files/text.txt',
       '/test/data/files/text-1.txt',
@@ -130,7 +134,9 @@ describe('Test precache method', () => {
       });
   });
 
-  it('should not precache paths that do no exist', () => {
+  // This behaviour is undefined - discussed here:
+  // https://github.com/GoogleChrome/sw-toolbox/issues/75
+  it.skip('should not precache paths that do no exist', () => {
     let testId = 'precache-non-existant-files';
     let validAssetsList = [
       '/test/data/files/text.txt',
@@ -169,7 +175,10 @@ describe('Test precache method', () => {
       });
   });
 
-  it('should precache all desired assets from a mix of strings, promises and arrays', () => {
+  // This behaviour is undefined - changes to API that would address this
+  // are discussed here:
+  // https://github.com/GoogleChrome/sw-toolbox/issues/77
+  it.skip('should precache all desired assets from a mix of strings, promises and arrays', () => {
     let assetList = [
       '/test/data/files/text.txt',
       '/test/data/files/text-1.txt',

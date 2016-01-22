@@ -3,7 +3,7 @@
   "version": "3.1.1",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "gulp lint"
+    "test": "gulp lint && gulp test:automated"
   },
   "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
@@ -15,16 +15,19 @@
     "browserify": "^12.0.1",
     "browserify-header": "^0.9.2",
     "chai": "^3.4.1",
+    "chromedriver": "^2.20.0",
     "eslint": "^1.10.3",
     "eslint-config-google": "^0.3.0",
     "express": "^4.13.3",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
     "gulp-gh-pages": "^0.5.4",
+    "gulp-mocha": "^2.2.0",
     "jshint-stylish": "^2.1.0",
     "minifyify": "^7.1.0",
     "mocha": "^2.3.4",
     "qunitjs": "^1.20.0",
+    "selenium-webdriver": "^2.48.2",
     "temp": "^0.8.3",
     "vinyl-source-stream": "^1.1.0"
   }

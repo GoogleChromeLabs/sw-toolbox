@@ -21,9 +21,35 @@ var ghPages = require('gulp-gh-pages');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var temp = require('temp').track();
+var spawn = require('child_process').spawn;
+var mocha = require('gulp-mocha');
 
 var buildSources = ['lib/**/*.js'];
 var lintSources = buildSources.concat(['gulpfile.js', 'recipes/**/*.js']);
+
+var testServer = null;
+
+gulp.task('test:manual', function() {
+  testServer = spawn('node', ['test/server/index.js'], {
+    stdio: 'inherit'
+  });
+});
+
+gulp.task('test:automated', ['test:manual'], function() {
+  // This task requires you to have chrome driver in your path
+  // You can do this with:
+  // npm install -g chromedriver
+  return gulp.src('test/automated-suite.js', {read: false})
+    .pipe(mocha({
+      timeout: 10000
+    }))
+    .once('error', () => {
+      testServer.kill();
+    })
+    .once('end', () => {
+      testServer.kill();
+    });
+});
 
 gulp.task('build', function() {
   var bundler = browserify({
