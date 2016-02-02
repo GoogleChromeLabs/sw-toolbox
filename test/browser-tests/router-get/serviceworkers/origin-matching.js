@@ -48,8 +48,6 @@ self.toolbox.router.get('/https-only-string',
     return new Response('/https-only-string');
   }, {origin: 'https://developers.google.com'});
 
-
-
 // Testing the regex route approach
 self.toolbox.router.get(/developers\.google\.com\/soft-origin-regex-route/,
   function() {
