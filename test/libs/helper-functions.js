@@ -17,7 +17,12 @@
 
 /* eslint-env browser */
 
+// The test counter ensures a unique scope between each test.
+// testTime is used to ensure a unique scope between runs of
+// the test suite - useful if manual testing parts of the
+// suite in different tabs at the same time.
 var testCounter = 0;
+var testTime = new Date().getTime();
 
 // Each service worker that is registered should be given a unique
 // scope. To achieve this we register it with a scope the same as
@@ -36,7 +41,7 @@ var getIframe = function() {
 
     var newIframe = document.createElement('iframe');
     newIframe.classList.add('js-test-iframe');
-    newIframe.src = '/test/iframe/' + testCounter;
+    newIframe.src = `/test/iframe/${testTime}${testCounter}`;
     newIframe.addEventListener('load', () => {
       resolve(newIframe);
     });
@@ -49,7 +54,7 @@ window.testHelper = {
     return navigator.serviceWorker.getRegistrations()
       .then(registrations => {
         return Promise.all(registrations.map(registration => {
-          registration.unregister();
+          return registration.unregister();
         }));
       });
   },
@@ -115,7 +120,7 @@ window.testHelper = {
       })
       .then(registration => {
         if (registration.installing === null) {
-          throw new Error(swUrl + ' already installed.');
+          throw new Error(swUrl + ' is not installing.');
         }
 
         // We unregister all service workers after each test - so this should
