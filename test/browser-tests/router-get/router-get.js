@@ -120,6 +120,16 @@ describe('Test router.get method', () => {
     .catch(done);
   });
 
+  // Firefox version 45+ support fetch requests to other origins going through
+  // service workers. This check will skip tests for older version of
+  // firefox and reenable the tests when appropriate.
+  var firefoxVersion = /Firefox\/(\d+).\d+/.exec(navigator.userAgent);
+  if (firefoxVersion && parseInt(firefoxVersion[1], 10) < 45) {
+    console.warn('Tests skipped due to version of Firefox not supporting ' +
+      'cross origin requests via fetch()');
+    return;
+  }
+
   it('should not match relative path starting with the origin defined in toolbox route. Origin option as regex.', done => {
     performTest(
       serviceWorkersFolder + '/origin-matching.js',
