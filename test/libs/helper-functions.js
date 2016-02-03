@@ -24,32 +24,33 @@
 var testCounter = 0;
 var testTime = new Date().getTime();
 
-// Each service worker that is registered should be given a unique
-// scope. To achieve this we register it with a scope the same as
-// an iframe's src that is unique for each test.
-// Service workers will then be made to claim pages on this scope -
-// i.e. the iframe
-var getIframe = function() {
-  return new Promise(resolve => {
-    var existingIframe = document.querySelector('.js-test-iframe');
-    if (existingIframe) {
-      return resolve(existingIframe);
-    }
-
-    // This will be used as a unique service worker scope
-    testCounter++;
-
-    var newIframe = document.createElement('iframe');
-    newIframe.classList.add('js-test-iframe');
-    newIframe.src = `/test/iframe/${testTime}${testCounter}`;
-    newIframe.addEventListener('load', () => {
-      resolve(newIframe);
-    });
-    document.body.appendChild(newIframe);
-  });
-};
 
 window.testHelper = {
+  // Each service worker that is registered should be given a unique
+  // scope. To achieve this we register it with a scope the same as
+  // an iframe's src that is unique for each test.
+  // Service workers will then be made to claim pages on this scope -
+  // i.e. the iframe
+  getIframe: function() {
+    return new Promise(resolve => {
+      var existingIframe = document.querySelector('.js-test-iframe');
+      if (existingIframe) {
+        return resolve(existingIframe);
+      }
+
+      // This will be used as a unique service worker scope
+      testCounter++;
+
+      var newIframe = document.createElement('iframe');
+      newIframe.classList.add('js-test-iframe');
+      newIframe.src = `/test/iframe/${testTime}${testCounter}`;
+      newIframe.addEventListener('load', () => {
+        resolve(newIframe);
+      });
+      document.body.appendChild(newIframe);
+    });
+  },
+
   unregisterAllRegistrations: function() {
     return navigator.serviceWorker.getRegistrations()
       .then(registrations => {
@@ -73,7 +74,7 @@ window.testHelper = {
   installSW: function(swUrl) {
     return new Promise((resolve, reject) => {
       var iframe;
-      getIframe()
+      this.getIframe()
       .then(newIframe => {
         var options = null;
         if (newIframe) {
@@ -109,7 +110,7 @@ window.testHelper = {
   activateSW: function(swUrl) {
     return new Promise((resolve, reject) => {
       var iframe;
-      getIframe()
+      this.getIframe()
       .then(newIframe => {
         var options = null;
         if (newIframe) {

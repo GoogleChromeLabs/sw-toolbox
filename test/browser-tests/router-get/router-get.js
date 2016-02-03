@@ -14,18 +14,17 @@
   limitations under the License.
 */
 
-// This is a test and we want descriptions to be useful, if this
-// breaks the max-length, it's ok.
-
-/* eslint-disable max-len */
 /* eslint-env browser, mocha */
-/* global testHelper */
 
 'use strict';
 
 describe('Test router.get method', () => {
-  let performFetch = (iframe, fetchUrl, expectedString) => {
-    return iframe.contentWindow.fetch(fetchUrl)
+  let performFetch = (fetchUrl, expectedString) => {
+    return testHelper.getIframe()
+      .then(iframe => {
+        // Call the iframes fetch event so it goes through the service worker
+        return iframe.contentWindow.fetch(fetchUrl);
+      })
       .then(response => {
         response.status.should.equal(200);
         return response.text();
@@ -36,20 +35,14 @@ describe('Test router.get method', () => {
   };
 
   let performTest = (swUrl, fetchUrl, expectedString, done) => {
-    let iframe = null;
     let testPromise = testHelper.activateSW(swUrl)
-    .then(newIframe => {
-      iframe = newIframe;
-
-      // Call the iframes fetch event so it goes through the service worker
-      return performFetch(newIframe, fetchUrl, expectedString);
+    .then(() => {
+      return performFetch(fetchUrl, expectedString);
     });
 
     if (done) {
       testPromise = testPromise.then(() => done(), done);
     }
-
-    testPromise = testPromise.then(() => iframe);
 
     return testPromise;
   };
@@ -84,7 +77,7 @@ describe('Test router.get method', () => {
   });
 
  // TODO: Find out correct behaviour https://github.com/GoogleChrome/sw-toolbox/issues/86
-  it.skip('should throw an error for route with an origin defined in sw', done => {
+  it.skip('should throw an error for route with an origin defined in sw testing request for full url', done => {
     performTest(
       serviceWorkersFolder + '/full-url.js',
       location.origin + '/test/absolute-url-test',
@@ -94,7 +87,7 @@ describe('Test router.get method', () => {
   });
 
   // TODO: Find out correct behaviour https://github.com/GoogleChrome/sw-toolbox/issues/86
-  it.skip('should throw an error for route with an origin defined in sw', done => {
+  it.skip('should throw an error for route with an origin defined in sw testing request for relative url', done => {
     performTest(
       serviceWorkersFolder + '/full-url.js',
       '/test/absolute-url-test',
@@ -109,9 +102,8 @@ describe('Test router.get method', () => {
       '/multiple/match/something.html',
       'multiple-match-1'
     )
-    .then(iframe => {
+    .then(() => {
       return performFetch(
-        iframe,
         '/multiple/match/something',
         'multiple-match-2'
       );

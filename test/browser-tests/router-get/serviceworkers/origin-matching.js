@@ -18,15 +18,7 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js');
-
-self.addEventListener('install', function() {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', function(event) {
-  event.waitUntil(self.clients.claim());
-});
+importScripts('/sw-toolbox.js', '/test/data/skip-and-claim.js');
 
 // This is simply here so no actual requests are made
 // to developers.google.com
