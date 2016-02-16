@@ -42,7 +42,7 @@ describe('Test precache method', () => {
 
   const serviceWorkersFolder = '/test/browser-tests/precache/serviceworkers';
 
-  it('should precache all desired assets in precache-valid', () => {
+  it('should precache all desired assets from an array in precache-valid', () => {
     let assetList = [
       '/test/data/files/text.txt',
       '/test/data/files/text-1.txt'
@@ -56,93 +56,17 @@ describe('Test precache method', () => {
       });
   });
 
-  it('should precache a single item in precache-valid', () => {
-    let assetList = [
-      '/test/data/files/text.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/single-item.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-valid');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
-      });
-  });
-
-  it('should precache all desired assets from promises in precache-valid', () => {
+  it('should precache all desired assets from a promise in precache-valid', () => {
     let assetList = [
       '/test/data/files/text.txt',
       '/test/data/files/text-1.txt'
     ];
-    return testHelper.activateSW(serviceWorkersFolder + '/promises.js')
+    return testHelper.activateSW(serviceWorkersFolder + '/simple-promise.js')
       .then(() => {
         return testHelper.getAllCachedAssets('precache-valid');
       })
       .then(cachedAssets => {
         return compareCachedAssets(assetList, cachedAssets);
-      });
-  });
-
-  // This behaviour is undefined - discussed here:
-  // https://github.com/GoogleChrome/sw-toolbox/issues/74
-  it.skip('should precache all desired assets from arrays of arrays in precache-valid', () => {
-    let assetList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt',
-      '/test/data/files/text-2.txt',
-      '/test/data/files/text-3.txt',
-      '/test/data/files/text-4.txt',
-      '/test/data/files/text-5.txt',
-      '/test/data/files/text-6.txt',
-      '/test/data/files/text-7.txt',
-      '/test/data/files/text-8.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/arrays.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-valid');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
-      });
-  });
-
-  // This behaviour is undefined - discussed here:
-  // https://github.com/GoogleChrome/sw-toolbox/issues/79
-  it.skip('should precache all desired assets from arrays of arrays of promises in precache-valid', () => {
-    let assetList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt',
-      '/test/data/files/text-2.txt',
-      '/test/data/files/text-3.txt',
-      '/test/data/files/text-4.txt',
-      '/test/data/files/text-5.txt',
-      '/test/data/files/text-6.txt',
-      '/test/data/files/text-7.txt',
-      '/test/data/files/text-8.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/promise-arrays.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-valid');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
-      });
-  });
-
-  // This behaviour is undefined - discussed here:
-  // https://github.com/GoogleChrome/sw-toolbox/issues/75
-  it.skip('should not precache paths that do no exist', () => {
-    let testId = 'precache-non-existant-files';
-    let validAssetsList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/non-existant-files.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets(testId);
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(validAssetsList, cachedAssets);
       });
   });
 
@@ -170,24 +94,90 @@ describe('Test precache method', () => {
       });
   });
 
-  // This behaviour is undefined - changes to API that would address this
-  // are discussed here:
-  // https://github.com/GoogleChrome/sw-toolbox/issues/77
-  it.skip('should precache all desired assets from a mix of strings, promises and arrays', () => {
-    let assetList = [
+  // This behaviour is undefined - discussed here:
+  // https://github.com/GoogleChrome/sw-toolbox/issues/75
+  it.skip('should not precache paths that do no exist', () => {
+    let testId = 'precache-non-existant-files';
+    let validAssetsList = [
       '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt',
-      '/test/data/files/text-2.txt',
-      '/test/data/files/text-3.txt',
-      '/test/data/files/text-4.txt',
-      '/test/data/files/text-5.txt'
+      '/test/data/files/text-1.txt'
     ];
-    return testHelper.activateSW(serviceWorkersFolder + '/mix.js')
+    return testHelper.activateSW(serviceWorkersFolder + '/non-existant-files.js')
       .then(() => {
-        return testHelper.getAllCachedAssets('precache-mix');
+        return testHelper.getAllCachedAssets(testId);
       })
       .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
+        return compareCachedAssets(validAssetsList, cachedAssets);
       });
+  });
+
+  it('should throw an error when caching a single string', done => {
+    testHelper.addMessageListener(function(result) {
+      if (result.testPass) {
+        done();
+      } else {
+        done('Test Failed - See console for info.');
+      }
+    });
+
+    testHelper.activateSW(serviceWorkersFolder + '/single-item.js');
+  });
+
+  it('should throw an error when precaching an array of promises', done => {
+    testHelper.addMessageListener(function(result) {
+      if (result.testPass) {
+        done();
+      } else {
+        done('Test Failed - See console for info.');
+      }
+    });
+
+    testHelper.activateSW(serviceWorkersFolder + '/promises.js');
+  });
+
+  it('should throw an error when attmpting to precache nested arrays', done => {
+    testHelper.addMessageListener(function(result) {
+      if (result.testPass) {
+        done();
+      } else {
+        done('Test Failed - See console for info.');
+      }
+    });
+
+    testHelper.activateSW(serviceWorkersFolder + '/arrays.js');
+  });
+
+  it('should throw an error when attempting to precache nested promises', done => {
+    testHelper.addMessageListener(function(result) {
+      if (result.testPass) {
+        done();
+      } else {
+        done('Test Failed - See console for info.');
+      }
+    });
+
+    testHelper.activateSW(serviceWorkersFolder + '/promise-arrays.js');
+  });
+
+  it('should throw an error when precaching a mix of strings, promises and arrays', done => {
+    testHelper.addMessageListener(function(result) {
+      if (result.testPass) {
+        done();
+      } else {
+        done('Test Failed - See console for info.');
+      }
+    });
+
+    testHelper.activateSW(serviceWorkersFolder + '/mix.js');
+  });
+
+  it('should cause an error since precache resolves promise to a javascript object, not an array.', () => {
+    return testHelper.activateSW(serviceWorkersFolder + '/unexpected-promise-resolve.js')
+    .then(function() {
+      throw new Error('Expected service to fail install step but it hasn\'t.');
+    })
+    .catch(function(err) {
+      err.message.should.equal('Installing servier worker became redundant');
+    });
   });
 });

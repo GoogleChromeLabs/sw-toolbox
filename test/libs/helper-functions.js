@@ -24,6 +24,36 @@
 var testCounter = 0;
 var testTime = new Date().getTime();
 
+function onStateChangePromise(registration, desiredState) {
+  return new Promise((resolve, reject) => {
+    if (registration.installing === null) {
+      throw new Error('Service worker is not installing.');
+    }
+
+    var serviceWorker = registration.installing;
+
+    // We unregister all service workers after each test - this should
+    // always trigger an install state change
+    var stateChangeListener = function() {
+      if (this.state === desiredState) {
+        serviceWorker.removeEventListener('statechange', stateChangeListener);
+        resolve();
+        return;
+      }
+
+      if (this.state === 'redundant') {
+        serviceWorker.removeEventListener('statechange', stateChangeListener);
+
+        // Must call reject rather than throw error here due to this
+        // being inside the scope of the callback function stateChangeListener
+        reject(new Error('Installing servier worker became redundant'));
+        return;
+      }
+    };
+
+    serviceWorker.addEventListener('statechange', stateChangeListener);
+  });
+}
 
 window.testHelper = {
   // Each service worker that is registered should be given a unique
@@ -84,24 +114,9 @@ window.testHelper = {
 
         return navigator.serviceWorker.register(swUrl, options);
       })
-      .then(registration => {
-        if (registration.installing === null) {
-          throw new Error(swUrl + ' already installed.');
-        }
-
-        // We unregister all service workers after each test - this should
-        // always trigger an install state change
-        registration.installing.onstatechange = function() {
-          if (this.state !== 'installed') {
-            return;
-          }
-
-          resolve(iframe);
-        };
-      })
-      .catch(err => {
-        reject(err);
-      });
+      .then(registration => onStateChangePromise(registration, 'installed'))
+      .then(() => resolve(iframe))
+      .catch(err => reject(err));
     });
   },
 
@@ -119,25 +134,9 @@ window.testHelper = {
         }
         return navigator.serviceWorker.register(swUrl, options);
       })
-      .then(registration => {
-        if (registration.installing === null) {
-          throw new Error(swUrl + ' is not installing.');
-        }
-
-        // We unregister all service workers after each test - so this should
-        // always have an activate event if the service worker calls
-        // self.clients.claim()
-        registration.installing.onstatechange = function() {
-          if (this.state !== 'activated') {
-            return;
-          }
-
-          resolve(iframe);
-        };
-      })
-      .catch(err => {
-        reject(err);
-      });
+      .then(registration => onStateChangePromise(registration, 'activated'))
+      .then(() => resolve(iframe))
+      .catch(err => reject(err));
     });
   },
 
@@ -186,6 +185,23 @@ window.testHelper = {
       for (var i = 0; i < iframeList.length; i++) {
         iframeList[i].parentElement.removeChild(iframeList[i]);
       }
+    })
+    .then(() => {
+      this.messageListeners.forEach(function(listener) {
+        navigator.serviceWorker.removeEventListener('message', listener);
+      });
     });
+  },
+
+  messageListeners: [],
+
+  addMessageListener: function(cb) {
+    var messageListener = function(event) {
+      cb(JSON.parse(event.data));
+    };
+
+    this.messageListeners.push(messageListener);
+
+    navigator.serviceWorker.addEventListener('message', messageListener);
   }
 };
