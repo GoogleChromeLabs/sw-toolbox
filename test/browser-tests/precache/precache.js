@@ -70,6 +70,34 @@ describe('Test precache method', () => {
       });
   });
 
+  it('should precache all desired assets from an array of requests in precache-valid', () => {
+    let assetList = [
+      '/test/data/files/text.txt',
+      '/test/data/files/text-1.txt'
+    ];
+    return testHelper.activateSW(serviceWorkersFolder + '/simple-request.js')
+      .then(() => {
+        return testHelper.getAllCachedAssets('precache-valid');
+      })
+      .then(cachedAssets => {
+        return compareCachedAssets(assetList, cachedAssets);
+      });
+  });
+
+  it('should precache all desired assets from a mixed array of strings and requests in precache-valid', () => {
+    let assetList = [
+      '/test/data/files/text.txt',
+      '/test/data/files/text-1.txt'
+    ];
+    return testHelper.activateSW(serviceWorkersFolder + '/mix-of-strings-requests.js')
+      .then(() => {
+        return testHelper.getAllCachedAssets('precache-valid');
+      })
+      .then(cachedAssets => {
+        return compareCachedAssets(assetList, cachedAssets);
+      });
+  });
+
   it('should precache all assets from each install step', () => {
     let toolboxAssetList = [
       '/test/data/files/text.txt',
