@@ -37,18 +37,24 @@ describe('Test SW-Toolbox', () => {
   let driver = null;
 
   afterEach(done => {
+    // Suggested as fix to 'chrome not reachable'
+    // http://stackoverflow.com/questions/23014220/webdriver-randomly-produces-chrome-not-reachable-on-linux-tests
+    var timeoutGapCb = function() {
+      setTimeout(done, 2000);
+    };
+
     if (driver === null) {
-      return done();
+      return timeoutGapCb();
     }
 
     driver.quit()
     .then(() => {
       driver = null;
-      done();
+      timeoutGapCb();
     })
     .thenCatch(() => {
       driver = null;
-      done();
+      timeoutGapCb();
     });
   });
 
