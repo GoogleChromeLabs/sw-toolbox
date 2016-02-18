@@ -230,62 +230,32 @@ describe('Test precache method', () => {
   describe('Test precaching Error Cases', function() {
     it('should throw an error when caching a single string', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-single-item.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Failed to register a ServiceWorker: ServiceWorker script evaluation failed');
-      });
+      .should.be.rejected;
     });
 
     it('should throw an error when precaching an array of promises', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-array-of-promises.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Failed to register a ServiceWorker: ServiceWorker script evaluation failed');
-      });
+      .should.be.rejected;
     });
 
     it('should throw an error when attmpting to precache nested arrays', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-nested-arrays.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Failed to register a ServiceWorker: ServiceWorker script evaluation failed');
-      });
+      .should.be.rejected;
     });
 
     it('should throw an error when attempting to precache nested promises', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-nested-promises.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Failed to register a ServiceWorker: ServiceWorker script evaluation failed');
-      });
+      .should.be.rejected;
     });
 
     it('should throw an error when precaching a mix of strings, promises and arrays', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-mix.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Failed to register a ServiceWorker: ServiceWorker script evaluation failed');
-      });
+      .should.be.rejected;
     });
 
     it('should failt to install service worker due to Promise resolving to a javascript object, not an array.', () => {
       return testHelper.activateSW(serviceWorkersFolder + '/error-non-array-promise.js')
-      .then(function() {
-        throw new Error('Expected service worker to fail the install step but it hasn\'t.');
-      })
-      .catch(function(err) {
-        err.message.should.equal('Installing servier worker became redundant');
-      });
+      .should.be.rejected;
     });
 
     // This behaviour is undefined - discussed here:
