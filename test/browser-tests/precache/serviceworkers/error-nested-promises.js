@@ -18,44 +18,34 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js', '/test/data/send-message.js');
+importScripts('/sw-toolbox.js');
 
 self.toolbox.options.cache = {
   name: 'precache-valid'
 };
 
-var thrownError = null;
-
-try {
-  self.toolbox.precache([
-    Promise.resolve('/test/data/files/text.txt'),
+self.toolbox.precache([
+  Promise.resolve('/test/data/files/text.txt'),
+  [
+    Promise.resolve('/test/data/files/text-1.txt'),
+    Promise.resolve('/test/data/files/text-2.txt')
+  ],
+  [
+    Promise.resolve('/test/data/files/text-3.txt'),
     [
-      Promise.resolve('/test/data/files/text-1.txt'),
-      Promise.resolve('/test/data/files/text-2.txt')
-    ],
-    [
-      Promise.resolve('/test/data/files/text-3.txt'),
+      Promise.resolve('/test/data/files/text-4.txt'),
       [
-        Promise.resolve('/test/data/files/text-4.txt'),
+        Promise.resolve('/test/data/files/text-5.txt'),
         [
-          Promise.resolve('/test/data/files/text-5.txt'),
+          Promise.resolve('/test/data/files/text-6.txt'),
           [
-            Promise.resolve('/test/data/files/text-6.txt'),
+            Promise.resolve('/test/data/files/text-7.txt'),
             [
-              Promise.resolve('/test/data/files/text-7.txt'),
-              [
-                Promise.resolve('/test/data/files/text-8.txt')
-              ]
+              Promise.resolve('/test/data/files/text-8.txt')
             ]
           ]
         ]
       ]
     ]
-  ]);
-} catch (err) {
-  thrownError = err;
-}
-
-self.sendMessage({
-  testPass: (thrownError instanceof TypeError)
-});
+  ]
+]);

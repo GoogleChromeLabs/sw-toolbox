@@ -18,44 +18,34 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js', '/test/data/send-message.js');
+importScripts('/sw-toolbox.js');
 
 self.toolbox.options.cache = {
   name: 'precache-valid'
 };
 
-var thrownError = null;
-
-try {
-  self.toolbox.precache([
-    '/test/data/files/text.txt',
+self.toolbox.precache([
+  '/test/data/files/text.txt',
+  [
+    '/test/data/files/text-1.txt',
+    '/test/data/files/text-2.txt'
+  ],
+  [
+    '/test/data/files/text-3.txt',
     [
-      '/test/data/files/text-1.txt',
-      '/test/data/files/text-2.txt'
-    ],
-    [
-      '/test/data/files/text-3.txt',
+      '/test/data/files/text-4.txt',
       [
-        '/test/data/files/text-4.txt',
+        '/test/data/files/text-5.txt',
         [
-          '/test/data/files/text-5.txt',
+          '/test/data/files/text-6.txt',
           [
-            '/test/data/files/text-6.txt',
+            '/test/data/files/text-7.txt',
             [
-              '/test/data/files/text-7.txt',
-              [
-                '/test/data/files/text-8.txt'
-              ]
+              '/test/data/files/text-8.txt'
             ]
           ]
         ]
       ]
     ]
-  ]);
-} catch (err) {
-  thrownError = err;
-}
-
-self.sendMessage({
-  testPass: (thrownError instanceof TypeError)
-});
+  ]
+]);

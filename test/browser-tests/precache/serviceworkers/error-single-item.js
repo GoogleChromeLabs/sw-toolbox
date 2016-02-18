@@ -18,20 +18,10 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js', '/test/data/send-message.js');
+importScripts('/sw-toolbox.js');
 
 self.toolbox.options.cache = {
   name: 'precache-valid'
 };
 
-var thrownError = null;
-
-try {
-  self.toolbox.precache('/test/data/files/text.txt');
-} catch (err) {
-  thrownError = err;
-}
-
-self.sendMessage({
-  testPass: (thrownError instanceof TypeError)
-});
+self.toolbox.precache('/test/data/files/text.txt');
