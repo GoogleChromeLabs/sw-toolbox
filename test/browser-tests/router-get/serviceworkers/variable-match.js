@@ -18,7 +18,8 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js', '/test/data/skip-and-claim.js');
+importScripts('/sw-toolbox.js');
+importScripts('/test/data/skip-and-claim.js');
 
 self.toolbox.router.get(
   '/test/match/:variable/pattern',
