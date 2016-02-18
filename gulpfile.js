@@ -41,7 +41,7 @@ gulp.task('test:automated', ['test:manual'], function() {
   // npm install -g chromedriver
   return gulp.src('test/automated-suite.js', {read: false})
     .pipe(mocha({
-      timeout: 10000
+      timeout: 60000
     }))
     .once('error', () => {
       testServer.kill();
