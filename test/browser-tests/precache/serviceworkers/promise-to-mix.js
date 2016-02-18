@@ -23,10 +23,10 @@ importScripts('/sw-toolbox.js');
 self.toolbox.options.cache = {
   name: 'precache-valid'
 };
-self.toolbox.options.debug = true;
 
 self.toolbox.precache(
-  Promise.resolve({
-    message: 'I should cause precache to throw an error'
-  })
+  Promise.resolve([
+    '/test/data/files/text.txt',
+    new Request('/test/data/files/text-1.txt', {mode: 'cors'})
+  ])
 );

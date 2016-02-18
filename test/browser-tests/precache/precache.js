@@ -42,142 +42,277 @@ describe('Test precache method', () => {
 
   const serviceWorkersFolder = '/test/browser-tests/precache/serviceworkers';
 
-  it('should precache all desired assets from an array in precache-valid', () => {
-    let assetList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/simple.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-valid');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
+  describe('Test precache(<Array>)', function() {
+    it('should precache all desired assets from an array of strings', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/array-strings.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from an array of requests', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/array-requests.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from an array of strings and requests', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/array-mix.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+  });
+
+  describe('Test precache(<Promise>)', function() {
+    it('should precache all desired assets from a promise that results in an array of strings', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-strings.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from a promise that results in an array of requests', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-requests.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from a promise that results in an array of requests and strings', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-mix.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+  });
+
+  describe('Test Multiple precache() Calls', function() {
+    it('should precache all desired assets from multiple precache calls passing in an array of strings', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt',
+        '/test/data/files/text-2.txt',
+        '/test/data/files/text-3.txt',
+        '/test/data/files/text-4.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-strings.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from multiple precache calls passing in an array of requests', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt',
+        '/test/data/files/text-2.txt',
+        '/test/data/files/text-3.txt',
+        '/test/data/files/text-4.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-requests.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from multiple precache calls passing in a promise', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt',
+        '/test/data/files/text-2.txt',
+        '/test/data/files/text-3.txt',
+        '/test/data/files/text-4.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-promises.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+
+    it('should precache all desired assets from multiple precache calls passing in arrays or promises', () => {
+      let assetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt',
+        '/test/data/files/text-2.txt',
+        '/test/data/files/text-3.txt',
+        '/test/data/files/text-4.txt',
+        '/test/data/files/text-5.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-mix.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-valid');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(assetList, cachedAssets);
+        });
+    });
+  });
+
+  describe('Test precaching Edge Cases', function() {
+    it('should precache all assets from precache and custom install listeners', () => {
+      let toolboxAssetList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      let additionalInstallAssets = [
+        '/test/data/files/text-2.txt',
+        '/test/data/files/text-3.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/edgecase-custom-install.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-custom-install-toolbox');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(toolboxAssetList, cachedAssets);
+        })
+        .then(() => {
+          return testHelper.getAllCachedAssets('precache-custom-install');
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(additionalInstallAssets, cachedAssets);
+        });
+    });
+  });
+
+  describe('Test precaching Error Cases', function() {
+    it('should throw an error when caching a single string', done => {
+      testHelper.addMessageListener(function(result) {
+        if (result.testPass) {
+          done();
+        } else {
+          done('Test Failed - See console for info.');
+        }
       });
-  });
 
-  it('should precache all desired assets from a promise in precache-valid', () => {
-    let assetList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/simple-promise.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-valid');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(assetList, cachedAssets);
+      testHelper.activateSW(serviceWorkersFolder + '/error-single-item.js');
+    });
+
+    it('should throw an error when precaching an array of promises', done => {
+      testHelper.addMessageListener(function(result) {
+        if (result.testPass) {
+          done();
+        } else {
+          done('Test Failed - See console for info.');
+        }
       });
-  });
 
-  it('should precache all assets from each install step', () => {
-    let toolboxAssetList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt'
-    ];
-    let additionalInstallAssets = [
-      '/test/data/files/text-2.txt',
-      '/test/data/files/text-3.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/custom-install.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-custom-install-toolbox');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(toolboxAssetList, cachedAssets);
-      })
-      .then(() => {
-        return testHelper.getAllCachedAssets('precache-custom-install');
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(additionalInstallAssets, cachedAssets);
+      testHelper.activateSW(serviceWorkersFolder + '/error-array-of-promises.js');
+    });
+
+    it('should throw an error when attmpting to precache nested arrays', done => {
+      testHelper.addMessageListener(function(result) {
+        if (result.testPass) {
+          done();
+        } else {
+          done('Test Failed - See console for info.');
+        }
       });
-  });
 
-  // This behaviour is undefined - discussed here:
-  // https://github.com/GoogleChrome/sw-toolbox/issues/75
-  it.skip('should not precache paths that do no exist', () => {
-    let testId = 'precache-non-existant-files';
-    let validAssetsList = [
-      '/test/data/files/text.txt',
-      '/test/data/files/text-1.txt'
-    ];
-    return testHelper.activateSW(serviceWorkersFolder + '/non-existant-files.js')
-      .then(() => {
-        return testHelper.getAllCachedAssets(testId);
-      })
-      .then(cachedAssets => {
-        return compareCachedAssets(validAssetsList, cachedAssets);
+      testHelper.activateSW(serviceWorkersFolder + '/error-nested-arrays.js');
+    });
+
+    it('should throw an error when attempting to precache nested promises', done => {
+      testHelper.addMessageListener(function(result) {
+        if (result.testPass) {
+          done();
+        } else {
+          done('Test Failed - See console for info.');
+        }
       });
-  });
 
-  it('should throw an error when caching a single string', done => {
-    testHelper.addMessageListener(function(result) {
-      if (result.testPass) {
-        done();
-      } else {
-        done('Test Failed - See console for info.');
-      }
+      testHelper.activateSW(serviceWorkersFolder + '/error-nested-promises.js');
     });
 
-    testHelper.activateSW(serviceWorkersFolder + '/single-item.js');
-  });
+    it('should throw an error when precaching a mix of strings, promises and arrays', done => {
+      testHelper.addMessageListener(function(result) {
+        if (result.testPass) {
+          done();
+        } else {
+          done('Test Failed - See console for info.');
+        }
+      });
 
-  it('should throw an error when precaching an array of promises', done => {
-    testHelper.addMessageListener(function(result) {
-      if (result.testPass) {
-        done();
-      } else {
-        done('Test Failed - See console for info.');
-      }
+      testHelper.activateSW(serviceWorkersFolder + '/error-mix.js');
     });
 
-    testHelper.activateSW(serviceWorkersFolder + '/promises.js');
-  });
-
-  it('should throw an error when attmpting to precache nested arrays', done => {
-    testHelper.addMessageListener(function(result) {
-      if (result.testPass) {
-        done();
-      } else {
-        done('Test Failed - See console for info.');
-      }
+    it('should failt to install service worker due to Promise resolving to a javascript object, not an array.', () => {
+      return testHelper.activateSW(serviceWorkersFolder + '/error-non-array-promise.js')
+      .then(function() {
+        throw new Error('Expected service to fail install step but it hasn\'t.');
+      })
+      .catch(function(err) {
+        err.message.should.equal('Installing servier worker became redundant');
+      });
     });
 
-    testHelper.activateSW(serviceWorkersFolder + '/arrays.js');
-  });
-
-  it('should throw an error when attempting to precache nested promises', done => {
-    testHelper.addMessageListener(function(result) {
-      if (result.testPass) {
-        done();
-      } else {
-        done('Test Failed - See console for info.');
-      }
-    });
-
-    testHelper.activateSW(serviceWorkersFolder + '/promise-arrays.js');
-  });
-
-  it('should throw an error when precaching a mix of strings, promises and arrays', done => {
-    testHelper.addMessageListener(function(result) {
-      if (result.testPass) {
-        done();
-      } else {
-        done('Test Failed - See console for info.');
-      }
-    });
-
-    testHelper.activateSW(serviceWorkersFolder + '/mix.js');
-  });
-
-  it('should cause an error since precache resolves promise to a javascript object, not an array.', () => {
-    return testHelper.activateSW(serviceWorkersFolder + '/unexpected-promise-resolve.js')
-    .then(function() {
-      throw new Error('Expected service to fail install step but it hasn\'t.');
-    })
-    .catch(function(err) {
-      err.message.should.equal('Installing servier worker became redundant');
+    // This behaviour is undefined - discussed here:
+    // https://github.com/GoogleChrome/sw-toolbox/issues/75
+    it.skip('should not precache paths that do no exist', () => {
+      let testId = 'precache-non-existant-files';
+      let validAssetsList = [
+        '/test/data/files/text.txt',
+        '/test/data/files/text-1.txt'
+      ];
+      return testHelper.activateSW(serviceWorkersFolder + '/error-non-existant-files.js')
+        .then(() => {
+          return testHelper.getAllCachedAssets(testId);
+        })
+        .then(cachedAssets => {
+          return compareCachedAssets(validAssetsList, cachedAssets);
+        });
     });
   });
 });
