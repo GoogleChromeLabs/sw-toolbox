@@ -22,14 +22,17 @@ describe('Test router.get method', () => {
   let performFetch = (fetchUrl, expectedString) => {
     return testHelper.getIframe()
       .then(iframe => {
+        console.log('Got iframe');
         // Call the iframes fetch event so it goes through the service worker
         return iframe.contentWindow.fetch(fetchUrl);
       })
       .then(response => {
+        console.log('Got response');
         response.status.should.equal(200);
         return response.text();
       })
       .then(responseText => {
+        console.log('Got text', responseText);
         responseText.should.equal(expectedString);
       });
   };

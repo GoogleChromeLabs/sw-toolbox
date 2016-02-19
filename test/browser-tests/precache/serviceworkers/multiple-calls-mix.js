@@ -19,10 +19,25 @@
 /* eslint-env worker, serviceworker */
 
 importScripts('/sw-toolbox.js');
-importScripts('/test/data/skip-and-claim.js');
 
-self.toolbox.router.get(
-  '/test/match/:variable/pattern',
-  function(request, values) {
-    return new Response(values.variable);
-  });
+self.toolbox.options.cache = {
+  name: 'precache-valid'
+};
+
+self.toolbox.precache([
+  new Request('/test/data/files/text.txt', {mode: 'cors'}),
+  '/test/data/files/text-1.txt'
+]);
+
+self.toolbox.precache(Promise.resolve([
+  '/test/data/files/text-2.txt'
+]));
+
+self.toolbox.precache(Promise.resolve([
+  new Request('/test/data/files/text-3.txt', {mode: 'cors'}),
+  '/test/data/files/text-4.txt'
+]));
+
+self.toolbox.precache([
+  '/test/data/files/text-5.txt'
+]);

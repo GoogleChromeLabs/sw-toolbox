@@ -19,10 +19,13 @@
 /* eslint-env worker, serviceworker */
 
 importScripts('/sw-toolbox.js');
-importScripts('/test/data/skip-and-claim.js');
 
-self.toolbox.router.get(
-  '/test/match/:variable/pattern',
-  function(request, values) {
-    return new Response(values.variable);
-  });
+self.toolbox.options.cache = {
+  name: 'precache-valid'
+};
+
+self.toolbox.precache(
+  Promise.resolve({
+    message: 'I should cause precache to throw an error'
+  })
+);
