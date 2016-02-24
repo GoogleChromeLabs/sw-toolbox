@@ -18,12 +18,14 @@
 
 'use strict';
 
-describe('Test router.get method', () => {
+describe('Test router.post method', () => {
   let performFetch = (fetchUrl, expectedString) => {
     return testHelper.getIframe()
       .then(iframe => {
         // Call the iframes fetch event so it goes through the service worker
-        return iframe.contentWindow.fetch(fetchUrl);
+        return iframe.contentWindow.fetch(fetchUrl, {
+          method: 'post'
+        });
       })
       .then(response => {
         response.status.should.equal(200);
@@ -47,7 +49,7 @@ describe('Test router.get method', () => {
     return testPromise;
   };
 
-  const serviceWorkersFolder = '/test/browser-tests/router-get/serviceworkers';
+  const serviceWorkersFolder = '/test/browser-tests/router-post/serviceworkers';
 
   it('should return response for absolute url', done => {
     performTest(
