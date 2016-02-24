@@ -20,9 +20,12 @@
 
 importScripts('/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
+importScripts('/test/data/router-methods-helper.js');
 
-self.toolbox.router.post(
-  '/test/match/:variable/pattern',
-  function(request, values) {
-    return new Response(values.variable);
+const method = self.getMethodToTest();
+
+self.toolbox.router[method](
+  location.origin + '/test/absolute-url-test',
+  function() {
+    return new Response('/test/absolute-url-test');
   });

@@ -20,14 +20,17 @@
 
 importScripts('/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
+importScripts('/test/data/router-methods-helper.js');
 
-self.toolbox.router.post(
+const method = self.getMethodToTest();
+
+self.toolbox.router[method](
   '/test/relative-url-test',
   function() {
     return new Response('/test/relative-url-test');
   });
 
-self.toolbox.router.post(
+self.toolbox.router[method](
   'test/relative-url-test-2',
   function() {
     return new Response('test/relative-url-test-2');

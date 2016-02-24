@@ -20,11 +20,12 @@
 
 importScripts('/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
+importScripts('/test/data/router-methods-helper.js');
 
-self.toolbox.router.get('/multiple/match/:variable.html', function() {
-  return new Response('multiple-match-1');
-});
+const method = self.getMethodToTest();
 
-self.toolbox.router.get('/multiple/match/:variable', function() {
-  return new Response('multiple-match-2');
-});
+self.toolbox.router[method](
+  '/test/match/:variable/pattern',
+  function(request, values) {
+    return new Response(values.variable);
+  });
