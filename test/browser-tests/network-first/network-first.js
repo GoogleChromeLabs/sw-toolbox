@@ -25,39 +25,48 @@ describe('Test networkFirst Routing', function() {
   it('should handle redirects correctly', done => {
     testHelper.activateSW(serviceWorkersFolder + '/redirects.js')
     .then(() => {
-      return testHelper.getIframe()
-        .then(iframe => {
-          // Call the iframes fetch event so it goes through the service worker
-          return iframe.contentWindow.fetch('/test/helper/redirect');
-        })
-        .then(response => {
-          response.status.should.equal(200);
-          return response.json();
-        })
-        .then(response => {
-          console.log(response);
-          if (!response.redirect) {
-            throw new Error('Unexpected response from server');
-          } else {
-            return testHelper.getIframe()
-            .then(iframe => {
-              // Call the iframes fetch event so it goes through the service worker
-              return iframe.contentWindow.fetch(response.redirect, {
-                credentials: 'same-origin'
+      const redirectTest = () => {
+        return testHelper.getIframe()
+          .then(iframe => {
+            // Call the iframes fetch event so it goes through the service worker
+            return iframe.contentWindow.fetch('/test/helper/redirect');
+          })
+          .then(response => {
+            response.status.should.equal(200);
+            return response.json();
+          })
+          .then(response => {
+            console.log(response);
+            if (!response.redirect) {
+              throw new Error('Unexpected response from server');
+            } else {
+              return testHelper.getIframe()
+              .then(iframe => {
+                // Call the iframes fetch event so it goes through the service worker
+                return iframe.contentWindow.fetch(response.redirect, {
+                  credentials: 'same-origin'
+                });
               });
-            });
-          }
-        })
-        .then(response => {
-          response.status.should.equal(200);
-          return response.json();
-        })
-        .then(response => {
-          console.log(response);
-          if (!response.success) {
-            throw new Error('Unexpected response from server');
-          }
-        });
+            }
+          })
+          .then(response => {
+            response.status.should.equal(200);
+            return response.json();
+          })
+          .then(response => {
+            console.log(response);
+            if (!response.success) {
+              throw new Error('Unexpected response from server');
+            }
+          });
+      };
+
+      // Imagine a user coming to a site multiple times.
+      // This should catch caching states
+      return redirectTest()
+      .then(() => {
+        return redirectTest();
+      })
     })
     .then(() => done())
     .catch(done);
