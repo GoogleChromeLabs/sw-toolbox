@@ -97,6 +97,9 @@
       // We unregister all service workers, clear all caches and remove
       // All registered iframes
       beforeEach(function() {
+        // This clears a cooke set by the server for redirects
+        document.cookie = 'bouncedRedirect=; expires=' + new Date().getTime() + ';path=/';
+
         return testHelper.cleanState();
       });
 

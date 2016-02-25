@@ -53,8 +53,8 @@ app.get('/test/iframe/:timestamp', function(req, res) {
 });
 
 app.get('/test/helper/redirect', function(req, res) {
-  res.clearCookie('bouncedRedirect');
   if (req.cookies.bouncedRedirect === 'true') {
+    res.clearCookie('bouncedRedirect');
     res.json({success: true});
   } else {
     res.redirect('/test/helper/redirect/bounce');
@@ -63,7 +63,9 @@ app.get('/test/helper/redirect', function(req, res) {
 
 app.get('/test/helper/redirect/bounce', function(req, res) {
   res.cookie('bouncedRedirect', true);
-  res.redirect('/test/helper/redirect');
+  res.json({
+    redirect: '/test/helper/redirect'
+  });
 });
 
 // Start service on port 8888
