@@ -22,3 +22,5 @@ importScripts('/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
 
 self.toolbox.router.get('/test/helper/redirect', self.toolbox.networkFirst);
+
+self.toolbox.router.get('/test/helper/redirect/bounce', self.toolbox.networkFirst);
