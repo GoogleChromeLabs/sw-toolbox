@@ -53,6 +53,7 @@ app.get('/test/iframe/:timestamp', function(req, res) {
 });
 
 app.get('/test/helper/redirect', function(req, res) {
+  console.log('redirect', req.cookies);
   if (req.cookies.bouncedRedirect === 'true') {
     res.clearCookie('bouncedRedirect');
     res.json({success: true});
@@ -62,6 +63,7 @@ app.get('/test/helper/redirect', function(req, res) {
 });
 
 app.get('/test/helper/redirect/bounce', function(req, res) {
+  console.log('Bounce');
   res.cookie('bouncedRedirect', true);
   res.json({
     redirect: '/test/helper/redirect'

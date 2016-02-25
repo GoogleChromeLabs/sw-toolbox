@@ -29,7 +29,9 @@ describe('Test networkFirst Routing', function() {
         return testHelper.getIframe()
           .then(iframe => {
             // Call the iframes fetch event so it goes through the service worker
-            return iframe.contentWindow.fetch('/test/helper/redirect');
+            return iframe.contentWindow.fetch('/test/helper/redirect', {
+              credentials: 'same-origin'
+            });
           })
           .then(response => {
             response.status.should.equal(200);
