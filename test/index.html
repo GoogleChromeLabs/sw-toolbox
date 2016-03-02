@@ -48,6 +48,7 @@
   <!-- In browser test scripts should be added to the page here-->
   <script src="/test/browser-tests/precache/precache.js"></script>
   <script src="/test/browser-tests/router-methods/router-methods.js"></script>
+  <script src="/test/browser-tests/network-first/network-first.js"></script>
 
   <script>
     (function() {
@@ -96,6 +97,9 @@
       // We unregister all service workers, clear all caches and remove
       // All registered iframes
       beforeEach(function() {
+        // This clears a cooke set by the server for redirects
+        document.cookie = 'bouncedRedirect=; expires=' + new Date().getTime() + ';path=/';
+
         return testHelper.cleanState();
       });
 
