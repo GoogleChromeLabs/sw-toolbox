@@ -23,6 +23,7 @@
 
 var path = require('path');
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var app = express();
 
 // Set up static assets
@@ -36,6 +37,7 @@ app.use('/test/browser-tests/',
 
 // Allow all assets in the project to be served (This includes sw-toolbox.js)
 app.use('/', express.static(path.join(__dirname, '..', '..')));
+app.use(cookieParser());
 
 // If the user tries to go to the root of the test server, redirect them
 // to /test/
@@ -48,6 +50,22 @@ app.get('/', function(req, res) {
 // html file for /test/iframe/<timestamp>
 app.get('/test/iframe/:timestamp', function(req, res) {
   res.sendFile(path.join(__dirname, '..', 'data', 'test-iframe.html'));
+});
+
+app.get('/test/helper/redirect', function(req, res) {
+  if (req.cookies.bouncedRedirect === 'true') {
+    res.clearCookie('bouncedRedirect');
+    res.json({success: true});
+  } else {
+    res.redirect('/test/helper/redirect/bounce');
+  }
+});
+
+app.get('/test/helper/redirect/bounce', function(req, res) {
+  res.cookie('bouncedRedirect', true);
+  res.json({
+    redirect: '/test/helper/redirect'
+  });
 });
 
 // Start service on port 8888
