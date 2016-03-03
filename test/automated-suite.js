@@ -21,11 +21,17 @@
 /* eslint-disable max-len, no-console, padded-blocks, no-multiple-empty-lines */
 /* eslint-env node,mocha */
 
-var fs = require('fs');
-var webdriver = require('selenium-webdriver');
-var chrome = require('selenium-webdriver/chrome');
-var firefox = require('selenium-webdriver/firefox');
 require('chai').should();
+const fs = require('fs');
+const webdriver = require('selenium-webdriver');
+const chromeOptions = require('selenium-webdriver/chrome');
+const firefoxOptions = require('selenium-webdriver/firefox');
+const which = require('which');
+
+const CHROME_PATH = which.sync('google-chrome');
+const CHROME_BETA_PATH = which.sync('google-chrome-beta');
+const FIREFOX_PATH = which.sync('firefox');
+const FIREFOX_BETA_PATH_FOR_TRAVIS = './firefox/firefox';
 
 // These tests make use of selenium-webdriver. You can find the relevant
 // documentation here: http://selenium.googlecode.com/git/docs/api/javascript/index.html
@@ -34,42 +40,31 @@ describe('Test SW-Toolbox', () => {
   // Driver is initialised to null to handle scenarios
   // where the desired browser isn't installed / fails to load
   // Null allows afterEach a safe way to skip quiting the driver
-  let driver = null;
+  let globalDriverReference = null;
 
   afterEach(done => {
     // Suggested as fix to 'chrome not reachable'
     // http://stackoverflow.com/questions/23014220/webdriver-randomly-produces-chrome-not-reachable-on-linux-tests
-    var timeoutGapCb = function() {
+    const timeoutGapCb = function() {
       setTimeout(done, 2000);
     };
 
-    if (driver === null) {
+    if (globalDriverReference === null) {
       return timeoutGapCb();
     }
 
-    driver.quit()
+    globalDriverReference.quit()
     .then(() => {
-      driver = null;
+      globalDriverReference = null;
       timeoutGapCb();
     })
     .thenCatch(() => {
-      driver = null;
+      globalDriverReference = null;
       timeoutGapCb();
     });
   });
 
-  let checkFileExists = path => {
-    return new Promise((resolve, reject) => {
-      fs.stat(path, err => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      });
-    });
-  };
-
-  let performTests = (browserName, driver) => {
+  const performTests = (browserName, driver) => {
     // The driver methods are wrapped in a new promise because the
     // selenium-webdriver API seems to using some custom promise
     // implementation that has slight behaviour differences.
@@ -87,12 +82,12 @@ describe('Test SW-Toolbox', () => {
         // This is set in the in browser mocha tests when the tests have finished
         // successfully
         return driver.wait(function() {
-          return driver.executeScript('return ((typeof window.swtoolbox !== \'undefined\') && window.swtoolbox.testResults !== \'undefined\');');
+          return driver.executeScript('return ((typeof window.testsuite !== \'undefined\') && window.testsuite.testResults !== \'undefined\');');
         });
       })
       .then(() => {
         // This simply retrieves the test results from the inbrowser mocha tests
-        return driver.executeScript('return window.swtoolbox.testResults;');
+        return driver.executeScript('return window.testsuite.testResults;');
       })
       .then(testResults => {
         // Resolve the outer promise to get out of the webdriver promise chain
@@ -102,8 +97,8 @@ describe('Test SW-Toolbox', () => {
     })
     .then(testResults => {
       if (testResults.failed.length > 0) {
-        var failedTests = testResults.failed;
-        var errorMessage = 'Issues in ' + browserName + '.\n\n' + browserName + ' had ' + testResults.failed.length + ' test failures.\n';
+        const failedTests = testResults.failed;
+        let errorMessage = 'Issues in ' + browserName + '.\n\n' + browserName + ' had ' + testResults.failed.length + ' test failures.\n';
         errorMessage += '------------------------------------------------\n';
         errorMessage += failedTests.map((failedTest, i) => {
           return `[Failed Test ${i + 1}]\n    ${failedTest.title}\n`;
@@ -114,98 +109,45 @@ describe('Test SW-Toolbox', () => {
     });
   };
 
-  it('should pass all tests in Chrome Stable', done => {
-    checkFileExists('/usr/bin/google-chrome-stable')
-    .then(() => {
-      // This will only work on linux. It's here
-      // to primarily work with Travis. Would be good to enable support
-      // on other platforms at a later stage.
-      var options = new chrome.Options();
-      options.setChromeBinaryPath('/usr/bin/google-chrome-stable');
-
-      driver = new webdriver
+  const queueUnitTest = (browserName, browserPath, seleniumBrowserID, options) => {
+    if (!browserPath) {
+      console.warn(`${browserName} path wasn\'t found so skipping`);
+      return;
+    }
+    it(`should pass all tests in ${browserName}`, () => {
+      globalDriverReference = new webdriver
         .Builder()
-        .forBrowser('chrome')
+        .forBrowser(seleniumBrowserID)
         .setChromeOptions(options)
-        .build();
-
-      return performTests('chrome-stable', driver)
-        .then(() => {
-          done();
-        })
-        .catch(done);
-    })
-    .catch(() => {
-      done(new Error('Executable for Chrome Stable not found'));
-    });
-  });
-
-  it('should pass all tests in Chrome Beta', done => {
-    checkFileExists('/usr/bin/google-chrome-beta')
-    .then(() => {
-      // This will only work on linux. It's here
-      // to primarily work with Travis. Would be good to enable support
-      // on other platforms at a later stage.
-      var options = new chrome.Options();
-      options.setChromeBinaryPath('/usr/bin/google-chrome-beta');
-
-      driver = new webdriver
-        .Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(options)
-        .build();
-
-      performTests('chrome-beta', driver)
-        .then(() => {
-          done();
-        })
-        .catch(done);
-    })
-    .catch(() => {
-      done(new Error('Executable for Chrome Beta not found'));
-    });
-  });
-
-  it('should pass all tests in Firefox', done => {
-    driver = new webdriver
-      .Builder()
-      .forBrowser('firefox')
-      .build();
-
-    performTests('Firefox Stable', driver)
-    .then(() => {
-      done();
-    })
-    .catch(done);
-  });
-
-  it('should pass all tests in Firefox Beta', done => {
-    checkFileExists('./firefox/firefox')
-    .then(() => {
-      // This will only work on linux. It's here
-      // to primarily work with Travis. Would be good to enable support
-      // on other platforms at a later stage.
-      var options = new firefox.Options();
-      options.setBinary('./firefox/firefox');
-
-      driver = new webdriver
-        .Builder()
-        .forBrowser('firefox')
         .setFirefoxOptions(options)
         .build();
 
-      return performTests('Firefox Beta', driver)
-      .then(() => {
-        done();
-      })
-      .catch(() => {
-        // Firefox V45 is a range of issues with this test suite
-        // For now don't let this fail all of travis.
-        done();
-      });
-    })
-    .catch(() => {
-      done(new Error('Executable for Firefox Beta not found'));
+      return performTests(browserName, globalDriverReference);
     });
-  });
+  };
+
+  const chromeStableOpts = new chromeOptions.Options();
+  chromeStableOpts.setChromeBinaryPath(CHROME_PATH);
+
+  queueUnitTest('Chrome Stable', CHROME_PATH, 'chrome', chromeStableOpts);
+
+
+  const chromeBetaOpts = new chromeOptions.Options();
+  chromeBetaOpts.setChromeBinaryPath(CHROME_BETA_PATH);
+
+  queueUnitTest('Chrome Beta', CHROME_BETA_PATH, 'chrome', chromeBetaOpts);
+
+
+  const ffStableOpts = new firefoxOptions.Options();
+  ffStableOpts.setBinary(FIREFOX_PATH);
+
+  queueUnitTest('Firefox Stable', FIREFOX_PATH, 'firefox', ffStableOpts);
+
+
+  if (process.env.TRAVIS) {
+    const ffBetaOpts = new firefoxOptions.Options();
+    ffBetaOpts.setBinary(FIREFOX_BETA_PATH_FOR_TRAVIS);
+
+    queueUnitTest('Firefox Beta', FIREFOX_BETA_PATH_FOR_TRAVIS, 'firefox', ffStableOpts);
+  }
 });
