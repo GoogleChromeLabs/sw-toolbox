@@ -18,7 +18,7 @@
 
 'use strict';
 
-const availableMethods = ['get', 'post'];
+const availableMethods = ['get', 'post', 'put', 'delete', 'head'];
 
 describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
   const serviceWorkersFolder = '/test/browser-tests/router-methods/serviceworkers';
@@ -43,6 +43,14 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
   const performTest = (method, swUrl, fetchUrl, expectedString, done) => {
     let testPromise = testHelper.activateSW(swUrl + '?method=' + method)
     .then(() => {
+      if (method === 'any') {
+        return Promise.all(
+          availableMethods.map(fetchMethod => {
+            return performFetch(fetchMethod, fetchUrl, expectedString);
+          })
+        );
+      }
+
       return performFetch(method, fetchUrl, expectedString);
     });
 
@@ -321,4 +329,6 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
   availableMethods.map(method => {
     addMochaTests(method);
   });
+
+  addMochaTests('any');
 });
