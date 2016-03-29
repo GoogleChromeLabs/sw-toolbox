@@ -18,13 +18,15 @@
 
 'use strict';
 
+var swUtils = window.goog.SWHelper;
 const availableMethods = ['get', 'post', 'put', 'delete', 'head'];
+const domainName = 'progress-web-app-sw-toolbox-domain.com';
 
 describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
   const serviceWorkersFolder = '/test/browser-tests/router-methods/serviceworkers';
 
   const performFetch = (method, fetchUrl, expectedString) => {
-    return testHelper.getIframe()
+    return swUtils.getIframe()
       .then(iframe => {
         // Call the iframes fetch event so it goes through the service worker
         return iframe.contentWindow.fetch(fetchUrl, {
@@ -41,7 +43,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
   };
 
   const performTest = (method, swUrl, fetchUrl, expectedString, done) => {
-    let testPromise = testHelper.activateSW(swUrl + '?method=' + method)
+    let testPromise = swUtils.activateSW(swUrl + '?method=' + method)
     .then(() => {
       if (method === 'any') {
         return Promise.all(
@@ -133,11 +135,13 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         .catch(done);
       });
 
-      // Firefox version 45+ support fetch requests to other origins going through
+      // Firefox version 47+ support fetch requests to other origins going through
       // service workers. This check will skip tests for older version of
       // firefox and reenable the tests when appropriate.
+      // 46 doesn't work with HTTPS domains
+      // 45 doesn't work with other origins
       var firefoxVersion = /Firefox\/(\d+).\d+/.exec(navigator.userAgent);
-      if (firefoxVersion && parseInt(firefoxVersion[1], 10) < 45) {
+      if (firefoxVersion && parseInt(firefoxVersion[1], 10) < 47) {
         console.warn('Tests skipped due to version of Firefox not supporting ' +
           'cross origin requests via fetch()');
         return;
@@ -147,7 +151,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/origin-option-regex',
+          `${domainName}/origin-option-regex`,
           '/default',
           done
         );
@@ -157,7 +161,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/origin-option-regex',
+          `http://${domainName}/origin-option-regex`,
           '/origin-option-regex',
           done
         );
@@ -167,7 +171,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/origin-option-regex',
+          `https://${domainName}/origin-option-regex`,
           '/origin-option-regex',
           done
         );
@@ -177,7 +181,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/origin-option-string',
+          `${domainName}/origin-option-string`,
           '/default',
           done
         );
@@ -187,7 +191,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/origin-option-string',
+          `http://${domainName}/origin-option-string`,
           '/origin-option-string',
           done
         );
@@ -197,7 +201,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/origin-option-string',
+          `https://${domainName}/origin-option-string`,
           '/origin-option-string',
           done
         );
@@ -207,7 +211,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/https-only-string',
+          `${domainName}/https-only-string`,
           '/default',
           done
         );
@@ -217,7 +221,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/https-only-string',
+          `http://${domainName}/https-only-string`,
           '/default',
           done
         );
@@ -227,7 +231,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/https-only-string',
+          `https://${domainName}/https-only-string`,
           '/https-only-string',
           done
         );
@@ -238,7 +242,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/soft-origin-regex-route',
+          `${domainName}/soft-origin-regex-route`,
           '/soft-origin-regex-route',
           done
         );
@@ -248,7 +252,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/soft-origin-regex-route',
+          `http://${domainName}/soft-origin-regex-route`,
           '/soft-origin-regex-route',
           done
         );
@@ -258,7 +262,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/soft-origin-regex-route',
+          `https://${domainName}/soft-origin-regex-route`,
           '/soft-origin-regex-route',
           done
         );
@@ -268,7 +272,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/hard-origin-regex-route',
+          `${domainName}/hard-origin-regex-route`,
           '/default',
           done
         );
@@ -278,7 +282,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/hard-origin-regex-route',
+          `http://${domainName}/hard-origin-regex-route`,
           '/hard-origin-regex-route',
           done
         );
@@ -288,7 +292,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/hard-origin-regex-route',
+          `https://${domainName}/hard-origin-regex-route`,
           '/hard-origin-regex-route',
           done
         );
@@ -298,7 +302,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'developers.google.com/https-only-regex',
+          `${domainName}/https-only-regex`,
           '/default',
           done
         );
@@ -308,7 +312,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'http://developers.google.com/https-only-regex',
+          `http://${domainName}/https-only-regex`,
           '/default',
           done
         );
@@ -318,7 +322,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
-          'https://developers.google.com/https-only-regex',
+          `https://${domainName}/https-only-regex`,
           '/https-only-regex',
           done
         );
@@ -326,7 +330,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
     });
   };
 
-  availableMethods.map(method => {
+  availableMethods.forEach(method => {
     addMochaTests(method);
   });
 

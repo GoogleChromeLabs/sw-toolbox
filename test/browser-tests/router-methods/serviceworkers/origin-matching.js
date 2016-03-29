@@ -23,36 +23,37 @@ importScripts('/test/data/skip-and-claim.js');
 importScripts('/test/data/router-methods-helper.js');
 
 const method = self.getMethodToTest();
+const domainName = 'progress-web-app-sw-toolbox-domain.com';
 
 // Testing the origin option
 self.toolbox.router[method]('/origin-option-regex', function() {
   return new Response('/origin-option-regex');
-}, {origin: /developers\.google\.com/});
+}, {origin: /progress-web-app-sw-toolbox-domain\.com/});
 
 self.toolbox.router[method]('/origin-option-string', function() {
   return new Response('/origin-option-string');
-}, {origin: 'developers.google.com'});
+}, {origin: `${domainName}`});
 
 self.toolbox.router[method]('/https-only-string',
   function() {
     return new Response('/https-only-string');
-  }, {origin: 'https://developers.google.com'});
+  }, {origin: `https://${domainName}`});
 
 // Testing the regex route approach
-self.toolbox.router[method](/developers\.google\.com\/soft-origin-regex-route/,
+self.toolbox.router[method](/progress-web-app-sw-toolbox-domain\.com\/soft-origin-regex-route/,
   function() {
     return new Response('/soft-origin-regex-route');
   }
 );
 
 self.toolbox.router[method](
-  /http(s)?:\/\/developers\.google\.com\/hard-origin-regex-route/,
+  /http(s)?:\/\/progress-web-app-sw-toolbox-domain\.com\/hard-origin-regex-route/,
   function() {
     return new Response('/hard-origin-regex-route');
   }
 );
 
-self.toolbox.router[method](/https:\/\/developers\.google\.com\/https-only-regex/,
+self.toolbox.router[method](/https:\/\/progress-web-app-sw-toolbox-domain\.com\/https-only-regex/,
   function() {
     return new Response('/https-only-regex');
   }
@@ -62,7 +63,7 @@ self.toolbox.router[method](/https:\/\/developers\.google\.com\/https-only-regex
 // to developers.google.com
 // default route doesn't work for post requests, this should
 // work for all methods
-self.toolbox.router[method](/.*\/developers\.google\.com\/.*/,
+self.toolbox.router[method](/.*\/progress-web-app-sw-toolbox-domain\.com\/.*/,
   function() {
     return new Response('/default');
   }

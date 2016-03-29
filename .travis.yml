@@ -1,18 +1,32 @@
-sudo: false
+sudo: true
 language: node_js
+env:
+  global:
+    - FF_BETA_PATH: './firefox/firefox'
 node_js:
   - 'stable'
 addons:
   # From some tests it seems you can only have one firefox addon.
   # Adding two results in the last one defined being the one installed.
   firefox: latest
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
-      - google-chrome-beta
+  # Current broken on Travis 15/March/2016
+  #apt:
+  #  sources:
+  #    - google-chrome
+  #  packages:
+  #    - google-chrome-stable
+  #    - google-chrome-beta
+
 before_install:
+  # Chrome Stable
+  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+  - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -y google-chrome-stable
+
+  # Beta currently has dependencies that can't be met
+  # - sudo apt-get install -y google-chrome-beta
+
   # Get firefbox beta and extract to tar for the test runner to use.
   - wget 'https://download.mozilla.org/?product=firefox-beta-latest&lang=en-US&os=linux64' -O firefox-beta.tar.bz2 && tar xvjf firefox-beta.tar.bz2
 
