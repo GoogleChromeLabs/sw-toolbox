@@ -1,7 +1,4 @@
 {
-  "globals": {
-    "testHelper": false
-  },
   "rules": {
     "max-len": 0
   }

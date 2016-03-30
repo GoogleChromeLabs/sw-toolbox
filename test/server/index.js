@@ -17,59 +17,88 @@
 
 'use strict';
 
-// This server is needed most importantly to add the Service-Worker-Allowed
-// header to any service worker loaded in the tests. This allows the scope
-// to be manipulated any way we want / need during testing.
+/* eslint-env node */
 
-var path = require('path');
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var app = express();
+const path = require('path');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const app = express();
 
-// Set up static assets
-app.use('/test/browser-tests/',
-  express.static(path.join(__dirname, '..', 'browser-tests/'), {
+// If the user tries to go to the root of the server, redirect them
+// to the browser test path
+app.get('/', function(req, res) {
+  res.redirect('/test/browser-tests/');
+});
+
+let _server;
+
+function startServer(staticAssetsPath, portNumber) {
+  if (_server) {
+    _server.close();
+  }
+
+  // 0 will pick a random port number
+  if (typeof portNumber === 'undefined') {
+    portNumber = 0;
+  }
+
+  // Allow all assets in the project to be served, including any
+  // required js code from the project
+  //
+  // Add service worker allowed header to avoid any scope restrictions
+  // NOTE: NOT SAFE FOR PRODUCTION!!!
+  app.use('/', express.static(staticAssetsPath, {
     setHeaders: function(res) {
       res.setHeader('Service-Worker-Allowed', '/');
     }
-  })
-);
+  }));
+  app.use(cookieParser());
 
-// Allow all assets in the project to be served (This includes sw-toolbox.js)
-app.use('/', express.static(path.join(__dirname, '..', '..')));
-app.use(cookieParser());
-
-// If the user tries to go to the root of the test server, redirect them
-// to /test/
-app.get('/', function(req, res) {
-  res.redirect('/test/');
-});
-
-// Iframes need to have a page loaded so the service worker will have
-// a page to claim and control. This is done by returning a basic
-// html file for /test/iframe/<timestamp>
-app.get('/test/iframe/:timestamp', function(req, res) {
-  res.sendFile(path.join(__dirname, '..', 'data', 'test-iframe.html'));
-});
-
-app.get('/test/helper/redirect', function(req, res) {
-  if (req.cookies.bouncedRedirect === 'true') {
-    res.clearCookie('bouncedRedirect');
-    res.json({success: true});
-  } else {
-    res.redirect('/test/helper/redirect/bounce');
-  }
-});
-
-app.get('/test/helper/redirect/bounce', function(req, res) {
-  res.cookie('bouncedRedirect', true);
-  res.json({
-    redirect: '/test/helper/redirect'
+  // If the user tries to go to the root of the test server, redirect them
+  // to /test/
+  app.get('/', function(req, res) {
+    res.redirect('/test/browser-tests/');
   });
-});
 
-// Start service on port 8888
-var server = app.listen(8888, function() {
-  console.log('Example app listening at http://localhost:%s',
-    server.address().port);
-});
+  // Iframes need to have a page loaded so the service worker will have
+  // a page to claim and control. This is done by returning a basic
+  // html file for /test/iframe/<timestamp>
+  app.get('/test/iframe/:timestamp', function(req, res) {
+    res.sendFile(path.join(__dirname, '..', 'data', 'test-iframe.html'));
+  });
+
+  app.get('/test/helper/redirect', function(req, res) {
+    if (req.cookies.bouncedRedirect === 'true') {
+      res.clearCookie('bouncedRedirect');
+      res.json({success: true});
+    } else {
+      res.redirect('/test/helper/redirect/bounce');
+    }
+  });
+
+  app.get('/test/helper/redirect/bounce', function(req, res) {
+    res.cookie('bouncedRedirect', true);
+    res.json({
+      redirect: '/test/helper/redirect'
+    });
+  });
+
+  return new Promise(resolve => {
+    // Start service on desired port
+    _server = app.listen(portNumber, function() {
+      resolve(_server.address().port);
+    });
+  });
+}
+
+function killServer() {
+  if (_server) {
+    _server.close();
+    _server = null;
+  }
+}
+
+module.exports = {
+  startServer: startServer,
+  killServer: killServer
+};

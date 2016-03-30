@@ -1,5 +1,7 @@
 # Service Worker Toolbox
 
+[![Build Status](https://travis-ci.org/GoogleChrome/sw-toolbox.svg?branch=master)](https://travis-ci.org/GoogleChrome/sw-toolbox) [![Dependency Status](https://david-dm.org/googlechrome/sw-toolbox.svg)](https://david-dm.org/googlechrome/sw-toolbox) [![devDependency Status](https://david-dm.org/googlechrome/sw-toolbox/dev-status.svg)](https://david-dm.org/googlechrome/sw-toolbox#info=devDependencies)
+
 > A collection of tools for [service workers](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/)
 
 Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching patterns and an [expressive approach](#toolboxrouterheadurlpattern-handler-options) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
@@ -49,7 +51,7 @@ appropriate route. To define a route you call the appropriate method on
 
 For example, to send `GET` requests for the URL `'/myapp/index.html'` to the
 built-in `toolbox.networkFirst` handler, you would write the following in your
-service worker file: 
+service worker file:
 
 `toolbox.router.get('/myapp/index.html', toolbox.networkFirst);`
 
@@ -95,7 +97,7 @@ toolbox.router.post('/(.*)', apiHandler, {origin: 'https://api.example.com'});
 Developers who are more comfortable using [regular expressions](https://regex101.com/)
 can use an alternative syntax to define routes, passing in a [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
 object as the first parameter. This `RegExp` will be matched against the full
-request URL when determining whether the route applies, including the origin and 
+request URL when determining whether the route applies, including the origin and
 path. This can lead to simpler cross-origin routing vs. Express-style routes,
 since both the origin and the path are matched simultaneously, without having
 to specify a separate `origin` option.
@@ -269,8 +271,8 @@ Patches are encouraged, and may be submitted by forking this project and submitt
 
 Copyright 2015 Google, Inc.
 
-Licensed under the [Apache License, Version 2.0](LICENSE) (the "License"); 
-you may not use this file except in compliance with the License. You may 
+Licensed under the [Apache License, Version 2.0](LICENSE) (the "License");
+you may not use this file except in compliance with the License. You may
 obtain a copy of the License at
 
    http://www.apache.org/licenses/LICENSE-2.0

@@ -18,15 +18,16 @@
 
 'use strict';
 
+var swUtils = window.goog.SWHelper;
+
 describe('Test networkFirst Routing', function() {
   const serviceWorkersFolder = '/test/browser-tests/network-first/serviceworkers';
 
-
   it('should handle redirects correctly', done => {
-    testHelper.activateSW(serviceWorkersFolder + '/redirects.js')
+    swUtils.activateSW(serviceWorkersFolder + '/redirects.js')
     .then(() => {
       const redirectTest = () => {
-        return testHelper.getIframe()
+        return swUtils.getIframe()
           .then(iframe => {
             // Call the iframes fetch event so it goes through the service worker
             return iframe.contentWindow.fetch('/test/helper/redirect', {
@@ -38,25 +39,23 @@ describe('Test networkFirst Routing', function() {
             return response.json();
           })
           .then(response => {
-            console.log(response);
             if (!response.redirect) {
               throw new Error('Unexpected response from server');
-            } else {
-              return testHelper.getIframe()
-              .then(iframe => {
-                // Call the iframes fetch event so it goes through the service worker
-                return iframe.contentWindow.fetch(response.redirect, {
-                  credentials: 'same-origin'
-                });
-              });
             }
+
+            return swUtils.getIframe()
+            .then(iframe => {
+              // Call the iframes fetch event so it goes through the service worker
+              return iframe.contentWindow.fetch(response.redirect, {
+                credentials: 'same-origin'
+              });
+            });
           })
           .then(response => {
             response.status.should.equal(200);
             return response.json();
           })
           .then(response => {
-            console.log(response);
             if (!response.success) {
               throw new Error('Unexpected response from server');
             }
@@ -68,7 +67,7 @@ describe('Test networkFirst Routing', function() {
       return redirectTest()
       .then(() => {
         return redirectTest();
-      })
+      });
     })
     .then(() => done())
     .catch(done);

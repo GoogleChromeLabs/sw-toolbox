@@ -18,6 +18,8 @@
 
 'use strict';
 
+var swUtils = window.goog.SWHelper;
+
 describe('Test precache method', () => {
   let compareCachedAssets = (assetList, cachedAssets) => {
     // We make a set to ensure duplicates are removed from the asset list
@@ -48,9 +50,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/array-strings.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/array-strings.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -62,9 +64,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/array-requests.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/array-requests.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -76,9 +78,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/array-mix.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/array-mix.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -92,9 +94,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-strings.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/promise-to-strings.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -106,9 +108,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-requests.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/promise-to-requests.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -120,9 +122,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/promise-to-mix.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/promise-to-mix.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -139,9 +141,9 @@ describe('Test precache method', () => {
         '/test/data/files/text-3.txt',
         '/test/data/files/text-4.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-strings.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/multiple-calls-strings.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -156,9 +158,9 @@ describe('Test precache method', () => {
         '/test/data/files/text-3.txt',
         '/test/data/files/text-4.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-requests.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/multiple-calls-requests.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -173,9 +175,9 @@ describe('Test precache method', () => {
         '/test/data/files/text-3.txt',
         '/test/data/files/text-4.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-promises.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/multiple-calls-promises.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -191,9 +193,9 @@ describe('Test precache method', () => {
         '/test/data/files/text-4.txt',
         '/test/data/files/text-5.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/multiple-calls-mix.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/multiple-calls-mix.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-valid');
+          return swUtils.getAllCachedAssets('precache-valid');
         })
         .then(cachedAssets => {
           return compareCachedAssets(assetList, cachedAssets);
@@ -211,15 +213,15 @@ describe('Test precache method', () => {
         '/test/data/files/text-2.txt',
         '/test/data/files/text-3.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/edgecase-custom-install.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/edgecase-custom-install.js')
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-custom-install-toolbox');
+          return swUtils.getAllCachedAssets('precache-custom-install-toolbox');
         })
         .then(cachedAssets => {
           return compareCachedAssets(toolboxAssetList, cachedAssets);
         })
         .then(() => {
-          return testHelper.getAllCachedAssets('precache-custom-install');
+          return swUtils.getAllCachedAssets('precache-custom-install');
         })
         .then(cachedAssets => {
           return compareCachedAssets(additionalInstallAssets, cachedAssets);
@@ -229,32 +231,32 @@ describe('Test precache method', () => {
 
   describe('Test precaching Error Cases', function() {
     it('should throw an error when caching a single string', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-single-item.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-single-item.js')
       .should.be.rejected;
     });
 
     it('should throw an error when precaching an array of promises', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-array-of-promises.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-array-of-promises.js')
       .should.be.rejected;
     });
 
     it('should throw an error when attmpting to precache nested arrays', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-nested-arrays.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-nested-arrays.js')
       .should.be.rejected;
     });
 
     it('should throw an error when attempting to precache nested promises', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-nested-promises.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-nested-promises.js')
       .should.be.rejected;
     });
 
     it('should throw an error when precaching a mix of strings, promises and arrays', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-mix.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-mix.js')
       .should.be.rejected;
     });
 
     it('should failt to install service worker due to Promise resolving to a javascript object, not an array.', () => {
-      return testHelper.activateSW(serviceWorkersFolder + '/error-non-array-promise.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-non-array-promise.js')
       .should.be.rejected;
     });
 
@@ -266,9 +268,9 @@ describe('Test precache method', () => {
         '/test/data/files/text.txt',
         '/test/data/files/text-1.txt'
       ];
-      return testHelper.activateSW(serviceWorkersFolder + '/error-non-existant-files.js')
+      return swUtils.activateSW(serviceWorkersFolder + '/error-non-existant-files.js')
         .then(() => {
-          return testHelper.getAllCachedAssets(testId);
+          return swUtils.getAllCachedAssets(testId);
         })
         .then(cachedAssets => {
           return compareCachedAssets(validAssetsList, cachedAssets);

@@ -29,6 +29,7 @@
     "mocha": "^2.3.4",
     "qunitjs": "^1.20.0",
     "selenium-webdriver": "^2.48.2",
+    "sw-testing-helpers": "0.0.6",
     "temp": "^0.8.3",
     "vinyl-source-stream": "^1.1.0",
     "which": "^1.2.4"
