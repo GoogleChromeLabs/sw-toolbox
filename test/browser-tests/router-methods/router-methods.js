@@ -18,7 +18,7 @@
 
 'use strict';
 
-var swUtils = window.goog.SWHelper;
+const swUtils = window.goog.SWHelper;
 const availableMethods = ['get', 'post', 'put', 'delete', 'head'];
 const domainName = 'progress-web-app-sw-toolbox-domain.com';
 
@@ -140,7 +140,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
       // firefox and reenable the tests when appropriate.
       // 46 doesn't work with HTTPS domains
       // 45 doesn't work with other origins
-      var firefoxVersion = /Firefox\/(\d+).\d+/.exec(navigator.userAgent);
+      const firefoxVersion = /Firefox\/(\d+).\d+/.exec(navigator.userAgent);
       if (firefoxVersion && parseInt(firefoxVersion[1], 10) < 47) {
         console.warn('Tests skipped due to version of Firefox not supporting ' +
           'cross origin requests via fetch()');

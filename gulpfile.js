@@ -26,7 +26,10 @@ var mocha = require('gulp-mocha');
 var testServer = require('./test/server/index.js');
 
 var buildSources = ['lib/**/*.js'];
-var lintSources = buildSources.concat(['gulpfile.js', 'recipes/**/*.js']);
+var lintSources = buildSources.concat([
+  'gulpfile.js',
+  'recipes/**/*.js',
+  'test/**/*.js']);
 
 gulp.task('test:manual', function() {
   testServer.startServer(path.join(__dirname), 8888)

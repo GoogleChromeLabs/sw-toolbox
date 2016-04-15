@@ -18,10 +18,91 @@
 
 'use strict';
 
-var swUtils = window.goog.SWHelper;
+const swUtils = window.goog.SWHelper;
 
-describe('Test networkFirst Routing', function() {
+describe('Test toolbox.networkFirst', function() {
   const serviceWorkersFolder = '/test/browser-tests/network-first/serviceworkers';
+
+  it('should retrieve the first value from the network', function() {
+    let iframe;
+    const TEST_INPUT = 'hello';
+    return swUtils.activateSW(serviceWorkersFolder + '/network-first.js')
+    .then(newIframe => {
+      iframe = newIframe;
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.put('/test/data/files/text.txt', new Response(TEST_INPUT));
+    })
+    .then(() => {
+      // Call the iframes fetch event so it goes through the service worker
+      return iframe.contentWindow.fetch('/test/data/files/text.txt');
+    })
+    .then(response => {
+      response.status.should.equal(200);
+      return response.text();
+    })
+    .then(responseText => {
+      responseText.trim().should.equal('Hello, World!');
+      return new Promise(resolve => {
+        // Give the networkFirst step time to respond to request and
+        // update the cache
+        setTimeout(resolve, 500);
+      });
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.match('/test/data/files/text.txt');
+    })
+    .then(response => {
+      return response.text();
+    })
+    .then(responseText => {
+      responseText.trim().should.equal('Hello, World!');
+    });
+  });
+
+  it.skip('should retrieve the value from the cache for a bad network request', function() {
+    let iframe;
+    const TEST_INPUT = 'hello';
+    return swUtils.activateSW(serviceWorkersFolder + '/network-first.js')
+    .then(newIframe => {
+      iframe = newIframe;
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.put('/test/browser-tests/network-first/doesnt-exist', new Response(TEST_INPUT));
+    })
+    .then(() => {
+      // Call the iframes fetch event so it goes through the service worker
+      return iframe.contentWindow.fetch('/test/browser-tests/network-first/doesnt-exist');
+    })
+    .then(response => {
+      response.status.should.equal(200);
+      return response.text();
+    })
+    .then(responseText => {
+      responseText.trim().should.equal(TEST_INPUT);
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.match('/test/browser-tests/network-first/doesnt-exist');
+    })
+    .then(response => {
+      return response.text();
+    })
+    .then(responseText => {
+      responseText.trim().should.equal(TEST_INPUT);
+    });
+  });
 
   it('should handle redirects correctly', done => {
     swUtils.activateSW(serviceWorkersFolder + '/redirects.js')
