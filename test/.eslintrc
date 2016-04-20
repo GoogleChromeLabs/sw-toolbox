@@ -1,5 +1,6 @@
 {
   "rules": {
-    "max-len": 0
+    "max-len": 0,
+    "no-var": 2
   }
 }
