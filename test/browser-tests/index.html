@@ -34,7 +34,7 @@
   <script src="/node_modules/mocha/mocha.js"></script>
 
   <!-- Helper functions will be under window.goog.SWHelper -->
-  <script src="/node_modules/sw-testing-helpers/src/in-browser-helpers/sw-utils.js"></script>
+  <script src="/node_modules/sw-testing-helpers/build/browser/window-utils.js"></script>
 
   <!--
     Timeout is extended to ensure tests for max-cache-age
@@ -94,8 +94,6 @@
         return;
       }
 
-      var swUtils = window.goog.SWHelper;
-
       // should adds objects to primitives which requires this call to be made
       // before any tests are run.
       window.chai.should();
@@ -106,12 +104,12 @@
         // This clears a cookie set by the server for redirects
         document.cookie = 'bouncedRedirect=; expires=' + new Date().getTime() + ';path=/';
 
-        return swUtils.cleanState();
+        return window.goog.WindowUtils.cleanState();
       });
 
       // Clean up after the final test has finished
       after(function() {
-        return swUtils.cleanState();
+        return window.goog.WindowUtils.cleanState();
       });
 
       var runResults = mocha.run();

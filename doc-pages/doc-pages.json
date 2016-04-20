@@ -1,0 +1,11 @@
+{
+    "api": {
+        "title": "API"
+    },
+    "usage": {
+        "title": "Usage"
+    },
+    "recipes": {
+        "title": "Service Worker Toolbox Recipes"
+    }
+}

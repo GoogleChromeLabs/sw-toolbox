@@ -18,9 +18,8 @@
 
 'use strict';
 
-const swUtils = window.goog.SWHelper;
-
 describe('Test toolbox.networkFirst', function() {
+  const swUtils = window.goog.WindowUtils;
   const serviceWorkersFolder = '/test/browser-tests/network-first/serviceworkers';
 
   it('should retrieve the first value from the network', function() {

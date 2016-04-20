@@ -1,0 +1,21 @@
+{
+  "source": {
+    "include": "./lib",
+    "includePattern": ".+\\.js(doc)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "opts": {
+    "destination": "./docs/",
+    "readme": "./README.md",
+    "tutorials": "./doc-pages/"
+  },
+  "templates": {
+    "default": {
+      "staticFiles": {
+        "include": [
+            "./recipes"
+        ]
+      }
+    }
+  }
+}

@@ -18,9 +18,9 @@
 
 'use strict';
 
-const swUtils = window.goog.SWHelper;
-
 describe('Test precache method', () => {
+  const swUtils = window.goog.WindowUtils;
+
   let compareCachedAssets = (assetList, cachedAssets) => {
     // We make a set to ensure duplicates are removed from the asset list
     let assetSet = new Set(assetList);

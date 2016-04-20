@@ -18,11 +18,11 @@
 
 'use strict';
 
-const swUtils = window.goog.SWHelper;
 const availableMethods = ['get', 'post', 'put', 'delete', 'head'];
 const domainName = 'progress-web-app-sw-toolbox-domain.com';
 
 describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
+  const swUtils = window.goog.WindowUtils;
   const serviceWorkersFolder = '/test/browser-tests/router-methods/serviceworkers';
 
   const performFetch = (method, fetchUrl, expectedString) => {
