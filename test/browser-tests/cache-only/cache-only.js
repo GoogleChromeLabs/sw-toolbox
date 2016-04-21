@@ -18,9 +18,8 @@
 
 'use strict';
 
-const swUtils = window.goog.SWHelper;
-
 describe('Test toolbox.cacheOnly', function() {
+  const swUtils = window.goog.WindowUtils;
   const serviceWorkersFolder = '/test/browser-tests/cache-only/serviceworkers';
 
   it('should return nothing from the empty cache', function(done) {

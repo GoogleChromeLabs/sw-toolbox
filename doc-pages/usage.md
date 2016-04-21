@@ -1,5 +1,3 @@
-# Usage
-
 ## Basic Routes
 
 A _route_ is a URL pattern and request method associated with a handler.

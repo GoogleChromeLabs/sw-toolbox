@@ -1,5 +1,3 @@
-# API
-
 ## Options
 
 All options can be specified globally via properties of `toolbox.options`.

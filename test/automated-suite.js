@@ -24,6 +24,7 @@
 
 require('chai').should();
 const path = require('path');
+const mochaUtils = require('../node_modules/sw-testing-helpers/src/mocha/utils.js');
 const automatedBrowserTesting = require('sw-testing-helpers').automatedBrowserTesting;
 
 const testServer = require('./server/index.js');
@@ -67,10 +68,14 @@ describe('Test SW-Toolbox', function() {
         `${testServerURL}/test/browser-tests/`
       )
       .then(testResults => {
-        automatedBrowserTesting.manageTestResults(
-          browserInfo.prettyName,
-          testResults
-        );
+        if (testResults.failed.length > 0) {
+          const errorMessage = mochaUtils.prettyPrintErrors(
+            browserInfo.prettyName,
+            testResults
+          );
+
+          throw new Error(errorMessage);
+        }
       });
     });
   };
