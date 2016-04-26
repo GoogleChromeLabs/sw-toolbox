@@ -18,7 +18,7 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js');
+importScripts('/build/sw-toolbox.js');
 
 self.toolbox.options.cache = {
   name: 'precache-non-existant-files'

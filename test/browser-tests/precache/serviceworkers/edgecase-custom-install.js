@@ -21,7 +21,7 @@
 // This test looks at what would happen with multiple install events.
 // This should cache all assets in both the install and precache steps
 
-importScripts('/sw-toolbox.js');
+importScripts('/build/sw-toolbox.js');
 
 self.addEventListener('install', function(event) {
   event.waitUntil(

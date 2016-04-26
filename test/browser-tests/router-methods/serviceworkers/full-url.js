@@ -18,7 +18,7 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/sw-toolbox.js');
+importScripts('/build/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
 importScripts('/test/data/router-methods-helper.js');
 
