@@ -19,7 +19,7 @@
 'use strict';
 
 describe('Test toolbox.cacheFirst', function() {
-  const swUtils = window.goog.WindowUtils;
+  const swUtils = window.goog.swUtils;
   const serviceWorkersFolder = '/test/browser-tests/cache-first/serviceworkers';
 
   it('should retrieve the first value from the cache and not update it', function() {

@@ -19,7 +19,7 @@
 'use strict';
 
 describe('Test toolbox.networkOnly', function() {
-  const swUtils = window.goog.WindowUtils;
+  const swUtils = window.goog.swUtils;
   const serviceWorkersFolder = '/test/browser-tests/network-only/serviceworkers';
 
   it('should retrieve the first value from the network and not put anything in the cache', function() {
