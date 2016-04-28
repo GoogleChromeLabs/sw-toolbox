@@ -24,7 +24,7 @@
 
 require('chai').should();
 const path = require('path');
-const mochaUtils = require('../node_modules/sw-testing-helpers/src/mocha/utils.js');
+const mochaUtils = require('sw-testing-helpers').mochaUtils;
 const automatedBrowserTesting = require('sw-testing-helpers').automatedBrowserTesting;
 
 const testServer = require('./server/index.js');
@@ -59,11 +59,11 @@ describe('Test SW-Toolbox', function() {
   });
 
   const queueUnitTest = browserInfo => {
-    it(`should pass all tests in ${browserInfo.prettyName}`, () => {
+    it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
       globalDriverReference = browserInfo.getSeleniumDriver();
 
-      return automatedBrowserTesting.runMochaTests(
-        browserInfo.prettyName,
+      return mochaUtils.startWebDriverMochaTests(
+        browserInfo.getPrettyName(),
         globalDriverReference,
         `${testServerURL}/test/browser-tests/`
       )
@@ -80,7 +80,7 @@ describe('Test SW-Toolbox', function() {
     });
   };
 
-  const automatedBrowsers = automatedBrowserTesting.getAutomatedBrowsers();
+  const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     queueUnitTest(browserInfo);
   });

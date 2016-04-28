@@ -62,7 +62,7 @@ gulp.task('build', function() {
   return bundler
     .bundle()
     .pipe(source('sw-toolbox.js'))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build/'));
 });
 
 gulp.task('lint', function() {

@@ -28,4 +28,6 @@ before_script:
 
 script:
   - npm test
-  - ./node_modules/sw-testing-helpers/project/publish-docs.sh master
+  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+      ./node_modules/sw-testing-helpers/project/publish-docs.sh master;
+    fi

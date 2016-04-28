@@ -19,7 +19,7 @@
 'use strict';
 
 describe('Test toolbox.fastest', function() {
-  const swUtils = window.goog.WindowUtils;
+  const swUtils = window.goog.swUtils;
   const serviceWorkersFolder = '/test/browser-tests/fastest/serviceworkers';
 
   it('should return network value and add it to the cache', function() {
