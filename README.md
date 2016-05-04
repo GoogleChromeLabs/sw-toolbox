@@ -4,7 +4,7 @@
 
 > A collection of tools for [service workers](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/)
 
-Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching patterns and an [expressive approach](https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api#toolboxrouterheadurlpattern-handler-options) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
+Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching patterns and an [expressive approach](https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api#expressive-approach) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
 
 ## Install
 

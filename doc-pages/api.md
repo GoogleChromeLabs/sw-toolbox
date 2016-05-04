@@ -68,7 +68,7 @@ Resolve the request from the cache, or fail. This option is good for when you ne
 ### `toolbox.networkOnly`
 Handle the request by trying to fetch the URL from the network. If the fetch fails, fail the request. Essentially the same as not creating a route for the URL at all.
 
-## Methods
+<h2 id="expressive-approach">Methods</h2>
 
 ### `toolbox.router.get(urlPattern, handler, options)`
 ### `toolbox.router.post(urlPattern, handler, options)`
