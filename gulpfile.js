@@ -55,8 +55,8 @@ gulp.task('build', function() {
 
   bundler.plugin('browserify-header');
   bundler.plugin('minifyify', {
-    map: 'sw-toolbox.map.json',
-    output: 'sw-toolbox.map.json'
+    map: './build/sw-toolbox.map.json',
+    output: './build/sw-toolbox.map.json'
   });
 
   return bundler
