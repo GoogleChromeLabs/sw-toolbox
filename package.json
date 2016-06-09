@@ -1,6 +1,6 @@
 {
   "name": "sw-toolbox",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "license": "Apache-2.0",
   "scripts": {
     "publish-release": "./node_modules/sw-testing-helpers/project/publish-release.sh",
