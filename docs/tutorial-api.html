@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Tutorial: API</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Tutorial: API</h1>
+
+    <section>
+
+<header>
+    
+
+    <h2>API</h2>
+</header>
+
+<article>
+    <h2>Options</h2><p>All options can be specified globally via properties of <code>toolbox.options</code>.
+Any individual options can be configured on a per-handler basis, via the <code>Object</code> passed as the
+third parameter to <code>toolbox.router</code> methods.</p>
+<h3>debug [Boolean]</h3><p>Determines whether extra information is logged to the browser's console.</p>
+<p><em>Default</em>: <code>false</code></p>
+<h3>networkTimeoutSeconds [Number]</h3><p>A timeout that applies to the <code>toolbox.networkFirst</code> built-in handler.
+If <code>networkTimeoutSeconds</code> is set, then any network requests that take longer than that amount of time
+will automatically fall back to the cached response if one exists. When
+<code>networkTimeoutSeconds</code> is not set, the browser's native networking timeout logic applies.</p>
+<p><em>Default</em>: <code>null</code></p>
+<h3>cache [Object]</h3><p>Various properties of <code>cache</code> control the behavior of the default cache when set via
+<code>toolbox.options.cache</code>, or the cache used by a specific request handler.</p>
+<h3>cache.name [String]</h3><p>The name of the <a href="https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache"><code>Cache</code></a>
+used to store <a href="https://fetch.spec.whatwg.org/#response-class"><code>Response</code></a> objects. Using a unique name
+allows you to customize the cache's maximum size and age of entries.</p>
+<p><em>Default</em>: Generated at runtime based on the service worker's <code>registration.scope</code> value.</p>
+<h3>cache.maxEntries [Number]</h3><p>Imposes a least-recently used cache expiration policy
+on entries cached via the various built-in handlers. You can use this with a cache that's dedicated
+to storing entries for a dynamic set of resources with no natural limit. Setting <code>cache.maxEntries</code> to, e.g.,
+<code>10</code> would mean that after the 11th entry is cached, the least-recently used entry would be
+automatically deleted. The cache should never end up growing beyond <code>cache.maxEntries</code> entries.
+This option will only take effect if <code>cache.name</code> is also set.
+It can be used alone or in conjunction with <code>cache.maxAgeSeconds</code>.</p>
+<p><em>Default</em>: <code>null</code></p>
+<h3>cache.maxAgeSeconds [Number]</h3><p>Imposes a maximum age for cache entries, in seconds.
+You can use this with a cache that's dedicated to storing entries for a dynamic set of resources
+with no natural limit. Setting <code>cache.maxAgeSeconds</code> to, e.g., <code>60 * 60 * 24</code> would mean that any
+entries older than a day would automatically be deleted.
+This option will only take effect if <code>cache.name</code> is also set.
+It can be used alone or in conjunction with <code>cache.maxEntries</code>.</p>
+<p><em>Default</em>: <code>null</code></p>
+<h2>Handlers</h2><p>There are five built-in handlers to cover the most common network strategies. For more information about offline strategies see the <a href="http://jakearchibald.com/2014/offline-cookbook/">Offline Cookbook</a>.</p>
+<h3><code>toolbox.networkFirst</code></h3><p>Try to handle the request by fetching from the network. If it succeeds, store the response in the cache. Otherwise, try to fulfill the request from the cache. This is the strategy to use for basic read-through caching. It's also good for API requests where you always want the freshest data when it is available but would rather have stale data than no data.</p>
+<h3><code>toolbox.cacheFirst</code></h3><p>If the request matches a cache entry, respond with that. Otherwise try to fetch the resource from the network. If the network request succeeds, update the cache. This option is good for resources that don't change, or have some other update mechanism.</p>
+<h3><code>toolbox.fastest</code></h3><p>Request the resource from both the cache and the network in parallel. Respond with whichever returns first. Usually this will be the cached version, if there is one. On the one hand this strategy will always make a network request, even if the resource is cached. On the other hand, if/when the network request completes the cache is updated, so that future cache reads will be more up-to-date.</p>
+<h3><code>toolbox.cacheOnly</code></h3><p>Resolve the request from the cache, or fail. This option is good for when you need to guarantee that no network request will be made, for example saving battery on mobile.</p>
+<h3><code>toolbox.networkOnly</code></h3><p>Handle the request by trying to fetch the URL from the network. If the fetch fails, fail the request. Essentially the same as not creating a route for the URL at all.</p>
+<h2 id="expressive-approach">Methods</h2>
+
+<h3><code>toolbox.router.get(urlPattern, handler, options)</code></h3><h3><code>toolbox.router.post(urlPattern, handler, options)</code></h3><h3><code>toolbox.router.put(urlPattern, handler, options)</code></h3><h3><code>toolbox.router.delete(urlPattern, handler, options)</code></h3><h3><code>toolbox.router.head(urlPattern, handler, options)</code></h3><p>Create a route that causes requests for URLs matching <code>urlPattern</code> to be resolved by calling <code>handler</code>. Matches requests using the GET, POST, PUT, DELETE or HEAD HTTP methods respectively.</p>
+<ul>
+<li><code>urlPattern</code> - an Express style route. See the docs for the <a href="https://github.com/pillarjs/path-to-regexp">path-to-regexp</a> module for the full syntax</li>
+<li><code>handler</code> - a request handler, as <a href="#using-request-handlers">described above</a></li>
+<li><code>options</code> - an object containing options for the route. This options object will be passed to the request handler. The <code>origin</code> option is specific to the router methods, and can be either an exact string or a Regexp against which the origin of the Request must match for the route to be used.</li>
+</ul>
+<h3><code>toolbox.router.any(urlPattern, handler, options)</code></h3><p>Like <code>toolbox.router.get</code>, etc., but matches any HTTP method.</p>
+<h3><code>toolbox.router.default</code></h3><p>Takes a function to use as the request handler for any GET request that does not match a route.</p>
+<h3><code>toolbox.precache(arrayOfURLs)</code></h3><p>Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.</p>
+<h3><code>toolbox.cache(url, options)</code></h3><p>Causes the resource at <code>url</code> to be added to the cache and returns a Promise that resolves with void. The <code>options</code> parameter supports the <code>debug</code> and <code>cache</code> <a href="#global-options">global options</a>.</p>
+<h3><code>toolbox.uncache(url, options)</code></h3><p>Causes the resource at <code>url</code> to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The <code>options</code> parameter supports  the <code>debug</code> and <code>cache</code> <a href="#global-options">global options</a>.</p>
+</article>
+
+</section>
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Tutorials</h3><ul><li><a href="tutorial-api.html">API</a></li><li><a href="tutorial-recipes.html">Service Worker Toolbox Recipes</a></li><li><a href="tutorial-usage.html">Usage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Jun 09 2016 13:34:34 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

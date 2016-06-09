@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Tutorial: Usage</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Tutorial: Usage</h1>
+
+    <section>
+
+<header>
+    
+
+    <h2>Usage</h2>
+</header>
+
+<article>
+    <h2>Basic Routes</h2><p>A <em>route</em> is a URL pattern and request method associated with a handler.
+It defines the behaviour for a section of the site.
+<em>Routing</em> is the process of matching an incoming request with the most
+appropriate route. To define a route you call the appropriate method on
+<code>toolbox.router</code>.</p>
+<p>For example, to send <code>GET</code> requests for the URL <code>'/myapp/index.html'</code> to the
+built-in <code>toolbox.networkFirst</code> handler, you would write the following in your
+service worker file:</p>
+<p><code>toolbox.router.get('/myapp/index.html', toolbox.networkFirst);</code></p>
+<p>If you don't need wildcards in your route, and your route applies to the same
+domain as your main site, then you can use a string like <code>'/myapp/index.html'</code>.
+However, if you need wildcards (e.g. match <em>any</em> URL that begins with
+<code>/myapp/</code>), or if you need to match URLs that belong to different domains (e.g.
+match <code>https://othersite.com/api/</code>), <code>sw-toolbox</code> has two options for
+configuring your routes.</p>
+<h2>Express-style Routes</h2><p>For developers familiar with <a href="http://expressjs.com/en/guide/routing.html">Express routing</a>,
+<code>sw-toolbox</code> offers support for similar named wildcards, via the
+<a href="https://github.com/pillarjs/path-to-regexp"><code>path-to-regexp</code></a> library.</p>
+<p>If you use a <code>String</code> to define your route, it's assumed you're using
+Express-style routes.</p>
+<p>By default, a route will only match URLs on the same origin as the service
+worker. If you'd like your Express-style routes to match URLs on different
+origins, you need to pass in a value for the <code>origin</code> option. The value could be
+either a <code>String</code> (which is checked for an exact match) or a <code>RegExp</code> object.
+In both cases, it's matched against the full origin of the URL
+(e.g. <code>'https://example.com'</code>).</p>
+<p>Some examples of using Express-style routing include:</p>
+<pre class="prettyprint source lang-javascript"><code>// URL patterns are the same syntax as Express routes
+// (http://expressjs.com/guide/routing.html)
+toolbox.router.get(':foo/index.html', function(request, values) {
+  return new Response('Handled a request for ' + request.url +
+      ', where foo is &quot;' + values.foo + '&quot;');
+});
+
+// For requests to other origins, specify the origin as an option
+toolbox.router.post('/(.*)', apiHandler, {origin: 'https://api.example.com'});</code></pre><h2>Regular Expression Routes</h2><p>Developers who are more comfortable using <a href="https://regex101.com/">regular expressions</a>
+can use an alternative syntax to define routes, passing in a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions"><code>RegExp</code></a>
+object as the first parameter. This <code>RegExp</code> will be matched against the full
+request URL when determining whether the route applies, including the origin and
+path. This can lead to simpler cross-origin routing vs. Express-style routes,
+since both the origin and the path are matched simultaneously, without having
+to specify a separate <code>origin</code> option.</p>
+<p>Note that while Express-style routes allow you to name path fragment
+parameters that will be passed to your handler (see <code>values.foo</code> in the previous
+example), that functionality is not supported while using regular expression
+routes.</p>
+<p>Some examples of using Regular Expression routing include:</p>
+<pre class="prettyprint source lang-javascript"><code>// Match URLs that end in index.html
+toolbox.router.get(/index.html$/, function(request) {
+  return new Response('Handled a request for ' + request.url);
+});
+
+// Match URLs that begin with https://api.example.com
+toolbox.router.post(/^https://api.example.com\//, apiHandler);</code></pre><h2>The Default Route</h2><p><code>sw-toolbox</code> supports defining an optional &quot;default&quot; route via
+<code>toolbox.router.default</code> that is used whenever there is no alternative route for
+a given URL. If <code>toolbox.router.default</code> is not set, then <code>sw-toolbox</code> will
+just ignore requests for URLs that don't match any alternative routes, and the
+requests will potentially be handled by the browser as if there were no
+service worker involvement.</p>
+<pre class="prettyprint source lang-javascript"><code>// Provide a default handler for GET requests
+toolbox.router.default = myDefaultRequestHandler;</code></pre><h2>Precaching</h2><p>You can provide a list of resources which will be cached at service worker install time</p>
+<pre class="prettyprint source lang-javascript"><code>toolbox.precache(['/index.html', '/site.css', '/images/logo.png']);</code></pre><h2>Defining Request Handlers</h2><p>A request handler takes three arguments.</p>
+<pre class="prettyprint source lang-javascript"><code>var myHandler = function(request, values, options) {
+  // ...
+}</code></pre><ul>
+<li><code>request</code> - The <a href="https://fetch.spec.whatwg.org/#request">Request</a> object that triggered the <code>fetch</code> event</li>
+<li><code>values</code> - When using Express-style routing paths, this will be an object
+whose keys are the placeholder names in the URL pattern, with the values being
+the corresponding part of the request URL. For example, with a URL pattern of
+<code>'/images/:size/:name.jpg'</code> and an actual URL of <code>'/images/large/unicorns.jpg'</code>,
+<code>values</code> would be <code>{size: 'large', name: 'unicorns'}</code>.
+When using a RegExp for the path, <code>values</code> will not be set.</li>
+<li><code>options</code> - the <a href="#options">options</a> passed to one of the <a href="#methods">router methods</a>.</li>
+</ul>
+<p>The return value should be a <a href="https://fetch.spec.whatwg.org/#response">Response</a>, or a <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">Promise</a> that resolves with a Response. If another value is returned, or if the returned Promise is rejected, the Request will fail which will appear to be a <a href="https://developer.mozilla.org/en-US/docs/Web/API/DOMException#exception-NetworkError">NetworkError</a> to the page that made the request.</p>
+</article>
+
+</section>
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Tutorials</h3><ul><li><a href="tutorial-api.html">API</a></li><li><a href="tutorial-recipes.html">Service Worker Toolbox Recipes</a></li><li><a href="tutorial-usage.html">Usage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Jun 09 2016 13:34:34 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
