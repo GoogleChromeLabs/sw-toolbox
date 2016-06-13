@@ -24,8 +24,8 @@
 
 require('chai').should();
 const path = require('path');
+const seleniumAssistant = require('selenium-assistant');
 const mochaUtils = require('sw-testing-helpers').mochaUtils;
-const automatedBrowserTesting = require('sw-testing-helpers').automatedBrowserTesting;
 
 const testServer = require('./server/index.js');
 
@@ -55,18 +55,20 @@ describe('Test SW-Toolbox', function() {
   afterEach(function() {
     this.timeout(10000);
 
-    return automatedBrowserTesting.killWebDriver(globalDriverReference);
+    return seleniumAssistant.killWebDriver(globalDriverReference);
   });
 
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
-      globalDriverReference = browserInfo.getSeleniumDriver();
-
-      return mochaUtils.startWebDriverMochaTests(
-        browserInfo.getPrettyName(),
-        globalDriverReference,
-        `${testServerURL}/test/browser-tests/`
-      )
+      return browserInfo.getSeleniumDriver()
+      .then(driver => {
+        globalDriverReference = driver;
+        return mochaUtils.startWebDriverMochaTests(
+          browserInfo.getPrettyName(),
+          globalDriverReference,
+          `${testServerURL}/test/browser-tests/`
+        );
+      })
       .then(testResults => {
         if (testResults.failed.length > 0) {
           const errorMessage = mochaUtils.prettyPrintErrors(
@@ -80,8 +82,24 @@ describe('Test SW-Toolbox', function() {
     });
   };
 
-  const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
+  seleniumAssistant.printAvailableBrowserInfo();
+
+  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
+    // Tests are running a differently from mocha compared to gulp test:manual
+    // :( Results in errors that can't be debugged
+    if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+      browserInfo.getVersionNumber() <= 50) {
+      console.log('Skipping ' + browserInfo.getRawVersionString());
+      return;
+    }
+
+    // Block non-service worker browsers from being included in the tests
+    if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
+      browserInfo.getSeleniumBrowserId() !== 'chrome') {
+      return;
+    }
+
     queueUnitTest(browserInfo);
   });
 });
