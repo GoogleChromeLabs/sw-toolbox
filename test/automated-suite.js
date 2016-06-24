@@ -24,8 +24,8 @@
 
 require('chai').should();
 const path = require('path');
+const seleniumAssistant = require('selenium-assistant');
 const mochaUtils = require('sw-testing-helpers').mochaUtils;
-const automatedBrowserTesting = require('sw-testing-helpers').automatedBrowserTesting;
 
 const testServer = require('./server/index.js');
 
@@ -33,11 +33,12 @@ describe('Test SW-Toolbox', function() {
   // Browser tests can be slow
   // 2016-03-29 FF v45 keeps exceeding timeouts of 60000,
   // so bumped up the limit
+  // TODO: Verify FF.latest no longer has these timeout issues
   this.timeout(100000);
 
-  // Driver is initialised to null to handle scenarios
+  // Driver is initialised to `null` to handle scenarios
   // where the desired browser isn't installed / fails to load
-  // Null allows afterEach a safe way to skip quiting the driver
+  // `null` allows afterEach a safe way to skip quiting the driver
   let globalDriverReference = null;
   let testServerURL;
 
@@ -55,18 +56,20 @@ describe('Test SW-Toolbox', function() {
   afterEach(function() {
     this.timeout(10000);
 
-    return automatedBrowserTesting.killWebDriver(globalDriverReference);
+    return seleniumAssistant.killWebDriver(globalDriverReference);
   });
 
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
-      globalDriverReference = browserInfo.getSeleniumDriver();
-
-      return mochaUtils.startWebDriverMochaTests(
-        browserInfo.getPrettyName(),
-        globalDriverReference,
-        `${testServerURL}/test/browser-tests/`
-      )
+      return browserInfo.getSeleniumDriver()
+      .then(driver => {
+        globalDriverReference = driver;
+        return mochaUtils.startWebDriverMochaTests(
+          browserInfo.getPrettyName(),
+          globalDriverReference,
+          `${testServerURL}/test/browser-tests/`
+        );
+      })
       .then(testResults => {
         if (testResults.failed.length > 0) {
           const errorMessage = mochaUtils.prettyPrintErrors(
@@ -80,8 +83,24 @@ describe('Test SW-Toolbox', function() {
     });
   };
 
-  const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
+  seleniumAssistant.printAvailableBrowserInfo();
+
+  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
+    // Tests are running differently from mocha compared to gulp test:manual
+    // :( Results in errors that can't be debugged
+    if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+      browserInfo.getVersionNumber() <= 50) {
+      console.log('Skipping ' + browserInfo.getRawVersionString());
+      return;
+    }
+
+    // Block browsers w/o Service Worker support from being included in the tests
+    if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
+      browserInfo.getSeleniumBrowserId() !== 'chrome') {
+      return;
+    }
+
     queueUnitTest(browserInfo);
   });
 });

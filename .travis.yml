@@ -6,20 +6,6 @@ env:
     - FF_BETA_PATH: './firefox/firefox'
 node_js:
   - 'stable'
-addons:
-  # From some tests it seems you can only have one firefox addon.
-  # Adding two results in the last one defined being the one installed.
-  firefox: latest
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
-      - google-chrome-beta
-
-before_install:
-  # Get firefbox beta and extract to tar for the test runner to use.
-  - wget 'https://download.mozilla.org/?product=firefox-beta-latest&lang=en-US&os=linux64' -O firefox-beta.tar.bz2 && tar xvjf firefox-beta.tar.bz2
 
 # Read more here: https://docs.travis-ci.com/user/gui-and-headless-browsers/#Using-xvfb-to-Run-Tests-That-Require-a-GUI
 before_script:
@@ -28,6 +14,4 @@ before_script:
 
 script:
   - npm test
-  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
-      ./node_modules/sw-testing-helpers/project/publish-docs.sh master;
-    fi
+  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then ./node_modules/sw-testing-helpers/project/publish-docs.sh master; fi
