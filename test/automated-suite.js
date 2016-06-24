@@ -33,11 +33,12 @@ describe('Test SW-Toolbox', function() {
   // Browser tests can be slow
   // 2016-03-29 FF v45 keeps exceeding timeouts of 60000,
   // so bumped up the limit
+  // TODO: Verify FF.latest no longer has these timeout issues
   this.timeout(100000);
 
-  // Driver is initialised to null to handle scenarios
+  // Driver is initialised to `null` to handle scenarios
   // where the desired browser isn't installed / fails to load
-  // Null allows afterEach a safe way to skip quiting the driver
+  // `null` allows afterEach a safe way to skip quiting the driver
   let globalDriverReference = null;
   let testServerURL;
 
@@ -86,7 +87,7 @@ describe('Test SW-Toolbox', function() {
 
   const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    // Tests are running a differently from mocha compared to gulp test:manual
+    // Tests are running differently from mocha compared to gulp test:manual
     // :( Results in errors that can't be debugged
     if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
       browserInfo.getVersionNumber() <= 50) {
@@ -94,7 +95,7 @@ describe('Test SW-Toolbox', function() {
       return;
     }
 
-    // Block non-service worker browsers from being included in the tests
+    // Block browsers w/o Service Worker support from being included in the tests
     if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
       browserInfo.getSeleniumBrowserId() !== 'chrome') {
       return;
