@@ -17,5 +17,8 @@
         ]
       }
     }
+  },
+  "markdown": {
+    "idInHeadings": true
   }
 }
