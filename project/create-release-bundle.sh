@@ -29,4 +29,5 @@ cp -r ./build/* $1
 cp LICENSE $1
 cp package.json $1
 cp bower.json $1
+cp companion.js $1
 cp README.md $1
