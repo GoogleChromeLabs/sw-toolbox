@@ -83,6 +83,14 @@ function startServer(staticAssetsPath, portNumber) {
     });
   });
 
+  app.get('/test/browser-tests/network-first/503', function(req, res) {
+    res.sendStatus(503);
+  });
+
+  app.get('/test/browser-tests/network-first/403', function(req, res) {
+    res.sendStatus(403);
+  });
+
   return new Promise(resolve => {
     // Start service on desired port
     _server = app.listen(portNumber, function() {

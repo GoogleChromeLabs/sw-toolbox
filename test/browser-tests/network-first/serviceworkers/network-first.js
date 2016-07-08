@@ -25,3 +25,5 @@ self.toolbox.options.cache.name = 'test-cache-name';
 
 self.toolbox.router.get('/test/data/files/text.txt', self.toolbox.networkFirst);
 self.toolbox.router.get('/test/browser-tests/network-first/doesnt-exist', self.toolbox.networkFirst);
+self.toolbox.router.get('/test/browser-tests/network-first/503', self.toolbox.networkFirst);
+self.toolbox.router.get('/test/browser-tests/network-first/403', self.toolbox.networkFirst);
