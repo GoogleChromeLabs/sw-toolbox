@@ -1,5 +1,5 @@
 self.addEventListener('install', function() {
-  self.skipWaiting();
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', function(event) {
