@@ -14,4 +14,4 @@ before_script:
 
 script:
   - npm test
-  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then ./node_modules/sw-testing-helpers/project/publish-docs.sh master; fi
+  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then npm run publish-docs master; fi
