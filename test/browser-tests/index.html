@@ -1,0 +1,91 @@
+<!--
+  Copyright 2016 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SW Toolbox Tests</title>
+  <link href="/node_modules/mocha/mocha.css" rel="stylesheet" />
+
+  <!--
+    iframes are used to manage service worker scoping.
+    This will hide them and stop the page from jumping around
+  -->
+  <style>
+    iframe {
+      width: 0;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="mocha"></div>
+
+  <script src="/node_modules/chai/chai.js"></script>
+  <script src="/node_modules/mocha/mocha.js"></script>
+
+  <!-- sw-testing-helpers -->
+  <script src="/node_modules/sw-testing-helpers/browser/mocha-utils.js"></script>
+  <script src="/node_modules/sw-testing-helpers/browser/sw-utils.js"></script>
+
+  <!--
+    Timeout is extended to ensure tests for max-cache-age
+    have enough time to complete
+  -->
+  <script>mocha.setup({
+    ui: 'bdd',
+    timeout: 5000
+  })</script>
+
+  <!-- In browser test scripts should be added to the page here-->
+  <script src="/test/browser-tests/precache/precache.js"></script>
+  <script src="/test/browser-tests/options/options.js"></script>
+  <script src="/test/browser-tests/network-first/network-first.js"></script>
+  <script src="/test/browser-tests/cache-only/cache-only.js"></script>
+  <script src="/test/browser-tests/fastest/fastest.js"></script>
+  <script src="/test/browser-tests/cache-first/cache-first.js"></script>
+  <script src="/test/browser-tests/network-only/network-only.js"></script>
+  <script src="/test/browser-tests/router-methods/router-methods.js"></script>
+
+  <script>
+    (function() {
+      // This make browsers without a service worker pass tests by
+      // bypassing the tests altogether.
+      // This is desirable to allow travis to run tests in all browsers
+      // regardless of support or not and perform tests when the browser
+      // starts to support service workers.
+      if (!('serviceWorker' in navigator)) {
+        publishTestResults();
+        return;
+      }
+
+      // We unregister all service workers, clear all caches and remove
+      // All registered iframes
+      beforeEach(function() {
+        // This clears a cookie set by the server for redirects
+        document.cookie = 'bouncedRedirect=; expires=' + new Date().getTime() + ';path=/';
+
+        return window.goog.swUtils.cleanState();
+      });
+
+      // should adds objects to protyptes which requires this call to be made
+      // before any tests are run.
+      window.chai.should();
+
+      window.goog.mochaUtils.startInBrowserMochaTests()
+      .then(results => {
+        window.testsuite = results;
+      });
+    })();
+  </script>
+</body>
+</html>

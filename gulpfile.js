@@ -15,12 +15,27 @@
 */
 'use strict';
 
+var path = require('path');
 var browserify = require('browserify');
 var eslint = require('gulp-eslint');
+var ghPages = require('gulp-gh-pages');
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
+var temp = require('temp').track();
+var testServer = require('./test/server/index.js');
 
-var sources = ['build/**/*.js', 'lib/**/*.js'];
+var buildSources = ['lib/**/*.js'];
+var lintSources = buildSources.concat([
+  'gulpfile.js',
+  'recipes/**/*.js',
+  'test/**/*.js']);
+
+gulp.task('test:manual', function() {
+  testServer.startServer(path.join(__dirname), 8888)
+  .then(portNumber => {
+    console.log(`Tests are available at http://localhost:${portNumber}`);
+  });
+});
 
 gulp.task('build', function() {
   var bundler = browserify({
@@ -31,25 +46,37 @@ gulp.task('build', function() {
 
   bundler.plugin('browserify-header');
   bundler.plugin('minifyify', {
-    map: 'sw-toolbox.map.json',
-    output: 'sw-toolbox.map.json'
+    map: './build/sw-toolbox.map.json',
+    output: './build/sw-toolbox.map.json'
   });
 
   return bundler
     .bundle()
     .pipe(source('sw-toolbox.js'))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build/'));
 });
 
 gulp.task('lint', function() {
-  return gulp.src(sources.concat('gulpfile.js'))
+  return gulp.src(lintSources)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
 });
 
-gulp.task('watch', ['default'], function() {
-  gulp.watch(sources, ['default']);
+gulp.task('watch', ['build'], function() {
+  gulp.watch(buildSources, ['build']);
+});
+
+gulp.task('gh-pages', ['build'], function() {
+  var tempDir = temp.mkdirSync();
+
+  return gulp.src([
+    'companion.js',
+    'sw-toolbox.js',
+    'sw-toolbox.map.json',
+    'recipes/**/*'
+  ], {base: __dirname})
+    .pipe(ghPages({cacheDir: tempDir}));
 });
 
 gulp.task('default', ['lint', 'build']);
