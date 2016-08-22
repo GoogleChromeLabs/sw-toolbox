@@ -13,15 +13,16 @@
   //   in the URL should be fine for this sample.
   // - toolbox.cacheFirst let us to use the predefined cache strategy for those
   //   requests.
-  global.toolbox.router.get(/\.ytimg\.com\//, global.toolbox.cacheFirst, {
+  global.toolbox.router.get(/\.appspot\.com\//, global.toolbox.fastest, {
     // Use a dedicated cache for the responses, separate from the default cache.
     cache: {
       name: 'youtube-thumbnails',
       // Store up to 10 entries in that cache.
       maxEntries: 10,
       // Expire any entries that are older than 30 seconds.
-      maxAgeSeconds: 30
-    }
+      maxAgeSeconds: 30,
+      notifyOnCacheUpdate: true
+    },
   });
 
   // By default, all requests that don't match our custom handler will use the
@@ -31,8 +32,6 @@
 
   // Boilerplate to ensure our service worker takes control of the page as soon
   // as possible.
-  global.addEventListener('install',
-      event => event.waitUntil(global.skipWaiting()));
-  global.addEventListener('activate',
-      event => event.waitUntil(global.clients.claim()));
+  global.addEventListener('install', () => global.skipWaiting());
+  global.addEventListener('activate', () => global.clients.claim());
 })(self);
