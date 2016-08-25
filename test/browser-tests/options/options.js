@@ -241,7 +241,7 @@ describe('Test Options Parameters', function() {
             try {
               event.data.type.should.equal('cache-updated');
               event.data.url.endsWith(urlWithRandomResponse).should.be.true;
-            } catch(ex) {
+            } catch (ex) {
               done(ex);
             }
             done();

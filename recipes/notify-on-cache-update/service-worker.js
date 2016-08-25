@@ -14,7 +14,7 @@
     cache: {
       name: 'data-cache',
       notifyOnCacheUpdate: true
-    },
+    }
   });
 
   // By default, all requests that don't match our custom handler will use the
