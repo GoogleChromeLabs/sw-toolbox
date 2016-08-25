@@ -226,4 +226,31 @@ describe('Test Options Parameters', function() {
       });
     });
   });
+
+  describe('options.cache.notifyOnCacheUpdate', () => {
+    it('trigger an appropriate message event when there is an update', done => {
+      this.timeout(8000);
+      const urlWithRandomResponse = '/test/helper/random';
+
+      let iframe;
+      swUtils.activateSW(`${serviceWorkersFolder}/notify-on-cache-update-global.js`)
+        .then(newIframe => {
+          iframe = newIframe;
+          // Set up the message event handler on the new iframe.
+          iframe.contentWindow.navigator.serviceWorker.addEventListener('message', event => {
+            try {
+              event.data.type.should.equal('cache-updated');
+              event.data.url.endsWith(urlWithRandomResponse).should.be.true;
+            } catch(ex) {
+              done(ex);
+            }
+            done();
+          });
+
+          return iframe.contentWindow.fetch(urlWithRandomResponse);
+        })
+        .then(() => pausePromise(500))
+        .then(() => iframe.contentWindow.fetch(urlWithRandomResponse));
+    });
+  });
 });

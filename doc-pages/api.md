@@ -49,6 +49,27 @@ It can be used alone or in conjunction with `cache.maxEntries`.
 
 _Default_: `null`
 
+### cache.notifyOnCacheUpdate [Boolean]
+If set to `true`, each time a previously cached response is updated from the
+network, the responses will be compared. If they appear to be different (due to
+an updated `content-length`, `last-modified` or `etag` header), then the a
+notification will be sent to all clients of the service worker.
+The notification is done by triggering a `message` event on the
+`navigator.serviceWorker` interface exposed on the client pages, and the `data`
+for the message event takes the form of
+
+```
+{
+  type: 'cache-updated',
+  url: <url of the updated resource>
+}
+```
+
+You can learn more about using this option by looking at the corresponding
+[recipe](https://github.com/GoogleChrome/sw-toolbox/tree/master/recipes/notify-on-cache-update).
+
+_Default_: `false`
+
 ## Handlers
 
 There are five built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).

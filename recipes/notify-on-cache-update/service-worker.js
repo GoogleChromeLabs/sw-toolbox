@@ -1,26 +1,18 @@
 (global => {
   'use strict';
 
-  // Load the sw-tookbox library.
+  // Load the sw-toolbox library.
   importScripts('../../build/sw-toolbox.js');
 
   // Turn on debug logging, visible in the Developer Tools' console.
   global.toolbox.options.debug = true;
 
-  // Set up a handler for HTTP GET requests:
-  // - /\.ytimg\.com\// will match any requests whose URL contains 'ytimg.com'.
-  //   A narrower RegExp could be used, but just checking for ytimg.com anywhere
-  //   in the URL should be fine for this sample.
-  // - toolbox.cacheFirst let us to use the predefined cache strategy for those
-  //   requests.
-  global.toolbox.router.get(/\.appspot\.com\//, global.toolbox.fastest, {
+  // Set up a handler for HTTP GET requests for /data/ URLs:
+  global.toolbox.router.get(/\/data\//, global.toolbox.fastest, {
     // Use a dedicated cache for the responses, separate from the default cache.
+    // Enable notifyOnCacheUpdate to get message events if the response changes.
     cache: {
-      name: 'youtube-thumbnails',
-      // Store up to 10 entries in that cache.
-      maxEntries: 10,
-      // Expire any entries that are older than 30 seconds.
-      maxAgeSeconds: 30,
+      name: 'data-cache',
       notifyOnCacheUpdate: true
     },
   });

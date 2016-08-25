@@ -1,72 +1,108 @@
 <html>
   <head>
-    <title>Cache Expiration Demo</title>
+    <title>Notify on Cache Update Demo</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-      // If we're running on a real web server (as opposed to localhost, which is whitelisted),
-      // then change the protocol to HTTPS.
-      // See https://goo.gl/lq4gCo for an explanation as to why this is needed for some features.
-      (function() {
-        var isLocalhost = !!(window.location.hostname === 'localhost' ||
-          // [::1] is the IPv6 localhost address.
-          window.location.hostname === '[::1]' ||
-          // 127.0.0.1/8 is considered localhost for IPv4.
-          window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/));
-        if (window.location.protocol === 'http:' && !isLocalhost) {
-          // Redirect to https: if we're currently using http: and we're not on localhost.
-          window.location.protocol = 'https:';
-        }
-      })();
-    </script>
   </head>
 
   <body>
-    <h1>Cache Expiration Demo</h1>
+    <h1>Notify on Cache Update Demo</h1>
 
     <h3>Background</h3>
     <p>
-      The <a href="service-worker.js" target="_blank">service worker</a> in this example
-      demonstrates using the <code>maxCacheEntries</code> and <code>maxCacheAgeSeconds</code>
-      options. It uses a dedicated cache to hold YouTube video thumbnails. That
-      dedicated cache will purge entries once they're older than 30 seconds, and store at most 10
-      entries. It uses the <code>cacheFirst</code> strategy, so any responses that are still in the
-      cache will be used directly, without going against the network.
+      <code>sw-toolbox</code>'s <code>fastest</code>
+      <a href="https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api">caching strategy</a>
+      is a popular choice, as it offers the performance benefits of reading
+      responses directly from the cache, with eventual-freshness due to the
+      cache being refreshed from the network "in the background". It's
+      effectively a <a href="https://www.mnot.net/blog/2014/06/01/chrome_and_stale-while-revalidate">stale-while-revalidate</a>
+      approach, but implemented in a service worker.
     </p>
 
     <p>
-      While this example uses both <code>maxCacheEntries</code> and <code>maxCacheAgeSeconds</code>,
-      it's possible to use each of those options independently.
+      One drawback to using the <code>fastest</code> strategy is that users
+      viewing the cached content on the page have no way of knowing that, when
+      something has been updated from the network, that they're effectively
+      looking at stale content. To address this issue, <code>sw-toolbox</code>
+      has a <code>notifyOnCacheUpdate: true</code> option that can be passed in
+      to the general
+      <a href="https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api">cache configuration</a>
+      options for a given route.
+    </p>
+
+    <h3>What Do I Use notifyOnCacheUpdate?</h3>
+
+    <p>
+      Here's an example of a route and cache
+      configuration, which will cause every request for a URL matching
+      <code>/data/</code> to use the <code>fastest</code> strategy, store the
+      responses in a cache named <code>data-cache</code>, and notify all
+      pages controlled by the service worker if any previously cached entries
+      have been updated.
+    </p>
+
+    <pre>toolbox.router.get(/\/data\//, toolbox.fastest, {
+  cache: {
+    name: 'data-cache',
+    notifyOnCacheUpdate: true
+  },
+});</pre>
+
+    <p>
+      Update notifications are sent by the service worker to all of its client
+      pages (not just the page that made the original request), and any page
+      can opt-in to listening to the notifications by adding a
+      <code>message</code> event listener to the
+      <code>navigation.serviceWorker</code> interface:
+    </p>
+
+    <pre>if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'cache-updated') {
+      var url = event.data.url;
+      // Show something in the UI to the user know that the resource
+      // at `url` was updated.
+    }
+  });
+}</pre>
+    </p>
+
+    <h3>What Headers are Checked?</h3>
+
+    <p>
+      In order to determine whether a previously cached response differs from
+      the response retrieved from the network, three response headers are
+      checked: <code>content-length</code>, <code>last-modified</code>, and
+      <code>etag</code>.
     </p>
 
     <p>
-      The cache used for YouTube thumbnail URLs is separate from the "default" cache, which is
-      used for all other requests, like YouTube API responses and this page's CSS, JavaScript, and
-      HTML. The page doesn't impose any upper limit on the size of that default cache, and we can
-      use a <code>networkFirst</code> strategy for it.
+      Out of those three, <code>content-length</code> and
+      <code>etag</code> are
+      <a href="https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name">normally not available</a>
+      for CORS-enabled responses, unless the remote server explicitly allows
+      them via <code>access-control-allow-headers</code>. So if you are using
+      this with resources fetched via CORS, make sure that the remote server
+      properly sets <code>last-modified</code> or whitelists additional headers.
     </p>
 
     <p>
-      Creating a dedicated cache with expiration options for dynamic, unbounded requests is a useful
-      pattern to follow. If we just used the default cache without imposing a cache expiration,
-      then that cache would grow in size as more and more searches were performed, needlessly
-      consuming disk space for old thumbnails that are likely no longer needed.
+      This won't work at all with opaque responses, since those responses don't
+      <a href="http://stackoverflow.com/questions/39109789/what-limitations-apply-to-opaque-responses">provide access</a>
+      to any underlying header information.
     </p>
 
     <h3>Live Demo</h3>
-    <p>
-      Try increasing the number of thumbnails returned, or changing the search term, and then
-      observe the cache expirations logged in the developer console.
-    </p>
-    <form id="search">
-      <label for="searchTerm">Search YouTube for</label>
-      <input id="searchTerm" type="search" value="javascript">
-      <label for="maxResults">, returning at most</label>
-      <input id="maxResults" type="number" min="1" max="50" value="10">
-      <span>thumbnails.</span>
-      <input type="submit" value="Search">
-    </form>
 
-    <div id="results"></div>
+    <p>
+      The following demo is a bit contrived, and won't accomplish much when
+      accessed via a production web server, since you won't be able to
+      modify the <code>data/test.txt</code> file. You can run it with a local
+      web server and make changes to the file to see the <code>message</code>
+      event notification in action.
+    </p>
+
+    <button id="fetch">Fetch data/test.txt</button>
+    <div id="test"></div>
 
     <script src="app.js"></script>
     <script src="../../companion.js" data-service-worker="service-worker.js"></script>
