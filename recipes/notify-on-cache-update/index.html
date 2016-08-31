@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <title>Notify on Cache Update Demo</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body>
+    <h1>Notify on Cache Update Demo</h1>
+
+    <h3>Background</h3>
+    <p>
+      <code>sw-toolbox</code>'s <code>fastest</code>
+      <a href="https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api">caching strategy</a>
+      is a popular choice, as it offers the performance benefits of reading
+      responses directly from the cache, with eventual-freshness due to the
+      cache being refreshed from the network "in the background". It's
+      effectively a <a href="https://www.mnot.net/blog/2014/06/01/chrome_and_stale-while-revalidate">stale-while-revalidate</a>
+      approach, but implemented in a service worker.
+    </p>
+
+    <p>
+      One drawback to using the <code>fastest</code> strategy is that users
+      viewing the cached content on the page have no way of knowing that, when
+      something has been updated from the network, that they're effectively
+      looking at stale content. To address this issue, <code>sw-toolbox</code>
+      has a <code>notifyOnCacheUpdate: true</code> option that can be passed in
+      to the general
+      <a href="https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api">cache configuration</a>
+      options for a given route.
+    </p>
+
+    <h3>What Do I Use notifyOnCacheUpdate?</h3>
+
+    <p>
+      Here's an example of a route and cache
+      configuration, which will cause every request for a URL matching
+      <code>/data/</code> to use the <code>fastest</code> strategy, store the
+      responses in a cache named <code>data-cache</code>, and notify all
+      pages controlled by the service worker if any previously cached entries
+      have been updated.
+    </p>
+
+    <pre>toolbox.router.get(/\/data\//, toolbox.fastest, {
+  cache: {
+    name: 'data-cache',
+    notifyOnCacheUpdate: true
+  },
+});</pre>
+
+    <p>
+      Update notifications are sent by the service worker to all of its client
+      pages (not just the page that made the original request), and any page
+      can opt-in to listening to the notifications by adding a
+      <code>message</code> event listener to the
+      <code>navigation.serviceWorker</code> interface:
+    </p>
+
+    <pre>if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'cache-updated') {
+      var url = event.data.url;
+      // Show something in the UI to the user know that the resource
+      // at `url` was updated, or use
+      // `caches.open(event.data.cacheName).then(cache => cache.match(url))`
+      // to get the `Response` object.
+    }
+  });
+}</pre>
+    </p>
+
+    <h3>What Headers are Checked?</h3>
+
+    <p>
+      In order to determine whether a previously cached response differs from
+      the response retrieved from the network, three response headers are
+      checked: <code>content-length</code>, <code>last-modified</code>, and
+      <code>etag</code>.
+    </p>
+
+    <p>
+      Out of those three, <code>content-length</code> and
+      <code>etag</code> are
+      <a href="https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name">normally not available</a>
+      for CORS-enabled responses, unless the remote server explicitly allows
+      them via <code>access-control-allow-headers</code>. So if you are using
+      this with resources fetched via CORS, make sure that the remote server
+      properly sets <code>last-modified</code> or whitelists additional headers.
+    </p>
+
+    <p>
+      This won't work at all with opaque responses, since those responses don't
+      <a href="http://stackoverflow.com/questions/39109789/what-limitations-apply-to-opaque-responses">provide access</a>
+      to any underlying header information.
+    </p>
+
+    <h3>Live Demo</h3>
+
+    <p>
+      The following demo is a bit contrived, and won't accomplish much when
+      accessed via a production web server, since you won't be able to
+      modify the <code>data/test.txt</code> file. You can run it with a local
+      web server and make changes to the file to see the <code>message</code>
+      event notification in action.
+    </p>
+
+    <button id="fetch">Fetch data/test.txt</button>
+    <div id="test"></div>
+
+    <script src="app.js"></script>
+    <script src="../../companion.js" data-service-worker="service-worker.js"></script>
+  </body>
+</html>

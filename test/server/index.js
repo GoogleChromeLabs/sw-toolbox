@@ -31,6 +31,7 @@ app.get('/', function(req, res) {
 });
 
 let _server;
+let counter = 0;
 
 function startServer(staticAssetsPath, portNumber) {
   if (_server) {
@@ -81,6 +82,14 @@ function startServer(staticAssetsPath, portNumber) {
     res.json({
       redirect: '/test/helper/redirect'
     });
+  });
+
+  app.get('/test/helper/random', function(req, res) {
+    // Make sure we really get a different value each time...
+    let randomOutput = `${Date.now()}-${Math.random()}-${counter++}`;
+    res.setHeader('etag', randomOutput);
+    res.setHeader('cache-control', 'no-cache, no-store, must-revalidate');
+    res.send(randomOutput);
   });
 
   return new Promise(resolve => {
