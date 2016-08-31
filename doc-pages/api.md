@@ -61,12 +61,23 @@ for the message event takes the form of
 ```
 {
   type: 'cache-updated',
+  source: 'sw-toolbox',
+  cacheName: <name of cache>,
   url: <url of the updated resource>
 }
 ```
 
 You can learn more about using this option by looking at the corresponding
 [recipe](https://github.com/GoogleChrome/sw-toolbox/tree/master/recipes/notify-on-cache-update).
+
+If you'd like to retrieve the actual updated [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+object, you can do so from inside the page's `message` event handler via
+
+```
+caches.open(event.data.cacheName)
+  .then(cache => cache.match(event.data.url))
+  .then(response => /* Do something with response, like call response.text() */);
+```
 
 _Default_: `false`
 

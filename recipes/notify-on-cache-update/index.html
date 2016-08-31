@@ -60,7 +60,9 @@
     if (event.data.type === 'cache-updated') {
       var url = event.data.url;
       // Show something in the UI to the user know that the resource
-      // at `url` was updated.
+      // at `url` was updated, or use
+      // `caches.open(event.data.cacheName).then(cache => cache.match(url))`
+      // to get the `Response` object.
     }
   });
 }</pre>

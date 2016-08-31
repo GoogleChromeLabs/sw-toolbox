@@ -4,9 +4,11 @@
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', event => {
     if (event.data.type === 'cache-updated') {
-      var url = event.data.url;
-      document.querySelector('#test').textContent +=
-        ` (there is an update to ${url})`;
+      caches.open(event.data.cacheName)
+        .then(cache => cache.match(event.data.url))
+        .then(response => response.text())
+        .then(text => document.querySelector('#test').textContent =
+          `${text} (updated via message handler)`);
     }
   });
 }

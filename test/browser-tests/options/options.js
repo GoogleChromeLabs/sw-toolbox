@@ -240,11 +240,13 @@ describe('Test Options Parameters', function() {
           iframe.contentWindow.navigator.serviceWorker.addEventListener('message', event => {
             try {
               event.data.type.should.equal('cache-updated');
+              event.data.source.should.equal('sw-toolbox');
+              event.data.cacheName.should.equal('options-test');
               event.data.url.endsWith(urlWithRandomResponse).should.be.true;
+              done();
             } catch (ex) {
               done(ex);
             }
-            done();
           });
 
           return iframe.contentWindow.fetch(urlWithRandomResponse);
