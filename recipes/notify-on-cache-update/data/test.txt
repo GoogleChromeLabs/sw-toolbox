@@ -1,1 +1,0 @@
-Feel free to modify this file, and then refetch from the demo page. This only really works if you run this demo from a local web server.

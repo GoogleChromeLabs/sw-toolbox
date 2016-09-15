@@ -49,38 +49,6 @@ It can be used alone or in conjunction with `cache.maxEntries`.
 
 _Default_: `null`
 
-### cache.notifyOnCacheUpdate [Boolean]
-If set to `true`, each time a previously cached response is updated from the
-network, the responses will be compared. If they appear to be different (due to
-an updated `content-length`, `last-modified` or `etag` header), then the a
-notification will be sent to all clients of the service worker.
-The notification is done by triggering a `message` event on the
-`navigator.serviceWorker` interface exposed on the client pages, and the `data`
-for the message event takes the form of
-
-```
-{
-  type: 'cache-updated',
-  source: 'sw-toolbox',
-  cacheName: <name of cache>,
-  url: <url of the updated resource>
-}
-```
-
-You can learn more about using this option by looking at the corresponding
-[recipe](https://github.com/GoogleChrome/sw-toolbox/tree/master/recipes/notify-on-cache-update).
-
-If you'd like to retrieve the actual updated [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)
-object, you can do so from inside the page's `message` event handler via
-
-```
-caches.open(event.data.cacheName)
-  .then(cache => cache.match(event.data.url))
-  .then(response => /* Do something with response, like call response.text() */);
-```
-
-_Default_: `false`
-
 ## Handlers
 
 There are five built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).
