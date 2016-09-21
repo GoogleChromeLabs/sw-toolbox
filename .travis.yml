@@ -1,9 +1,6 @@
 sudo: required
 dist: trusty
 language: node_js
-env:
-  global:
-    - FF_BETA_PATH: './firefox/firefox'
 node_js:
   - 'stable'
 
