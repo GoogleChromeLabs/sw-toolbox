@@ -1,3 +1,9 @@
+---
+layout: index
+title: "Usage"
+navigation_weight: 2
+---
+
 ## Basic Routes
 
 A _route_ is a URL pattern and request method associated with a handler.

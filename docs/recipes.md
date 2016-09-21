@@ -1,3 +1,9 @@
+---
+layout: index
+title: "SW Toolbox Recipes"
+navigation_weight: 3
+---
+
 <ul>
   <li>
     <h4><a href="cache-expiration-options/">Cache Expiration</a></h4>

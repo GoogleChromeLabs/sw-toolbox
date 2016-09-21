@@ -1,3 +1,9 @@
+---
+layout: index
+title: "API"
+navigation_weight: 1
+---
+
 ## Options
 
 All options can be specified globally via properties of `toolbox.options`.
