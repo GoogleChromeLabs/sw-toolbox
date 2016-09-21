@@ -22,19 +22,26 @@
 // These tests make use of selenium-webdriver. You can find the relevant
 // documentation here: http://selenium.googlecode.com/git/docs/api/javascript/index.html
 
-require('chai').should();
 const path = require('path');
 const seleniumAssistant = require('selenium-assistant');
 const mochaUtils = require('sw-testing-helpers').mochaUtils;
+
+require('geckodriver');
+require('chromedriver');
+require('operadriver');
+
+require('chai').should();
 
 const testServer = require('./server/index.js');
 
 describe('Test SW-Toolbox', function() {
   // Browser tests can be slow
-  // 2016-03-29 FF v45 keeps exceeding timeouts of 60000,
-  // so bumped up the limit
-  // TODO: Verify FF.latest no longer has these timeout issues
   this.timeout(100000);
+
+  if (process.env.TRAVIS) {
+    // Selenium Tests are Flakey
+    this.retries(3);
+  }
 
   // Driver is initialised to `null` to handle scenarios
   // where the desired browser isn't installed / fails to load
@@ -56,7 +63,10 @@ describe('Test SW-Toolbox', function() {
   afterEach(function() {
     this.timeout(10000);
 
-    return seleniumAssistant.killWebDriver(globalDriverReference);
+    return seleniumAssistant.killWebDriver(globalDriverReference)
+    .then(() => {
+      globalDriverReference = null;
+    });
   });
 
   const queueUnitTest = browserInfo => {
@@ -87,18 +97,36 @@ describe('Test SW-Toolbox', function() {
 
   const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    // Tests are running differently from mocha compared to gulp test:manual
-    // :( Results in errors that can't be debugged
-    if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
-      browserInfo.getVersionNumber() <= 50) {
-      console.log('Skipping ' + browserInfo.getRawVersionString());
-      return;
-    }
+    if (process.env.TRAVIS) {
+      // Firefox before version 50 have issues that can't be duplicated outside
+      // of the selenium test runner.
+      if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+        browserInfo.getVersionNumber() <= 50) {
+        console.log('Skipping ' + browserInfo.getRawVersionString());
+        return;
+      }
 
-    // Block browsers w/o Service Worker support from being included in the tests
-    if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
-      browserInfo.getSeleniumBrowserId() !== 'chrome') {
-      return;
+      if (browserInfo.getSeleniumBrowserId() === 'opera' &&
+        browserInfo.getVersionNumber() <= 39) {
+        console.log('Skipping ' + browserInfo.getRawVersionString());
+        return;
+      }
+
+      // Chrome 54 is having some issues with the selenium :(
+      if (browserInfo.getSeleniumBrowserId() === 'chrome' &&
+        browserInfo.getVersionNumber() >= 54) {
+        console.log('Skipping ' + browserInfo.getRawVersionString());
+        return;
+      }
+
+      // Block browsers w/o Service Worker support from being included in the
+      // tests on Travis
+      if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
+        browserInfo.getSeleniumBrowserId() !== 'chrome' &&
+        browserInfo.getSeleniumBrowserId() !== 'opera') {
+        console.log('Not running tests on: ' + browserInfo.getPrettyName());
+        return;
+      }
     }
 
     queueUnitTest(browserInfo);
