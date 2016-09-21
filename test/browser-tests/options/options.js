@@ -29,11 +29,13 @@ describe('Test Options Parameters', function() {
   };
 
   const cleanUpIDB = () => {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const req = indexedDB.deleteDatabase('sw-toolbox-options-test');
       req.onsuccess = () => resolve();
-      req.onerror = () => resolve();
-      req.onblocked = () => resolve();
+      req.onerror = err => reject(err);
+      req.onblocked = () => {
+        console.warn('IndexedDB.close() is blocked.');
+      };
     });
   };
 
@@ -44,7 +46,7 @@ describe('Test Options Parameters', function() {
 
   after(function() {
     // Clear IndexDB - Used for max age / max Entries
-    return cleanUpIDB();
+    // return cleanUpIDB();
   });
 
   describe('options.cache.maxEntries', function() {
@@ -148,15 +150,20 @@ describe('Test Options Parameters', function() {
         '/test/data/files/text-3.txt'
       ];
 
+      console.log('Attempting to cache', urls);
+
       return swUtils.activateSW(serviceWorkersFolder + '/max-cache-age-route.js')
       .then(iframe => {
         return urls.reduce((promiseChain, url, index) => {
           return promiseChain
           .then(() => {
+            console.log('Going to cache: ', url);
             // Pause is to ensure the cache has had time to finish.
             return iframe.contentWindow.fetch(url)
             .then(() => {
               if (index === 0) {
+                // Delay adding the other urls 1.5s so the max age of
+                // 1s is met
                 return pausePromise(1500);
               }
             });
@@ -164,13 +171,17 @@ describe('Test Options Parameters', function() {
         }, Promise.resolve());
       })
       .then(() => {
+        console.log('Waiting 500ms for cache');
         // Give cache time to settle
         return pausePromise(500);
       })
       .then(() => {
+        console.log('Getting all assets');
         return swUtils.getAllCachedAssets('options-test');
       })
       .then(cachedAssets => {
+        console.log('cachedAssets: ', cachedAssets);
+        debugger;
         Object.keys(cachedAssets).length.should.equal(2);
         Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
         Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);

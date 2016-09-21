@@ -74,7 +74,10 @@
         // This clears a cookie set by the server for redirects
         document.cookie = 'bouncedRedirect=; expires=' + new Date().getTime() + ';path=/';
 
-        return window.goog.swUtils.cleanState();
+        return window.goog.swUtils.cleanState()
+        .then(function() {
+          console.log('swUtils.cleanState() done.');
+        });
       });
 
       // should adds objects to protyptes which requires this call to be made

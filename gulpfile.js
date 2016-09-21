@@ -30,7 +30,7 @@ var lintSources = buildSources.concat([
   'recipes/**/*.js',
   'test/**/*.js']);
 
-gulp.task('test:manual', function() {
+gulp.task('test:manual', ['build'], function() {
   testServer.startServer(path.join(__dirname), 8888)
   .then(portNumber => {
     console.log(`Tests are available at http://localhost:${portNumber}`);
