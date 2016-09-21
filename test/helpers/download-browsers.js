@@ -1,14 +1,18 @@
 const seleniumAssistant = require('selenium-assistant');
 
-Promise.all([
-  seleniumAssistant.downloadFirefoxDriver(),
-  seleniumAssistant.downloadBrowser('chrome', 'stable'),
-  seleniumAssistant.downloadBrowser('chrome', 'beta'),
-  seleniumAssistant.downloadBrowser('chrome', 'unstable'),
-  seleniumAssistant.downloadBrowser('firefox', 'stable'),
-  seleniumAssistant.downloadBrowser('firefox', 'beta'),
-  seleniumAssistant.downloadBrowser('firefox', 'unstable')
-])
+const promises = [
+  seleniumAssistant.downloadBrowser('chrome', 'stable', true),
+  seleniumAssistant.downloadBrowser('chrome', 'beta', true),
+  seleniumAssistant.downloadBrowser('chrome', 'unstable', true),
+  seleniumAssistant.downloadBrowser('firefox', 'stable', true),
+  seleniumAssistant.downloadBrowser('firefox', 'beta', true),
+  seleniumAssistant.downloadBrowser('firefox', 'unstable', true)
+];
+
+Promise.all(promises)
 .then(() => {
   console.log('Browser download complete.');
+})
+.catch(() => {
+  console.log('Unable to download browsers.');
 });

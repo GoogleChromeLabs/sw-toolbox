@@ -18,7 +18,7 @@
 
 'use strict';
 
-describe('Test precache method', () => {
+describe('Test precache method', function() {
   const swUtils = window.goog.swUtils;
 
   let compareCachedAssets = (assetList, cachedAssets) => {
