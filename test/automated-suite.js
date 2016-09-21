@@ -38,7 +38,7 @@ describe('Test SW-Toolbox', function() {
   // Browser tests can be slow
   this.timeout(100000);
 
-  if (process.env.TRAVIS) {
+  if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
     // Selenium Tests are Flakey
     this.retries(3);
   }
