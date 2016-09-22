@@ -22,7 +22,7 @@ importScripts('/build/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
 
 self.toolbox.options.cache = {
-  name: 'options-test',
+  name: self.registration.scope,
   maxEntries: 2,
   maxAgeSeconds: 1
 };

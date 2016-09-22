@@ -20,209 +20,117 @@
 
 describe('Test Options Parameters', function() {
   const swUtils = window.goog.swUtils;
-  const serviceWorkersFolder = '/test/browser-tests/options/serviceworkers';
+  const serviceWorkersFolder = '/test/browser-tests/options/serviceworkers/';
 
-  const pausePromise = timeout => {
-    return new Promise(function(resolve) {
-      setTimeout(resolve, timeout);
-    });
+  /**
+   * @param {Number} timeout The number of milliseconds to pause for.
+   * @returns {Promise} A promise that resolves after a specified delay.
+   */
+  const pause = timeout => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
   };
 
-  const cleanUpIDB = () => {
-    return new Promise(resolve => {
-      const req = indexedDB.deleteDatabase('sw-toolbox-options-test');
-      req.onsuccess = () => resolve();
-      req.onerror = () => resolve();
-      req.onblocked = () => resolve();
-    });
+  /**
+   * Performs a series of fetch() calls on an iframe, then pauses.
+   * @param {iframe} iframe The iframe whose contentWindow will be used to fetch().
+   * @param {Array.<String>} urls The URLs to fetch.
+   * @returns {Promise} A promise that resolves following the fetches and a delay.
+   */
+  const sequentialFetch = (iframe, urls) => {
+    return urls.reduce((chain, url) => {
+      return chain.then(() => iframe.contentWindow.fetch(url));
+    }, Promise.resolve()).then(() => pause(500));
   };
 
-  beforeEach(function() {
-    // Clear IndexDB - Used for max age / max Entries
-    return cleanUpIDB();
+  /**
+   * Prepends a common prefix to several partial URLs, and returns the absolute URLs.
+   * @param urls The partial URLs.
+   * @returns {Array.<String>} The absolute URLs.
+   */
+  const absoluteTestDataFileUrls = urls => urls.map(url => {
+    return String(new URL(url, `${location.origin}/test/data/files/`));
   });
 
-  after(function() {
-    // Clear IndexDB - Used for max age / max Entries
-    return cleanUpIDB();
-  });
+  /**
+   * Asserts that the keys in cachedAssets match exactly the list of expected URLs.
+   * @param {Object} cachedAssets The result from a call to swUtils.getAllCachedAssets().
+   * @param {Array.<String>} expectedUrls The expected cache contents.
+   */
+  const assertCacheContents = (cachedAssets, expectedUrls) => {
+    const expectedLength = expectedUrls.length;
+    const cachedUrls = Object.keys(cachedAssets);
+    const filteredUrls = cachedUrls.filter(url => expectedUrls.includes(url));
+    filteredUrls.should.have.lengthOf(expectedLength);
+    cachedUrls.should.have.lengthOf(expectedLength);
+  };
 
   describe('options.cache.maxEntries', function() {
     it('should cache according to global maxEntries option', function() {
-      const urls = [
-        '/test/data/files/text-1.txt',
-        '/test/data/files/text-2.txt',
-        '/test/data/files/text-3.txt'
-      ];
+      const urls = absoluteTestDataFileUrls([
+        'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      return swUtils.activateSW(serviceWorkersFolder + '/max-entries-global.js')
-      .then(iframe => {
-        return urls.reduce((promiseChain, url) => {
-          return promiseChain
-          .then(() => {
-            // Pause is to ensure the cache has had time to finish.
-            return iframe.contentWindow.fetch(url)
-            .then(pausePromise.bind(null, 500));
-          });
-        }, Promise.resolve());
-      })
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(2);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);
-      });
+      const swFile = `${serviceWorkersFolder}max-entries-global.js`;
+      return swUtils.activateSW(swFile).then(iframe => {
+        return sequentialFetch(iframe, urls)
+          .then(() => swUtils.getAllCachedAssets(iframe.src));
+      }).then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(1)));
     });
 
     it('should cache according to route specific maxEntries option', function() {
-      const urls = [
-        '/test/data/files/text-1.txt',
-        '/test/data/files/text-2.txt',
-        '/test/data/files/text-3.txt'
-      ];
+      const urls = absoluteTestDataFileUrls([
+        'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      return swUtils.activateSW(serviceWorkersFolder + '/max-entries-route.js')
-      .then(iframe => {
-        return urls.reduce((promiseChain, url) => {
-          return promiseChain
-          .then(() => {
-            // Pause is to ensure the cache has had time to finish.
-            return iframe.contentWindow.fetch(url)
-            .then(pausePromise.bind(null, 500));
-          });
-        }, Promise.resolve());
-      })
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(2);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);
-      });
+      const swFile =`${serviceWorkersFolder}max-entries-route.js`;
+      return swUtils.activateSW(swFile).then(iframe => {
+        return sequentialFetch(iframe, urls)
+          .then(() => swUtils.getAllCachedAssets(iframe.src));
+      }).then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(1)));
     });
   });
 
   describe('options.cache.maxAgeSeconds', function() {
     it('should cache according to global maxAgeSeconds option', function() {
-      const urls = [
-        '/test/data/files/text-1.txt',
-        '/test/data/files/text-2.txt',
-        '/test/data/files/text-3.txt'
-      ];
+      const urls = absoluteTestDataFileUrls([
+        'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      return swUtils.activateSW(serviceWorkersFolder + '/max-cache-age-global.js')
-      .then(iframe => {
-        return urls.reduce((promiseChain, url, index) => {
-          return promiseChain
-          .then(() => {
-            return iframe.contentWindow.fetch(url)
-            .then(() => {
-              if (index === 0) {
-                return pausePromise(1500);
-              }
-            });
-          });
-        }, Promise.resolve());
-      })
-      .then(() => {
-        // Give cache time to settle
-        return pausePromise(500);
-      })
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(2);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);
-      });
+      const swFile =`${serviceWorkersFolder}max-cache-age-global.js`;
+      return swUtils.activateSW(swFile).then(iframe => {
+        return iframe.contentWindow.fetch(urls[0])
+          .then(() => pause(1500))
+          .then(() => sequentialFetch(iframe, urls.slice(1)))
+          .then(() => swUtils.getAllCachedAssets(iframe.src));
+      }).then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(1)));
     });
 
     it('should cache according to route specific maxAgeSeconds option', function() {
-      const urls = [
-        '/test/data/files/text-1.txt',
-        '/test/data/files/text-2.txt',
-        '/test/data/files/text-3.txt'
-      ];
+      const urls = absoluteTestDataFileUrls([
+        'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      return swUtils.activateSW(serviceWorkersFolder + '/max-cache-age-route.js')
-      .then(iframe => {
-        return urls.reduce((promiseChain, url, index) => {
-          return promiseChain
-          .then(() => {
-            // Pause is to ensure the cache has had time to finish.
-            return iframe.contentWindow.fetch(url)
-            .then(() => {
-              if (index === 0) {
-                return pausePromise(1500);
-              }
-            });
-          });
-        }, Promise.resolve());
-      })
-      .then(() => {
-        // Give cache time to settle
-        return pausePromise(500);
-      })
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(2);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);
-      });
+      const swFile =`${serviceWorkersFolder}max-cache-age-route.js`;
+      return swUtils.activateSW(swFile).then(iframe => {
+        return iframe.contentWindow.fetch(urls[0])
+          .then(() => pause(1500))
+          .then(() => sequentialFetch(iframe, urls.slice(1)))
+          .then(() => swUtils.getAllCachedAssets(iframe.src));
+      }).then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(1)));
     });
   });
 
   describe('options.cache.maxEntries && options.cache.maxAgeSeconds', function() {
     it('should cache according to global maxEntries & maxAgeSeconds option', function() {
-      this.timeout(8000);
-      const urls = [
-        '/test/data/files/text-1.txt',
-        '/test/data/files/text-2.txt',
-        '/test/data/files/text-3.txt'
-      ];
+      const urls = absoluteTestDataFileUrls([
+        'text-1.txt', 'text-2.txt', 'text-3.txt', 'text-4.txt']);
 
-      let iframe;
-      return swUtils.activateSW(serviceWorkersFolder + '/max-cache-age-global.js')
-      .then(newIframe => {
-        iframe = newIframe;
-        return urls.reduce((promiseChain, url, index) => {
-          return promiseChain
-          .then(() => {
-            return iframe.contentWindow.fetch(url)
-            .then(() => {
-              if (index === 0) {
-                return pausePromise(1500);
-              }
-            });
-          });
-        }, Promise.resolve());
-      })
-      .then(() => pausePromise(500))
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(2);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-2.txt').should.not.equal(-1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-3.txt').should.not.equal(-1);
-      })
-      .then(() => pausePromise(1500))
-      .then(() => {
-        return iframe.contentWindow.fetch('/test/data/files/text-4.txt');
-      })
-      .then(() => pausePromise(500))
-      .then(() => {
-        return swUtils.getAllCachedAssets('options-test');
-      })
-      .then(cachedAssets => {
-        Object.keys(cachedAssets).length.should.equal(1);
-        Object.keys(cachedAssets).indexOf(location.origin + '/test/data/files/text-4.txt').should.not.equal(-1);
+      const swFile =`${serviceWorkersFolder}max-entries-cache-age-global.js`;
+      return swUtils.activateSW(swFile).then(iframe => {
+        return iframe.contentWindow.fetch(urls[0])
+          .then(() => pause(1500))
+          .then(() => sequentialFetch(iframe, urls.slice(1, 3)))
+          .then(() => swUtils.getAllCachedAssets(iframe.src))
+          .then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(1, 3)))
+          .then(() => sequentialFetch(iframe, urls.slice(2, 4)))
+          .then(() => swUtils.getAllCachedAssets(iframe.src))
+          .then(cachedAssets => assertCacheContents(cachedAssets, urls.slice(2, 4)));
       });
     });
   });
