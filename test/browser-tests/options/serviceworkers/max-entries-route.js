@@ -23,7 +23,7 @@ importScripts('/test/data/skip-and-claim.js');
 
 self.toolbox.router.get('/test/data/files/:foo', self.toolbox.networkFirst, {
   cache: {
-    name: 'options-test',
+    name: self.registration.scope,
     maxEntries: 2
   }
 });
