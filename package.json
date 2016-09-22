@@ -43,5 +43,10 @@
     "temp": "^0.8.3",
     "vinyl-source-stream": "^1.1.0",
     "which": "^1.2.4"
-  }
+  },
+  "files": [
+    "build/",
+    "lib/",
+    "companion.js"
+  ]
 }
