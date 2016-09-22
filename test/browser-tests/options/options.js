@@ -24,7 +24,7 @@ describe('Test Options Parameters', function() {
 
   /**
    * @param {Number} timeout The number of milliseconds to pause for.
-   * @returns {Promise} A promise that resolves after a specified delay.
+   * @return {Promise} A promise that resolves after a specified delay.
    */
   const pause = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -34,7 +34,7 @@ describe('Test Options Parameters', function() {
    * Performs a series of fetch() calls on an iframe, then pauses.
    * @param {iframe} iframe The iframe whose contentWindow will be used to fetch().
    * @param {Array.<String>} urls The URLs to fetch.
-   * @returns {Promise} A promise that resolves following the fetches and a delay.
+   * @return {Promise} A promise that resolves following the fetches and a delay.
    */
   const sequentialFetch = (iframe, urls) => {
     return urls.reduce((chain, url) => {
@@ -44,8 +44,8 @@ describe('Test Options Parameters', function() {
 
   /**
    * Prepends a common prefix to several partial URLs, and returns the absolute URLs.
-   * @param urls The partial URLs.
-   * @returns {Array.<String>} The absolute URLs.
+   * @param {Array.<String>} urls The partial URLs.
+   * @return {Array.<String>} The absolute URLs.
    */
   const absoluteTestDataFileUrls = urls => urls.map(url => {
     return String(new URL(url, `${location.origin}/test/data/files/`));
@@ -80,7 +80,7 @@ describe('Test Options Parameters', function() {
       const urls = absoluteTestDataFileUrls([
         'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      const swFile =`${serviceWorkersFolder}max-entries-route.js`;
+      const swFile = `${serviceWorkersFolder}max-entries-route.js`;
       return swUtils.activateSW(swFile).then(iframe => {
         return sequentialFetch(iframe, urls)
           .then(() => swUtils.getAllCachedAssets(iframe.src));
@@ -93,7 +93,7 @@ describe('Test Options Parameters', function() {
       const urls = absoluteTestDataFileUrls([
         'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      const swFile =`${serviceWorkersFolder}max-cache-age-global.js`;
+      const swFile = `${serviceWorkersFolder}max-cache-age-global.js`;
       return swUtils.activateSW(swFile).then(iframe => {
         return iframe.contentWindow.fetch(urls[0])
           .then(() => pause(1500))
@@ -106,7 +106,7 @@ describe('Test Options Parameters', function() {
       const urls = absoluteTestDataFileUrls([
         'text-1.txt', 'text-2.txt', 'text-3.txt']);
 
-      const swFile =`${serviceWorkersFolder}max-cache-age-route.js`;
+      const swFile = `${serviceWorkersFolder}max-cache-age-route.js`;
       return swUtils.activateSW(swFile).then(iframe => {
         return iframe.contentWindow.fetch(urls[0])
           .then(() => pause(1500))
@@ -121,7 +121,7 @@ describe('Test Options Parameters', function() {
       const urls = absoluteTestDataFileUrls([
         'text-1.txt', 'text-2.txt', 'text-3.txt', 'text-4.txt']);
 
-      const swFile =`${serviceWorkersFolder}max-entries-cache-age-global.js`;
+      const swFile = `${serviceWorkersFolder}max-entries-cache-age-global.js`;
       return swUtils.activateSW(swFile).then(iframe => {
         return iframe.contentWindow.fetch(urls[0])
           .then(() => pause(1500))
