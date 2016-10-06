@@ -46,8 +46,8 @@ Some examples of using Express-style routing include:
 ```javascript
 // URL patterns are the same syntax as Express routes
 // (http://expressjs.com/guide/routing.html)
-toolbox.router.get(':foo/index.html', function(request, values) {
-  return new Response('Handled a request for ' + request.url +
+toolbox.router.get(':foo/index.html', function(event, values) {
+  return new Response('Handled a request for ' + event.request.url +
       ', where foo is "' + values.foo + '"');
 });
 
@@ -75,8 +75,8 @@ Some examples of using Regular Expression routing include:
 
 ```javascript
 // Match URLs that end in index.html
-toolbox.router.get(/index.html$/, function(request) {
-  return new Response('Handled a request for ' + request.url);
+toolbox.router.get(/index.html$/, function(event) {
+  return new Response('Handled a request for ' + event.request.url);
 });
 
 // Match URLs that begin with https://api.example.com
@@ -109,13 +109,14 @@ toolbox.precache(['/index.html', '/site.css', '/images/logo.png']);
 A request handler takes three arguments.
 
 ```javascript
-var myHandler = function(request, values, options) {
+var myHandler = function(event, values, options) {
   // ...
 }
 ```
 
-- `request` - The [Request](https://fetch.spec.whatwg.org/#request) object that
-triggered the `fetch` event
+- `event` - The [FetchEvent](https://www.w3.org/TR/service-workers/#fetch-event-section)
+object that triggered the `fetch` event. Access the
+[Request](https://fetch.spec.whatwg.org/#request) object with `event.request`.
 - `values` - When using Express-style routing paths, this will be an object
 whose keys are the placeholder names in the URL pattern, with the values being
 the corresponding part of the request URL. For example, with a URL pattern of
