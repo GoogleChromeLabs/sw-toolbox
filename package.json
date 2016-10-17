@@ -47,7 +47,6 @@
     "which": "^1.2.4"
   },
   "files": [
-    "build/",
     "lib/",
     "companion.js"
   ]
