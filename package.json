@@ -48,6 +48,8 @@
   },
   "files": [
     "lib/",
-    "companion.js"
+    "companion.js",
+    "sw-toolbox.js",
+    "sw-toolbox.js.map"
   ]
 }
