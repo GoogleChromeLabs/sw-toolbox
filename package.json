@@ -1,0 +1,55 @@
+{
+  "name": "sw-toolbox",
+  "version": "3.4.0",
+  "description": "Service Worker Toolbox provides some simple helpers for use in creating your own service workers.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "publish-release": "publish-release.sh",
+    "publish-docs": "publish-docs.sh",
+    "build": "gulp default",
+    "build-docs": "echo No Reference Docs to Build.",
+    "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha",
+    "bundle": "./project/create-release-bundle.sh"
+  },
+  "main": "lib/sw-toolbox.js",
+  "repository": "https://github.com/GoogleChrome/sw-toolbox",
+  "dependencies": {
+    "serviceworker-cache-polyfill": "^4.0.0",
+    "path-to-regexp": "^1.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "chai": "^3.4.1",
+    "chromedriver": "^2.24.1",
+    "cookie-parser": "^1.4.1",
+    "eslint": "^1.10.3",
+    "eslint-config-google": "^0.3.0",
+    "express": "^4.13.3",
+    "geckodriver": "^1.1.2",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-header": "^1.8.8",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0",
+    "jsdoc": "^3.4.0",
+    "jshint-stylish": "^2.1.0",
+    "mocha": "^2.3.4",
+    "npm-publish-scripts": "^2.0.7",
+    "operadriver": "^0.2.2",
+    "qunitjs": "^1.20.0",
+    "selenium-assistant": "^1.0.0",
+    "selenium-webdriver": "^3.0.0-beta-2",
+    "sw-testing-helpers": "0.1.4",
+    "temp": "^0.8.3",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "which": "^1.2.4"
+  },
+  "files": [
+    "lib/",
+    "companion.js",
+    "sw-toolbox.js",
+    "sw-toolbox.js.map"
+  ]
+}
