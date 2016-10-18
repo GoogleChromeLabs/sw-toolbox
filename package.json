@@ -47,8 +47,9 @@
     "which": "^1.2.4"
   },
   "files": [
-    "build/",
     "lib/",
-    "companion.js"
+    "companion.js",
+    "sw-toolbox.js",
+    "sw-toolbox.js.map"
   ]
 }
