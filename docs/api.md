@@ -101,3 +101,6 @@ Causes the resource at `url` to be added to the cache and returns a Promise that
 
 ### `toolbox.uncache(url, options)`
 Causes the resource at `url` to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The `options` parameter supports  the `debug` and `cache` [global options](#global-options).
+
+### `toolbox.fetchAndCache(request, options)`
+Fetches the request from the network and adds the response to the cache. The `options` parameter supports the `debug` and `cache` [global options](#global-options).
