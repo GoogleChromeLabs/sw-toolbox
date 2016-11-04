@@ -4,7 +4,13 @@
 
 > A collection of tools for [service workers](https://w3c.github.io/ServiceWorker/)
 
-Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching patterns and an [expressive approach](https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api.html#expressive-approach) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
+Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching strategies for dynamic content, such as API calls, third-party resources, and large or infrequently used local resources that you don't want precached. 
+
+Service Worker Toolbox provides an [expressive approach](https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api.html#expressive-approach) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
+
+## What if I need precaching as well?
+
+Then you should go check out `[sw-precache](https://github.com/GoogleChrome/sw-precache)` before doing anything else. In addition to precaching static resources, `sw-precache` supports optional [runtime caching](https://github.com/GoogleChrome/sw-precache#runtime-caching) through a simple, declarative configuration that incorporates Service Worker Toolbox under the hood.
 
 ## Install
 
