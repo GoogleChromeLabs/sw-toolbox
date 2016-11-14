@@ -10,7 +10,7 @@ Service Worker Toolbox provides an [expressive approach](https://googlechrome.gi
 
 ## What if I need precaching as well?
 
-Then you should go check out `[sw-precache](https://github.com/GoogleChrome/sw-precache)` before doing anything else. In addition to precaching static resources, `sw-precache` supports optional [runtime caching](https://github.com/GoogleChrome/sw-precache#runtime-caching) through a simple, declarative configuration that incorporates Service Worker Toolbox under the hood.
+Then you should go check out [`sw-precache`](https://github.com/GoogleChrome/sw-precache) before doing anything else. In addition to precaching static resources, `sw-precache` supports optional [runtime caching](https://github.com/GoogleChrome/sw-precache#runtime-caching) through a simple, declarative configuration that incorporates Service Worker Toolbox under the hood.
 
 ## Install
 
