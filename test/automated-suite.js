@@ -83,7 +83,7 @@ describe('Test SW-Toolbox', function() {
       .then(testResults => {
         if (testResults.failed.length > 0) {
           const errorMessage = mochaUtils.prettyPrintErrors(
-            browserInfo.prettyName,
+            browserInfo.getPrettyName(),
             testResults
           );
 
@@ -95,25 +95,25 @@ describe('Test SW-Toolbox', function() {
 
   seleniumAssistant.printAvailableBrowserInfo();
 
-  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
+  const automatedBrowsers = seleniumAssistant.getLocalBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
       // Firefox before version 50 have issues that can't be duplicated outside
       // of the selenium test runner.
-      if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+      if (browserInfo.getId() === 'firefox' &&
         browserInfo.getVersionNumber() <= 50) {
         console.log('Skipping ' + browserInfo.getRawVersionString());
         return;
       }
 
-      if (browserInfo.getSeleniumBrowserId() === 'opera' &&
+      if (browserInfo.getId() === 'opera' &&
         browserInfo.getVersionNumber() <= 39) {
         console.log('Skipping ' + browserInfo.getRawVersionString());
         return;
       }
 
       // Chrome 54 is having some issues with the selenium :(
-      if (browserInfo.getSeleniumBrowserId() === 'chrome' &&
+      if (browserInfo.getId() === 'chrome' &&
         browserInfo.getVersionNumber() >= 54) {
         console.log('Skipping ' + browserInfo.getRawVersionString());
         return;
@@ -121,9 +121,9 @@ describe('Test SW-Toolbox', function() {
 
       // Block browsers w/o Service Worker support from being included in the
       // tests on Travis
-      if (browserInfo.getSeleniumBrowserId() !== 'firefox' &&
-        browserInfo.getSeleniumBrowserId() !== 'chrome' &&
-        browserInfo.getSeleniumBrowserId() !== 'opera') {
+      if (browserInfo.getId() !== 'firefox' &&
+        browserInfo.getId() !== 'chrome' &&
+        browserInfo.getId() !== 'opera') {
         console.log('Not running tests on: ' + browserInfo.getPrettyName());
         return;
       }
