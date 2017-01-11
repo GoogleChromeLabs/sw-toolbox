@@ -65,7 +65,7 @@ describe('Test toolbox.networkFirst', function() {
     });
   });
 
-  it.skip('should retrieve the value from the cache for a bad network request', function() {
+  it('should retrieve the value from the cache for a bad network request', function() {
     let iframe;
     const TEST_INPUT = 'hello';
     return swUtils.activateSW(serviceWorkersFolder + '/network-first.js')
@@ -76,11 +76,11 @@ describe('Test toolbox.networkFirst', function() {
       return window.caches.open('test-cache-name');
     })
     .then(cache => {
-      return cache.put('/test/browser-tests/network-first/doesnt-exist', new Response(TEST_INPUT));
+      return cache.put('/test/browser-tests/network-first/503', new Response(TEST_INPUT));
     })
     .then(() => {
       // Call the iframes fetch event so it goes through the service worker
-      return iframe.contentWindow.fetch('/test/browser-tests/network-first/doesnt-exist');
+      return iframe.contentWindow.fetch('/test/browser-tests/network-first/503');
     })
     .then(response => {
       response.status.should.equal(200);
@@ -93,13 +93,41 @@ describe('Test toolbox.networkFirst', function() {
       return window.caches.open('test-cache-name');
     })
     .then(cache => {
-      return cache.match('/test/browser-tests/network-first/doesnt-exist');
+      return cache.match('/test/browser-tests/network-first/503');
     })
     .then(response => {
       return response.text();
     })
     .then(responseText => {
       responseText.trim().should.equal(TEST_INPUT);
+    });
+  });
+
+  it('should retreive the response for a client error that was previously cached as ok', function() {
+    let iframe;
+    const TEST_INPUT = 'hello';
+    return swUtils.activateSW(serviceWorkersFolder + '/network-first.js')
+    .then(newIframe => {
+      iframe = newIframe;
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.put('/test/browser-tests/network-first/403', new Response(TEST_INPUT));
+    })
+    .then(() => {
+      // Call the iframes fetch event so it goes through the service worker
+      return iframe.contentWindow.fetch('/test/browser-tests/network-first/403');
+    })
+    .then(response => {
+      response.status.should.equal(403);
+    })
+    .then(() => {
+      return window.caches.open('test-cache-name');
+    })
+    .then(cache => {
+      return cache.match('/test/browser-tests/network-first/503');
     });
   });
 
