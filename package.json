@@ -36,7 +36,6 @@
     "mocha": "^3.2.0",
     "npm-publish-scripts": "^2.0.7",
     "operadriver": "^1.0.0",
-    "qunitjs": "^1.20.0",
     "selenium-assistant": "^5.0.2",
     "sw-testing-helpers": "1.0.1",
     "temp": "^0.8.3",

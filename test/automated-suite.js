@@ -68,7 +68,6 @@ describe('Test SW-Toolbox', function() {
 
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
-      console.log('Hello');
       return browserInfo.getSeleniumDriver()
       .then(driver => {
         globalDriverReference = driver;
