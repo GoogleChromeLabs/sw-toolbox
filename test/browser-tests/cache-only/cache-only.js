@@ -22,16 +22,15 @@ describe('Test toolbox.cacheOnly', function() {
   const swUtils = window.goog.swUtils;
   const serviceWorkersFolder = '/test/browser-tests/cache-only/serviceworkers';
 
-  it('should return nothing from the empty cache', function(done) {
-    swUtils.activateSW(serviceWorkersFolder + '/cache-only.js')
+  it('should return nothing from the empty cache', function() {
+    return swUtils.activateSW(serviceWorkersFolder + '/cache-only.js')
     .then(iframe => {
       return iframe.contentWindow.fetch('/get-cache-value');
     })
     .then(() => {
-      done(new Error('This shouldn\'t have returned a value'));
-    })
-    .catch(() => {
-      done();
+      throw new Error('This shouldn\'t have returned a value');
+    }, () => {
+      // NOOP
     });
   });
 
@@ -60,7 +59,7 @@ describe('Test toolbox.cacheOnly', function() {
     });
   });
 
-  it('should return value from the cache', function(done) {
+  it('should return value from the cache', function() {
     const date = String(Date.now());
     let iframe;
     return swUtils.activateSW(serviceWorkersFolder + '/cache-only.js')
@@ -93,10 +92,9 @@ describe('Test toolbox.cacheOnly', function() {
       return iframe.contentWindow.fetch('/get-cache-value');
     })
     .then(() => {
-      done(new Error('This should have rejected'));
-    })
-    .catch(() => {
-      done();
+      throw new Error('This should have rejected');
+    }, () => {
+      // NOOP - Error is valid here
     });
   });
 });

@@ -2,11 +2,15 @@
   "extends": "google",
   "env": {
     "serviceworker": true,
-    "worker": true
+    "worker": true,
+    "es6": true
   },
   "rules": {
     "max-nested-callbacks": 0,
     "no-warning-comments": 0,
-    "require-jsdoc": 0
+    "require-jsdoc": 0,
+    "no-var": 0,
+    "comma-dangle": 0,
+    "arrow-parens": 0
   }
 }

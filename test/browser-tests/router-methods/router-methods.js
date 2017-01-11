@@ -42,8 +42,8 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
       });
   };
 
-  const performTest = (method, swUrl, fetchUrl, expectedString, done) => {
-    let testPromise = swUtils.activateSW(swUrl + '?method=' + method)
+  const performTest = (method, swUrl, fetchUrl, expectedString) => {
+    return swUtils.activateSW(swUrl + '?method=' + method)
     .then(() => {
       if (method === 'any') {
         return Promise.all(
@@ -55,70 +55,59 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
 
       return performFetch(method, fetchUrl, expectedString);
     });
-
-    if (done) {
-      testPromise = testPromise.then(() => done(), done);
-    }
-
-    return testPromise;
   };
 
   const addMochaTests = method => {
     describe('Testing router.' + method, function() {
-      it('should return response for absolute url', done => {
-        performTest(
+      it('should return response for absolute url', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/relative.js',
           '/test/relative-url-test',
-          '/test/relative-url-test',
-          done
+          '/test/relative-url-test'
         );
       });
 
-      it('should return response for relative url', done => {
-        performTest(
+      it('should return response for relative url', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/relative.js',
           serviceWorkersFolder + '/test/relative-url-test-2',
-          'test/relative-url-test-2',
-          done
+          'test/relative-url-test-2'
         );
       });
 
-      it('should return the variable from a pattern', done => {
-        performTest(
+      it('should return the variable from a pattern', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/variable-match.js',
           '/test/match/echo-this/pattern',
-          'echo-this',
-          done
+          'echo-this'
         );
       });
 
      // TODO: Find out correct behaviour https://github.com/GoogleChrome/sw-toolbox/issues/86
-      it.skip('should throw an error for route with an origin defined in sw testing request for full url', done => {
-        performTest(
+      it.skip('should throw an error for route with an origin defined in sw testing request for full url', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/full-url.js',
           location.origin + '/test/absolute-url-test',
-          '/test/absolute-url-test',
-          done
+          '/test/absolute-url-test'
         );
       });
 
       // TODO: Find out correct behaviour https://github.com/GoogleChrome/sw-toolbox/issues/86
-      it.skip('should throw an error for route with an origin defined in sw testing request for relative url', done => {
-        performTest(
+      it.skip('should throw an error for route with an origin defined in sw testing request for relative url', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/full-url.js',
           '/test/absolute-url-test',
-          '/test/absolute-url-test',
-          done
+          '/test/absolute-url-test'
         );
       });
 
-      it('should return a response from the first defined match then second based on specificity', done => {
-        performTest(
+      it('should return a response from the first defined match then second based on specificity', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/definition-order.js',
           '/multiple/match/something.html',
@@ -130,9 +119,7 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
             '/multiple/match/something',
             'multiple-match-2'
           );
-        })
-        .then(() => done())
-        .catch(done);
+        });
       });
 
       // Firefox version 47+ support fetch requests to other origins going through
@@ -141,190 +128,172 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
       // 46 doesn't work with HTTPS domains
       // 45 doesn't work with other origins
       const firefoxVersion = /Firefox\/(\d+).\d+/.exec(navigator.userAgent);
-      if (firefoxVersion && parseInt(firefoxVersion[1], 10) < 47) {
+      if (firefoxVersion) {
         console.warn('Tests skipped due to version of Firefox not supporting ' +
-          'cross origin requests via fetch()');
+          'cross origin requests via fetch().');
         return;
       }
 
-      it('should not match relative path starting with the origin defined in toolbox route. Origin option as regex.', done => {
-        performTest(
+      it('should not match relative path starting with the origin defined in toolbox route. Origin option as regex.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/origin-option-regex`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should return response for request to a different origin defined in toolbox route. HTTP + Origin option as regex.', done => {
-        performTest(
+      it('should return response for request to a different origin defined in toolbox route. HTTP + Origin option as regex.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/origin-option-regex`,
-          '/origin-option-regex',
-          done
+          '/origin-option-regex'
         );
       });
 
-      it('should return response for request to a different origin defined in toolbox route. HTTPS + Origin option as regex.', done => {
-        performTest(
+      it('should return response for request to a different origin defined in toolbox route. HTTPS + Origin option as regex.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/origin-option-regex`,
-          '/origin-option-regex',
-          done
+          '/origin-option-regex'
         );
       });
 
-      it('should not match relative path starting with origin defined in toolbox route. Origin option as string.', done => {
-        performTest(
+      it('should not match relative path starting with origin defined in toolbox route. Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/origin-option-string`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should return response for request to a different origin defined in toolbox route. HTTP + Origin option as string.', done => {
-        performTest(
+      it('should return response for request to a different origin defined in toolbox route. HTTP + Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/origin-option-string`,
-          '/origin-option-string',
-          done
+          '/origin-option-string'
         );
       });
 
-      it('should return response for request to a different origin defined in toolbox route. HTTPS + Origin option as string.', done => {
-        performTest(
+      it('should return response for request to a different origin defined in toolbox route. HTTPS + Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/origin-option-string`,
-          '/origin-option-string',
-          done
+          '/origin-option-string'
         );
       });
 
-      it('should not match relative path starting with origin defined in toolbox route specifying HTTPS. Origin option as string.', done => {
-        performTest(
+      it('should not match relative path starting with origin defined in toolbox route specifying HTTPS. Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/https-only-string`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should not match a HTTP request to a different origin for route specifying HTTPS. HTTP + Origin option as string.', done => {
-        performTest(
+      it('should not match a HTTP request to a different origin for route specifying HTTPS. HTTP + Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/https-only-string`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should return response for HTTPS request to a different origin for route specifying HTTPS. HTTPS + Origin option as string.', done => {
-        performTest(
+      it('should return response for HTTPS request to a different origin for route specifying HTTPS. HTTPS + Origin option as string.', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/https-only-string`,
-          '/https-only-string',
-          done
+          '/https-only-string'
         );
       });
 
       // Note the behaviour of this is different to previous tests with this relative path
-      it('should match regex for relative request defining an origin in regex route. (Soft origin check)', done => {
-        performTest(
+      it('should match regex for relative request defining an origin in regex route. (Soft origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/soft-origin-regex-route`,
-          '/soft-origin-regex-route',
-          done
+          '/soft-origin-regex-route'
         );
       });
 
-      it('should match regex HTTP request defining an origin in regex route. (Soft origin check)', done => {
-        performTest(
+      it('should match regex HTTP request defining an origin in regex route. (Soft origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/soft-origin-regex-route`,
-          '/soft-origin-regex-route',
-          done
+          '/soft-origin-regex-route'
         );
       });
 
-      it('should match regex HTTPS request defining an origin in regex route. (Soft origin check)', done => {
-        performTest(
+      it('should match regex HTTPS request defining an origin in regex route. (Soft origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/soft-origin-regex-route`,
-          '/soft-origin-regex-route',
-          done
+          '/soft-origin-regex-route'
         );
       });
 
-      it('should not match regex for relative request defining an origin in regex route. (Hard origin check)', done => {
-        performTest(
+      it('should not match regex for relative request defining an origin in regex route. (Hard origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/hard-origin-regex-route`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should match regex HTTP request defining an origin in regex route. (Hard origin check)', done => {
-        performTest(
+      it('should match regex HTTP request defining an origin in regex route. (Hard origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/hard-origin-regex-route`,
-          '/hard-origin-regex-route',
-          done
+          '/hard-origin-regex-route'
         );
       });
 
-      it('should match regex HTTPS request defining an origin in regex route. (Hard origin check)', done => {
-        performTest(
+      it('should match regex HTTPS request defining an origin in regex route. (Hard origin check)', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/hard-origin-regex-route`,
-          '/hard-origin-regex-route',
-          done
+          '/hard-origin-regex-route'
         );
       });
 
-      it('should not match regex for relative request defining an HTTPS origin in regex route', done => {
-        performTest(
+      it('should not match regex for relative request defining an HTTPS origin in regex route', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `${domainName}/https-only-regex`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should not match regex for HTTP request defining an HTTPS origin in regex route', done => {
-        performTest(
+      it('should not match regex for HTTP request defining an HTTPS origin in regex route', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `http://${domainName}/https-only-regex`,
-          '/default',
-          done
+          '/default'
         );
       });
 
-      it('should match regex for HTTPS request defining an HTTPS origin in regex route', done => {
-        performTest(
+      it('should match regex for HTTPS request defining an HTTPS origin in regex route', () => {
+        return performTest(
           method,
           serviceWorkersFolder + '/origin-matching.js',
           `https://${domainName}/https-only-regex`,
-          '/https-only-regex',
-          done
+          '/https-only-regex'
         );
       });
     });

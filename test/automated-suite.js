@@ -28,7 +28,6 @@ const mochaUtils = require('sw-testing-helpers').mochaUtils;
 
 require('geckodriver');
 require('chromedriver');
-require('operadriver');
 
 require('chai').should();
 
@@ -38,10 +37,8 @@ describe('Test SW-Toolbox', function() {
   // Browser tests can be slow
   this.timeout(100000);
 
-  if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
-    // Selenium Tests are Flakey
-    this.retries(3);
-  }
+  // Selenium Tests are Flakey
+  this.retries(3);
 
   // Driver is initialised to `null` to handle scenarios
   // where the desired browser isn't installed / fails to load
@@ -61,7 +58,7 @@ describe('Test SW-Toolbox', function() {
   });
 
   afterEach(function() {
-    this.timeout(10000);
+    this.timeout(2 * 60 * 1000);
 
     return seleniumAssistant.killWebDriver(globalDriverReference)
     .then(() => {
@@ -71,6 +68,7 @@ describe('Test SW-Toolbox', function() {
 
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
+      console.log('Hello');
       return browserInfo.getSeleniumDriver()
       .then(driver => {
         globalDriverReference = driver;
@@ -81,52 +79,37 @@ describe('Test SW-Toolbox', function() {
         );
       })
       .then(testResults => {
+        mochaUtils.prettyPrintResults(testResults);
         if (testResults.failed.length > 0) {
-          const errorMessage = mochaUtils.prettyPrintErrors(
-            browserInfo.getPrettyName(),
-            testResults
-          );
-
-          throw new Error(errorMessage);
+          throw new Error('Tests Failed');
         }
       });
     });
   };
 
-  seleniumAssistant.printAvailableBrowserInfo();
-
   const automatedBrowsers = seleniumAssistant.getLocalBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
-      // Firefox before version 50 have issues that can't be duplicated outside
-      // of the selenium test runner.
-      if (browserInfo.getId() === 'firefox' &&
-        browserInfo.getVersionNumber() <= 50) {
-        console.log('Skipping ' + browserInfo.getRawVersionString());
-        return;
-      }
+    // Firefox before version 50 have issues that can't be duplicated outside
+    // of the selenium test runner.
+    if (browserInfo.getId() === 'firefox' &&
+      browserInfo.getVersionNumber() < 50) {
+      console.log(`Skipping ${browserInfo.getId()}: ${browserInfo.getRawVersionString()}`);
+      return;
+    }
 
-      if (browserInfo.getId() === 'opera' &&
-        browserInfo.getVersionNumber() <= 39) {
-        console.log('Skipping ' + browserInfo.getRawVersionString());
-        return;
-      }
+    // Opera has bad unregister API and it's driver is far from happy
+    // with latest builds.
+    if (browserInfo.getId() === 'opera') {
+      console.log(`Skipping ${browserInfo.getId()}: ${browserInfo.getRawVersionString()}`);
+      return;
+    }
 
-      // Chrome 54 is having some issues with the selenium :(
-      if (browserInfo.getId() === 'chrome' &&
-        browserInfo.getVersionNumber() >= 54) {
-        console.log('Skipping ' + browserInfo.getRawVersionString());
-        return;
-      }
-
-      // Block browsers w/o Service Worker support from being included in the
-      // tests on Travis
-      if (browserInfo.getId() !== 'firefox' &&
-        browserInfo.getId() !== 'chrome' &&
-        browserInfo.getId() !== 'opera') {
-        console.log('Not running tests on: ' + browserInfo.getPrettyName());
-        return;
-      }
+    // Block browsers w/o Service Worker support from being included in the
+    // tests on Travis
+    if (browserInfo.getId() !== 'firefox' &&
+      browserInfo.getId() !== 'chrome') {
+      console.log(`Skipping ${browserInfo.getId()}: ${browserInfo.getRawVersionString()}`);
+      return;
     }
 
     queueUnitTest(browserInfo);

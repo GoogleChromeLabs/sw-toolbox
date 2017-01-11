@@ -64,7 +64,7 @@
       // regardless of support or not and perform tests when the browser
       // starts to support service workers.
       if (!('serviceWorker' in navigator)) {
-        publishTestResults();
+        window.testsuite = {};
         return;
       }
 

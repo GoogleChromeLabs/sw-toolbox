@@ -1,10 +1,10 @@
 # Service Worker Toolbox
 
-[![Build Status](https://travis-ci.org/GoogleChrome/sw-toolbox.svg?branch=master)](https://travis-ci.org/GoogleChrome/sw-toolbox) [![Dependency Status](https://david-dm.org/googlechrome/sw-toolbox.svg)](https://david-dm.org/googlechrome/sw-toolbox) [![devDependency Status](https://david-dm.org/googlechrome/sw-toolbox/dev-status.svg)](https://david-dm.org/googlechrome/sw-toolbox#info=devDependencies)
+[![Build Status](https://travis-ci.org/GoogleChrome/sw-toolbox.svg?branch=master)](https://travis-ci.org/GoogleChrome/sw-toolbox) [![Dependency Status](https://david-dm.org/googlechrome/sw-toolbox.svg)](https://david-dm.org/googlechrome/sw-toolbox) [![devDependencies Status](https://david-dm.org/googlechrome/sw-toolbox/dev-status.svg)](https://david-dm.org/googlechrome/sw-toolbox?type=dev)
 
 > A collection of tools for [service workers](https://w3c.github.io/ServiceWorker/)
 
-Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching strategies for dynamic content, such as API calls, third-party resources, and large or infrequently used local resources that you don't want precached. 
+Service Worker Toolbox provides some simple helpers for use in creating your own service workers. Specifically, it provides common caching strategies for dynamic content, such as API calls, third-party resources, and large or infrequently used local resources that you don't want precached.
 
 Service Worker Toolbox provides an [expressive approach](https://googlechrome.github.io/sw-toolbox/docs/master/tutorial-api.html#expressive-approach) to using those strategies for runtime requests. If you're not sure what service workers are or what they are for, start with [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
 
