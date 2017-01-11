@@ -95,7 +95,7 @@ describe('Test SW-Toolbox', function() {
 
   seleniumAssistant.printAvailableBrowserInfo();
 
-  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
+  const automatedBrowsers = seleniumAssistant.getLocalBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
       // Firefox before version 50 have issues that can't be duplicated outside
