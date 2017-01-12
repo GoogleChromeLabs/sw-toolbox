@@ -9,6 +9,7 @@ const promises = [
   seleniumAssistant.downloadLocalBrowser('firefox', 'unstable', 48)
 ];
 
+console.log('Starting browser download.');
 Promise.all(promises)
 .then(() => {
   console.log('Browser download complete.');
