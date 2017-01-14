@@ -20,7 +20,7 @@
 /* eslint-env node,mocha */
 
 // These tests make use of selenium-webdriver. You can find the relevant
-// documentation here: http://selenium.googlecode.com/git/docs/api/javascript/index.html
+// documentation here: https://github.com/SeleniumHQ/selenium
 
 const path = require('path');
 const seleniumAssistant = require('selenium-assistant');
