@@ -5,13 +5,15 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "gulp default",
-    "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha"
+    "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha",
+    "publish-release": "npm-publish-scripts publish-release"
   },
   "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
   "dependencies": {
-    "serviceworker-cache-polyfill": "^4.0.0",
-    "path-to-regexp": "^1.0.1"
+    "npm-publish-scripts": "^4.1.0",
+    "path-to-regexp": "^1.0.1",
+    "serviceworker-cache-polyfill": "^4.0.0"
   },
   "devDependencies": {
     "browserify": "^13.1.0",
