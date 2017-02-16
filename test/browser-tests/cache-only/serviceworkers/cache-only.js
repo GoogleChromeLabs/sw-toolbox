@@ -21,7 +21,7 @@
 // This test looks at what would happen with multiple install events.
 // This should cache all assets in both the install and precache steps
 
-importScripts('/build/sw-toolbox.js');
+importScripts('/sw-toolbox.js');
 importScripts('/test/data/skip-and-claim.js');
 
 self.toolbox.options.cache.name = 'test-cache-name';

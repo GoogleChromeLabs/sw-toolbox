@@ -2,7 +2,7 @@
   'use strict';
 
   // Load the sw-tookbox library.
-  importScripts('/build/sw-toolbox.js');
+  importScripts('/sw-toolbox.js');
 
   // Turn on debug logging, visible in the Developer Tools' console.
   global.toolbox.options.debug = true;

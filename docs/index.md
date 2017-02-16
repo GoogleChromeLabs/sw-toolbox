@@ -2,37 +2,39 @@
 layout: index
 title: "SW Toolbox"
 navigation_weight: 0
+left_column: |
+  # Why
+
+  Service Worker Toolbox (or SW-Toolbox) provides some simple helpers for use
+  in creating your own service workers. Specifically, it provides common caching
+  patterns and an [expressive approach]({{ project_root_url }}/api#expressive-approach)
+  to using those strategies for runtime requests. If you're not sure what
+  service workers are or what they are for, start with
+  [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
+right_column: |
+  # Install
+
+  Service Worker Toolbox is available through NPM, Bower or direct from GitHub:
+
+      npm install --save sw-toolbox
+
+      bower install --save sw-toolbox
+
+      git clone https://github.com/GoogleChrome/sw-toolbox.git
 ---
 
-# Why
+# Getting Started
 
-Service Worker Toolbox (or SW-Toolbox) provides some simple helpers for use
-in creating your own service workers. Specifically, it provides common caching
-patterns and an [expressive approach]({{ project_root_url }}/api#expressive-approach)
-to using those strategies for runtime requests. If you're not sure what
-service workers are or what they are for, start with
-[the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
+Once you've installed sw-toolbox, you'll need to create a service worker file,
+let's call in `my-service-worker.js`. It's in this file that we'll be using
+sw-toolbox. But first we need to register our service worker.
 
-# Install
-
-Service Worker Toolbox is available through Bower, npm or direct from GitHub:
-
-`bower install --save sw-toolbox`
-
-`npm install --save sw-toolbox`
-
-`git clone https://github.com/GoogleChrome/sw-toolbox.git`
-
-# Usage
-
-### Register your service worker
-
-From your registering page, register your service worker in the normal way.
-For example:
+From your web page, register your service worker file like so:
 
 ```javascript
 navigator.serviceWorker.register('my-service-worker.js');
 ```
+
 As implemented in Chrome 40 or later, a service worker must exist at the root
 of the scope that you intend it to control, or higher. So if you want all of
 the pages under `/myapp/` to be controlled by the worker, the worker script

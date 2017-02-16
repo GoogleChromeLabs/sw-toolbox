@@ -57,7 +57,7 @@ gulp.task('build', function() {
     .pipe(uglify())
     .pipe(header(license))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./build/'));
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('lint', function() {
