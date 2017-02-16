@@ -18,7 +18,7 @@
 
 /* eslint-env worker, serviceworker */
 
-importScripts('/build/sw-toolbox.js');
+importScripts('/sw-toolbox.js');
 
 self.toolbox.options.cache = {
   name: 'precache-mix'
