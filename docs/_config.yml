@@ -1,3 +1,6 @@
 source:       .
-layouts_dir: ./jekyll-theme/_layouts/
-includes_dir: ./jekyll-theme/_includes/
+layouts_dir: ./themes/jekyll/_layouts/
+includes_dir: ./themes/jekyll/_includes/
+
+# This adds github pages data
+gems: ['jekyll-github-metadata']
