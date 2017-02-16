@@ -11,7 +11,6 @@
   "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
   "dependencies": {
-    "npm-publish-scripts": "^4.1.0",
     "path-to-regexp": "^1.0.1",
     "serviceworker-cache-polyfill": "^4.0.0"
   },
@@ -32,6 +31,7 @@
     "gulp-uglify": "^2.0.0",
     "jsdoc": "^3.4.0",
     "mocha": "^3.2.0",
+    "npm-publish-scripts": "^4.1.0",
     "operadriver": "^1.0.0",
     "selenium-assistant": "^5.0.2",
     "sw-testing-helpers": "1.0.1",
