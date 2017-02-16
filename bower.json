@@ -9,6 +9,7 @@
     "**/.*",
     "lib",
     "tests",
+    "docs",
     "gulpfile.js"
   ]
 }

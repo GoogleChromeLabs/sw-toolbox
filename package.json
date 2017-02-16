@@ -4,12 +4,8 @@
   "description": "Service Worker Toolbox provides some simple helpers for use in creating your own service workers.",
   "license": "Apache-2.0",
   "scripts": {
-    "publish-release": "publish-release.sh",
-    "publish-docs": "publish-docs.sh",
     "build": "gulp default",
-    "build-docs": "echo No Reference Docs to Build.",
-    "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha",
-    "bundle": "./project/create-release-bundle.sh"
+    "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha"
   },
   "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
@@ -34,7 +30,6 @@
     "gulp-uglify": "^2.0.0",
     "jsdoc": "^3.4.0",
     "mocha": "^3.2.0",
-    "npm-publish-scripts": "^2.0.7",
     "operadriver": "^1.0.0",
     "selenium-assistant": "^5.0.2",
     "sw-testing-helpers": "1.0.1",
