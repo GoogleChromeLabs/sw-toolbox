@@ -23,6 +23,7 @@ declare module 'sw-toolbox' {
 
   interface Router {
     any(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    default(handler: Handler, options?: Options): void
     delete(urlPattern: URLPattern, handler: Handler, options?: Options): void
     get(urlPattern: URLPattern, handler: Handler, options?: Options): void
     head(urlPattern: URLPattern, handler: Handler, options?: Options): void
