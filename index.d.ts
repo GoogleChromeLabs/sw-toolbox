@@ -7,21 +7,22 @@ declare module 'sw-toolbox' {
   }
   interface Response {
   }
-  interface CacheOptions {
+
+  export interface CacheOptions {
     name: string
     maxEntries: number
     maxAgeSeconds: number
   }
-  interface Options {
+  export interface Options {
     debug: boolean
     networkTimeoutSeconds: number
     cache: CacheOptions
   }
-  interface Handler {
+  export interface Handler {
     (request: Request): Promise<Response>
   }
 
-  interface Router {
+  export interface Router {
     any(urlPattern: URLPattern, handler: Handler, options?: Options): void
     default(handler: Handler, options?: Options): void
     delete(urlPattern: URLPattern, handler: Handler, options?: Options): void
