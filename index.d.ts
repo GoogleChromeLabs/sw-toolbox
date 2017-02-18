@@ -1,5 +1,13 @@
 declare module 'sw-toolbox' {
-  interface Cache {
+  type URLPattern = string | RegExp
+  type PrecacheURL = Request | string
+  type PrecacheURLs = Promise<PrecacheURL[]> | PrecacheURL[]
+
+  interface Request {
+  }
+  interface Response {
+  }
+  interface CacheOptions {
     name: string
     maxEntries: number
     maxAgeSeconds: number
@@ -7,18 +15,19 @@ declare module 'sw-toolbox' {
   interface Options {
     debug: boolean
     networkTimeoutSeconds: number
-    cache: Cache
+    cache: CacheOptions
   }
   interface Handler {
-    (): void
+    (request: Request): Promise<Response>
   }
+
   interface Router {
-    any(urlPattern: string, handler: Handler, options?: Options): void
-    delete(urlPattern: string, handler: Handler, options?: Options): void
-    get(urlPattern: string, handler: Handler, options?: Options): void
-    head(urlPattern: string, handler: Handler, options?: Options): void
-    post(urlPattern: string, handler: Handler, options?: Options): void
-    put(urlPattern: string, handler: Handler, options?: Options): void
+    any(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    delete(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    get(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    head(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    post(urlPattern: URLPattern, handler: Handler, options?: Options): void
+    put(urlPattern: URLPattern, handler: Handler, options?: Options): void
   }
 
   export const cacheFirst: Handler
@@ -28,9 +37,9 @@ declare module 'sw-toolbox' {
   export const networkOnly: Handler
   export const router: Router
 
-  export function cache (url: string, options: Options): void
+  export function cache(url: string, options: Options): void
 
-  export function precache (urls: string[]): Promise<void>
+  export function precache(urls: PrecacheURLs): void
 
-  export function uncache (urls: string[]): Promise<void>
+  export function uncache(url: string): Promise<void>
 }
