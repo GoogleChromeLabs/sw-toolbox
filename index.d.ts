@@ -35,6 +35,7 @@ declare module 'sw-toolbox' {
   export const fastest: Handler
   export const networkFirst: Handler
   export const networkOnly: Handler
+  export const options: Options
   export const router: Router
 
   export function cache(url: string, options: Options): void
