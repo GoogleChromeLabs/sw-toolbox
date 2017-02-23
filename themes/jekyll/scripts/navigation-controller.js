@@ -13,6 +13,7 @@ class NavigationController {
     this._jsdocCollapse = new window.__npmPublishScripts.JSDocCollapse();
 
     this._configureMenuBtn();
+    this._configureAnchors();
   }
 
   /**
@@ -27,6 +28,24 @@ class NavigationController {
     menuBtn.addEventListener('click', () => {
       this.toggleNavDrawer();
     });
+  }
+
+  /**
+   * Use third party anchor-js to add anchors to headings.
+   */
+  _configureAnchors() {
+    const anchorScriptElement = document.querySelector('#anchorjsscript');
+    const loadAnchors = () => {
+      window.anchors.options = {
+        placement: 'left',
+      };
+      window.anchors.add(
+        'main h1, main h2, main h3, main h4, main h5, main h6');
+    };
+    anchorScriptElement.onload = loadAnchors;
+    if (window.anchors) {
+      loadAnchors();
+    }
   }
 
   /**
