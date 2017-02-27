@@ -1,6 +1,6 @@
 {
   "name": "sw-toolbox",
-  "version": "3.5.1",
+  "version": "3.6.0",
   "description": "Service Worker Toolbox provides some simple helpers for use in creating your own service workers.",
   "license": "Apache-2.0",
   "scripts": {
