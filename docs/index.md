@@ -59,4 +59,4 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js'); // Update path to ma
 ```
 
 For more information on how to use the toolbox read
-the [usage]({{ project_root_url }}/usage) and [api]({{ project_root_url }}/api) documentation.
+the [usage](usage) and [api](api) documentation.
