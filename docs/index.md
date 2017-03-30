@@ -7,7 +7,7 @@ left_column: |
 
   Service Worker Toolbox (or SW-Toolbox) provides some simple helpers for use
   in creating your own service workers. Specifically, it provides common caching
-  patterns and an [expressive approach]({{ project_root_url }}/api#expressive-approach)
+  patterns and an [expressive approach](./api#expressive-approach)
   to using those strategies for runtime requests. If you're not sure what
   service workers are or what they are for, start with
   [the explainer doc](https://github.com/slightlyoff/ServiceWorker/blob/master/explainer.md).
