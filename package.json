@@ -6,6 +6,7 @@
   "scripts": {
     "build": "gulp default",
     "test": "gulp lint default && node ./test/helpers/download-browsers.js && mocha",
+    "publish-docs": "npm-publish-scripts publish-docs",
     "publish-release": "npm-publish-scripts publish-release"
   },
   "main": "lib/sw-toolbox.js",
@@ -31,7 +32,7 @@
     "gulp-uglify": "^2.0.0",
     "jsdoc": "^3.4.0",
     "mocha": "^3.2.0",
-    "npm-publish-scripts": "^4.1.0",
+    "npm-publish-scripts": "^4.1.16",
     "operadriver": "^1.0.0",
     "selenium-assistant": "^5.0.4",
     "sw-testing-helpers": "1.0.2",
