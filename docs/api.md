@@ -28,7 +28,7 @@ Various properties of `cache` control the behavior of the default cache when set
 `toolbox.options.cache`, or the cache used by a specific request handler.
 
 ### cache.name [String]
-The name of the [`Cache`](https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cache)
+The name of the [`Cache`](https://developer.mozilla.org/en-US/docs/Web/API/Cache)
 used to store [`Response`](https://fetch.spec.whatwg.org/#response-class) objects. Using a unique name
 allows you to customize the cache's maximum size and age of entries.
 
@@ -76,15 +76,12 @@ Handle the request by trying to fetch the URL from the network. If the fetch fai
 
 <h2 id="expressive-approach">Methods</h2>
 
-### `toolbox.router.get(urlPattern, handler, options)`
-### `toolbox.router.post(urlPattern, handler, options)`
-### `toolbox.router.put(urlPattern, handler, options)`
-### `toolbox.router.delete(urlPattern, handler, options)`
-### `toolbox.router.head(urlPattern, handler, options)`
+### `toolbox.router.<get|post|put|delete|head>(urlPattern, handler, options)`
+
 Create a route that causes requests for URLs matching `urlPattern` to be resolved by calling `handler`. Matches requests using the GET, POST, PUT, DELETE or HEAD HTTP methods respectively.
 
 - `urlPattern` - an Express style route. See the docs for the [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module for the full syntax
-- `handler` - a request handler, as [described above](#using-request-handlers)
+- `handler` - a request handler, as [described above](#handlers)
 - `options` - an object containing options for the route. This options object will be passed to the request handler. The `origin` option is specific to the router methods, and can be either an exact string or a Regexp against which the origin of the Request must match for the route to be used.
 
 ### `toolbox.router.any(urlPattern, handler, options)`
@@ -97,7 +94,7 @@ Takes a function to use as the request handler for any GET request that does not
 Add each URL in arrayOfURLs to the list of resources that should be cached during the service worker install step. URLs in the array can either be a String or Request object. Note that this needs to be called before the install event is triggered, so you should do it on the first run of your script.
 
 ### `toolbox.cache(url, options)`
-Causes the resource at `url` to be added to the cache and returns a Promise that resolves with void. The `options` parameter supports the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be added to the cache and returns a Promise that resolves with void. The `options` parameter supports the `debug` and `cache` [global options](#options).
 
 ### `toolbox.uncache(url, options)`
-Causes the resource at `url` to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The `options` parameter supports  the `debug` and `cache` [global options](#global-options).
+Causes the resource at `url` to be removed from the cache and returns a Promise that resolves to true if the cache entry is deleted. The `options` parameter supports  the `debug` and `cache` [global options](#options).

@@ -122,7 +122,7 @@ the corresponding part of the request URL. For example, with a URL pattern of
 `'/images/:size/:name.jpg'` and an actual URL of `'/images/large/unicorns.jpg'`,
 `values` would be `{size: 'large', name: 'unicorns'}`.
 When using a RegExp for the path, `values` will not be set.
-- `options` - the [options](#options) passed to one of the [router methods](#methods).
+- `options` - the [options](./api#options) passed to one of the [router methods](./api#expressive-approach).
 
 The return value should be a [Response](https://fetch.spec.whatwg.org/#response),
 or a [Promise](http://www.html5rocks.com/en/tutorials/es6/promises/) that
