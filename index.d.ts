@@ -10,13 +10,13 @@ declare module 'sw-toolbox' {
 
   export interface CacheOptions {
     name: string
-    maxEntries: number
-    maxAgeSeconds: number
+    maxEntries?: number
+    maxAgeSeconds?: number
   }
   export interface Options {
-    debug: boolean
-    networkTimeoutSeconds: number
-    cache: CacheOptions
+    debug?: boolean
+    networkTimeoutSeconds?: number
+    cache?: CacheOptions
   }
   export interface Handler {
     (request: Request): Promise<Response>
