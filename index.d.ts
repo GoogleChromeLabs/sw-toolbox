@@ -3,11 +3,6 @@ declare module 'sw-toolbox' {
   type PrecacheURL = Request | string
   type PrecacheURLs = Promise<PrecacheURL[]> | PrecacheURL[]
 
-  interface Request {
-  }
-  interface Response {
-  }
-
   export interface CacheOptions {
     name: string
     maxEntries?: number
