@@ -97,4 +97,52 @@ describe('Test toolbox.cacheOnly', function() {
       // NOOP - Error is valid here
     });
   });
+
+  it('should return a response when the URL includes a search parameter and ignoreSearch is true', function() {
+    const date = String(Date.now());
+    let iframe;
+    return swUtils.activateSW(serviceWorkersFolder + '/cache-only.js')
+      .then(newIframe => {
+        iframe = newIframe;
+      })
+      .then(() => {
+        return window.caches.open('test-cache-name');
+      })
+      .then(cache => {
+        return cache.put('/get-cache-value-ignore-search-true?k=v', new Response(date));
+      })
+      .then(() => {
+        return iframe.contentWindow.fetch('/get-cache-value-ignore-search-true');
+      })
+      .then(response => {
+        response.status.should.equal(200);
+        return response.text();
+      })
+      .then(response => {
+        response.should.equal(String(date));
+      });
+  });
+
+  it('should not return a response when the URL includes a search parameter and ignoreSearch is false', function() {
+    const date = String(Date.now());
+    let iframe;
+    return swUtils.activateSW(serviceWorkersFolder + '/cache-only.js')
+      .then(newIframe => {
+        iframe = newIframe;
+      })
+      .then(() => {
+        return window.caches.open('test-cache-name');
+      })
+      .then(cache => {
+        return cache.put('/get-cache-value-ignore-search-false?k=v', new Response(date));
+      })
+      .then(() => {
+        return iframe.contentWindow.fetch('/get-cache-value-ignore-search-false');
+      })
+      .then(() => {
+        throw new Error('This should have rejected');
+      }, (error) => {
+        error.name.should.eql('TypeError');
+      });
+  });
 });
