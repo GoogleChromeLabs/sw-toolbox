@@ -27,3 +27,20 @@ importScripts('/test/data/skip-and-claim.js');
 self.toolbox.options.cache.name = 'test-cache-name';
 
 self.toolbox.router.get('/get-cache-value', self.toolbox.cacheOnly);
+self.toolbox.router.get('/get-cache-value-ignore-search-true', self.toolbox.cacheOnly, {
+  cache: {
+    name: 'test-cache-name',
+    queryOptions: {
+      ignoreSearch: true
+    }
+  }
+});
+
+self.toolbox.router.get('/get-cache-value-ignore-search-false', self.toolbox.cacheOnly, {
+  cache: {
+    name: 'test-cache-name',
+    queryOptions: {
+      ignoreSearch: false
+    }
+  }
+});

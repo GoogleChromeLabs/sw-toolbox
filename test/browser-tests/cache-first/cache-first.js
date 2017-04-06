@@ -106,4 +106,50 @@ describe('Test toolbox.cacheFirst', function() {
       responseText.trim().should.equal(TEST_INPUT);
     });
   });
+
+  it('should return a response when the URL includes a search parameter and ignoreSearch is true', function() {
+    const date = String(Date.now());
+    let iframe;
+    return swUtils.activateSW(serviceWorkersFolder + '/cache-first.js')
+      .then(newIframe => {
+        iframe = newIframe;
+      })
+      .then(() => {
+        return window.caches.open('test-cache-name');
+      })
+      .then(cache => {
+        return cache.put('/get-cache-value-ignore-search-true?k=v', new Response(date));
+      })
+      .then(() => {
+        return iframe.contentWindow.fetch('/get-cache-value-ignore-search-true');
+      })
+      .then(response => {
+        response.status.should.equal(200);
+        return response.text();
+      })
+      .then(response => {
+        response.should.equal(String(date));
+      });
+  });
+
+  it('should return a 404 Not Found response when the URL includes a search parameter and ignoreSearch is false', function() {
+    const date = String(Date.now());
+    let iframe;
+    return swUtils.activateSW(serviceWorkersFolder + '/cache-first.js')
+      .then(newIframe => {
+        iframe = newIframe;
+      })
+      .then(() => {
+        return window.caches.open('test-cache-name');
+      })
+      .then(cache => {
+        return cache.put('/get-cache-value-ignore-search-false?k=v', new Response(date));
+      })
+      .then(() => {
+        return iframe.contentWindow.fetch('/get-cache-value-ignore-search-false');
+      })
+      .then(response => {
+        response.status.should.eql(404);
+      });
+  });
 });

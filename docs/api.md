@@ -55,6 +55,22 @@ It can be used alone or in conjunction with `cache.maxEntries`.
 
 _Default_: `null`
 
+### cache.queryOptions [Object]
+If provided, this value will be passed in as the [`CacheQueryOptions`](https://developers.google.com/web/updates/2016/09/cache-query-options)
+whenever one of the handlers calls `cache.match()`. For example, setting
+
+```js
+cache: {
+  queryOptions: {
+    ignoreSearch: true
+  }
+}
+```
+
+will cause cache matching to ignore URL query parameters present in the request.
+
+_Default_: `null`
+
 ## Handlers
 
 There are five built-in handlers to cover the most common network strategies. For more information about offline strategies see the [Offline Cookbook](http://jakearchibald.com/2014/offline-cookbook/).

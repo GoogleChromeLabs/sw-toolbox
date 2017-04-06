@@ -12,6 +12,7 @@ declare module 'sw-toolbox' {
     name: string
     maxEntries?: number
     maxAgeSeconds?: number
+    queryOptions?: CacheQueryOptions
   }
   export interface Options {
     debug?: boolean
