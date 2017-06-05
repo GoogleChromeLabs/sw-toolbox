@@ -23,7 +23,7 @@
     "eslint": "^3.13.1",
     "eslint-config-google": "^0.7.1",
     "express": "^4.13.3",
-    "geckodriver": "^1.6.1",
+    "geckodriver": "1.6.1",
     "gulp": "^3.9.0",
     "gulp-eslint": "^3.0.1",
     "gulp-gh-pages": "^0.5.4",
