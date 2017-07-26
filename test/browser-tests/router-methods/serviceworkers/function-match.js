@@ -26,18 +26,9 @@ const method = self.getMethodToTest();
 
 self.toolbox.router[method](
   function(request) {
-    return request.indexOf('/ok') !== -1;
+    return request.url.indexOf('/ok') !== -1;
   },
-  function() {
-    return new Response('function match ok');
-  });
-
-self.toolbox.router[method](
   function(request) {
-    return request.indexOf('/err') !== -1;
-  },
-  function() {
-    return new Response('function match err');
+    return new Response(request.url);
   });
-
 
