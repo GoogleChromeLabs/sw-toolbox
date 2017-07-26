@@ -86,6 +86,24 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
         );
       });
 
+      it('should return the variable from a function pattern ok', () => {
+        return performTest(
+          method,
+          serviceWorkersFolder + '/function-match.js',
+          '/test/match/function/pattern/ok',
+          'function match ok'
+        );
+      });
+
+      it('should return the variable from a function pattern err', () => {
+        return performTest(
+          method,
+          serviceWorkersFolder + '/function-match.js',
+          '/test/match/function/pattern/err',
+          'function match err'
+        );
+      });
+
      // TODO: Find out correct behaviour https://github.com/GoogleChrome/sw-toolbox/issues/86
       it.skip('should throw an error for route with an origin defined in sw testing request for full url', () => {
         return performTest(
