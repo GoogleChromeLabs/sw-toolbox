@@ -12,8 +12,7 @@
   "main": "lib/sw-toolbox.js",
   "repository": "https://github.com/GoogleChrome/sw-toolbox",
   "dependencies": {
-    "path-to-regexp": "^1.0.1",
-    "serviceworker-cache-polyfill": "^4.0.0"
+    "path-to-regexp": "^1.0.1"
   },
   "devDependencies": {
     "browserify": "^13.1.0",
