@@ -57,6 +57,21 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
     });
   };
 
+  const performTestResIn = (method, swUrl, request, expectedString) => {
+    return swUtils.activateSW(swUrl + '?method=' + method)
+    .then(() => {
+      if (method === 'any') {
+        return Promise.all(
+          availableMethods.map(fetchMethod => {
+            return performFetch(fetchMethod, request.url, expectedString);
+          })
+        );
+      }
+
+      return performFetch(method, request.url, expectedString);
+    });
+  };
+
   const addMochaTests = method => {
     describe('Testing router.' + method, function() {
       it('should return response for absolute url', () => {
@@ -83,6 +98,17 @@ describe('Test router.{' + availableMethods.join(',') + '} methods', () => {
           serviceWorkersFolder + '/variable-match.js',
           '/test/match/echo-this/pattern',
           'echo-this'
+        );
+      });
+
+      it('should return the variable from a function pattern ok', () => {
+        return performTestResIn(
+          method,
+          serviceWorkersFolder + '/function-match.js',
+          {
+            url: '/test/match/function/pattern/ok'
+          },
+          location.origin + '/test/match/function/pattern/ok'
         );
       });
 
