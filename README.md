@@ -52,12 +52,6 @@ To understand how to use the toolbox read the [Usage](https://googlechrome.githu
 
 ## Support
 
-If you’ve found an error in this library, please file an issue at https://github.com/GoogleChrome/sw-toolbox/issues.
-
-Patches are encouraged, and may be submitted by forking this project and submitting a [pull request through this GitHub repo](https://github.com/GoogleChrome/sw-toolbox/pulls).
-
-## Support
-
 The team behind `sw-toolbox` and `sw-precache` have been busy creating [Workbox](https://workboxjs.org), which is a collection of libraries and tools that make it easy to build offline web apps. It’s a joining of [sw-toolbox](https://github.com/GoogleChrome/sw-toolbox) and [sw-precache](https://github.com/GoogleChrome/sw-precache) with more features and a modern codebase.
 
 ### What does this mean for sw-toolbox?
