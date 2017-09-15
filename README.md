@@ -58,15 +58,15 @@ Patches are encouraged, and may be submitted by forking this project and submitt
 
 ## Support
 
-The team behind sw-toolbox and sw-precache have been busy creating [Workbox](https://workboxjs.org), which is a collection of libraries and build tools that make it easy build offline web apps. It’s a joining of [sw-toolbox](https://github.com/GoogleChrome/sw-toolbox) and [sw-precache](https://github.com/GoogleChrome/sw-precache) with more features and a modern codebase.
+The team behind `sw-toolbox` and `sw-precache` have been busy creating [Workbox](https://workboxjs.org), which is a collection of libraries and tools that make it easy to build offline web apps. It’s a joining of [sw-toolbox](https://github.com/GoogleChrome/sw-toolbox) and [sw-precache](https://github.com/GoogleChrome/sw-precache) with more features and a modern codebase.
 
 ### What does this mean for sw-toolbox?
 
-For now, it means we’ll continue to support both sw-toolbox and sw-precache with critical bug fixes and releases. However, non-critical bugs are unlikely to be addressed.
+For now, it means we’ll continue to support both `sw-toolbox` and `sw-precache` with critical bug fixes and releases. However, non-critical bugs are unlikely to be addressed.
 
 ### Should you switch to Workbox?
 
-We would recommend Workbox for new projects, but there is no immediate need to switch if sw-toolbox / sw-precache meets all your needs in your current project. We will announce a deprecation plan for these modules once we are happy with Workbox.
+We would recommend Workbox for new projects, but there is no immediate need to switch if `sw-toolbox` / `sw-precache` meets all your needs in your current project. We will announce a deprecation plan for these modules once Workbox has feature parity with `sw-toolbox` and `sw-precache`.
 
 In the meantime, you can get updates by following [@workboxjs](https://twitter.com/workboxjs).
 
