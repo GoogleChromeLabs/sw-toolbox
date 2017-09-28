@@ -1,7 +1,7 @@
 (global => {
   'use strict';
 
-  // Load the sw-tookbox library.
+  // Load the sw-toolbox library.
   importScripts('/sw-toolbox.js');
 
   // Turn on debug logging, visible in the Developer Tools' console.
