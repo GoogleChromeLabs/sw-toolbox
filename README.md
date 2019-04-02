@@ -1,4 +1,4 @@
-# Deprecated
+# ⚠️ sw-toolbox ⚠️
 
 `sw-toolbox` and `sw-precache` are deprecated in favor of Workbox.
 Please read [this migration guide](https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-sw)
