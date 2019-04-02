@@ -1,6 +1,10 @@
-# Service Worker Toolbox
+# Deprecated
 
-[![Build Status](https://travis-ci.org/GoogleChrome/sw-toolbox.svg?branch=master)](https://travis-ci.org/GoogleChrome/sw-toolbox) [![Dependency Status](https://david-dm.org/googlechrome/sw-toolbox.svg)](https://david-dm.org/googlechrome/sw-toolbox) [![devDependencies Status](https://david-dm.org/googlechrome/sw-toolbox/dev-status.svg)](https://david-dm.org/googlechrome/sw-toolbox?type=dev)
+`sw-toolbox` and `sw-precache` are deprecated in favor of Workbox.
+Please read [this migration guide](https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-sw)
+for information on upgrading.
+
+## About
 
 > A collection of tools for [service workers](https://w3c.github.io/ServiceWorker/)
 
@@ -49,21 +53,6 @@ importScripts('bower_components/sw-toolbox/sw-toolbox.js');  // Update path to m
 ### Use the toolbox
 
 To understand how to use the toolbox read the [Usage](https://googlechromelabs.github.io/sw-toolbox/usage.html#main) and [API](https://googlechromelabs.github.io/sw-toolbox/api.html#main) documentation.
-
-## Support
-
-The team behind `sw-toolbox` and `sw-precache` have been busy creating [Workbox](https://workboxjs.org), which is a collection of libraries and tools that make it easy to build offline web apps. It’s a joining of [sw-toolbox](https://github.com/GoogleChrome/sw-toolbox) and [sw-precache](https://github.com/GoogleChrome/sw-precache) with more features and a modern codebase.
-
-### What does this mean for sw-toolbox?
-
-For now, it means we’ll continue to support both `sw-toolbox` and `sw-precache` with critical bug fixes and releases. However, non-critical bugs are unlikely to be addressed.
-
-### Should you switch to Workbox?
-
-We would recommend Workbox for new projects, but there is no immediate need to switch if `sw-toolbox` / `sw-precache` meets all your needs in your current project. We will announce a deprecation plan for these modules once Workbox has feature parity with `sw-toolbox` and `sw-precache`.
-
-In the meantime, you can get updates by following [@workboxjs](https://twitter.com/workboxjs).
-
 
 ## License
 
