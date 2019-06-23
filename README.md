@@ -56,7 +56,7 @@ To understand how to use the toolbox read the [Usage](https://googlechromelabs.g
 
 ## License
 
-Copyright 2015-2016 Google, Inc.
+Copyright 2015-2017 Google, Inc.
 
 Licensed under the [Apache License, Version 2.0](LICENSE) (the "License");
 you may not use this file except in compliance with the License. You may
